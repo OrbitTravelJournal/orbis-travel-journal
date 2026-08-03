@@ -1,0 +1,14 @@
+{
+  "name": "Orbis travel journal",
+  "short_name": "Orbis",
+  "description": "A calm travel journal for every journey.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f3ec",
+  "theme_color": "#274a40",
+  "icons": [
+    { "src": "assets/orbis-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

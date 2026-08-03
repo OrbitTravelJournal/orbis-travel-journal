@@ -1,0 +1,7 @@
+/* Ambient colour field sourced from the active day's first stop photo. */
+body.workspace-glass{--workspace-photo:none;--ambient-gradient:linear-gradient(135deg,#24251f,#111);--ambient-drift-x:0px;--ambient-drift-y:0px;position:relative;isolation:isolate;background:#000!important;overflow-x:hidden}
+body.workspace-glass:before{background:#000!important}
+body.workspace-glass:after{content:"";position:fixed;inset:-12%;z-index:0;pointer-events:none;background:linear-gradient(125deg,rgba(0,0,0,.72) 5%,rgba(0,0,0,.24) 45%,rgba(0,0,0,.62) 100%),radial-gradient(ellipse at 20% 10%,rgba(255,255,255,.2),transparent 48%),var(--workspace-photo),var(--ambient-gradient);background-size:cover;background-position:center;filter:blur(72px) saturate(.78);opacity:.86;transform:translate3d(var(--ambient-drift-x),var(--ambient-drift-y),0) scale(1.14);animation:ambient-photo-drift 26s ease-in-out infinite alternate}
+body.workspace-glass .shell{position:relative;z-index:1}
+@keyframes ambient-photo-drift{0%{background-position:42% 46%;transform:translate3d(-1.5%,0,0) scale(1.14)}50%{background-position:60% 54%;transform:translate3d(1%,1.2%,0) scale(1.18)}100%{background-position:48% 40%;transform:translate3d(-.5%,-1%,0) scale(1.14)}}
+@media(prefers-reduced-motion:reduce){body.workspace-glass:after{animation:none}}

@@ -1,0 +1,305 @@
+/* Tabi visual system: quiet charcoal, warm paper and landscape accents. */
+:root{
+  --ink:#e9eee8;
+  --forest:#91b878;
+  --deep:#171b18;
+  --muted:#b7c0b7;
+  --paper:#242a25;
+  --cream:#2b312c;
+  --stone:#aab3aa;
+  --line:rgba(233,238,232,.20);
+  --red:#d58a70;
+  --serif:'DM Sans',system-ui,sans-serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+}
+html,body{background:#121512!important;color:var(--ink)}
+body.workspace-glass{background:#121512!important;color:var(--ink)}
+body.workspace-glass .shell{background:transparent}
+body.workspace-glass .sidebar,
+body.workspace-glass .topbar{background:rgba(25,30,26,.94)!important;border-color:rgba(233,238,232,.14)!important;color:var(--ink)}
+body.workspace-glass .brand,
+body.workspace-glass .main-nav .nav-link,
+body.workspace-glass .location-label,
+body.workspace-glass .quiet-btn{color:var(--ink)!important}
+body.workspace-glass .orbis-brand{gap:9px;letter-spacing:.02em}
+body.workspace-glass .orbis-mark{width:34px;height:34px;color:#b8df9b;flex:none}
+body.workspace-glass .orbis-brand em{font-size:11px;letter-spacing:.04em;color:#b7c0b7}
+body.workspace-glass .main-nav .nav-link i{color:var(--stone)!important}
+body.workspace-glass .main-nav .nav-link.active{background:rgba(145,184,120,.22)!important;border-color:rgba(145,184,120,.55)!important;color:#f4f7f2!important}
+body.workspace-glass h1,body.workspace-glass h2,body.workspace-glass h3,body.workspace-glass h4,
+body.workspace-glass .workspace-welcome h1,body.workspace-glass .item-card h3{color:#f5f7f3!important}
+body.workspace-glass p,body.workspace-glass li,body.workspace-glass label,
+body.workspace-glass .item-card p,body.workspace-glass .hotel-card p{color:rgba(233,238,232,.84)!important}
+body.workspace-glass .eyebrow,body.workspace-glass small,body.workspace-glass .caption,
+body.workspace-glass .item-time small,body.workspace-glass .hotel-card small{color:rgba(183,192,183,.82)!important}
+body.workspace-glass .glass-panel,
+body.workspace-glass .workspace-trip-card,
+body.workspace-glass .booking-section,
+body.workspace-glass .hotel-card,
+body.workspace-glass .saved-card,
+body.workspace-glass .paper-card,
+body.workspace-glass .context-panel{background:rgba(38,45,39,.88)!important;border:1px solid rgba(233,238,232,.18)!important;color:var(--ink);box-shadow:0 18px 44px rgba(0,0,0,.22)}
+body.workspace-glass .workspace-trip-card:hover,
+body.workspace-glass .hotel-card:hover,
+body.workspace-glass .saved-card:hover{border-color:rgba(145,184,120,.62)!important;box-shadow:0 20px 52px rgba(0,0,0,.30)}
+body.workspace-glass .timeline-item .item-card{background:rgba(32,38,33,.92)!important;border-color:rgba(233,238,232,.20)!important;color:var(--ink)}
+body.workspace-glass .timeline-item.meal .item-card{border-left-color:#c77c61!important}
+body.workspace-glass .timeline-item.transport .item-card{border-left-color:#79a9d1!important}
+body.workspace-glass .timeline-item:not(.meal):not(.transport) .item-card{border-left-color:var(--forest)!important}
+body.workspace-glass .item-type{background:rgba(145,184,120,.20)!important;color:#d7e8cc!important}
+body.workspace-glass .timeline-item.meal .item-type{background:rgba(199,124,97,.23)!important;color:#f0c1ae!important}
+body.workspace-glass .timeline-item.transport .item-type{background:rgba(121,169,209,.22)!important;color:#c5def1!important}
+body.workspace-glass .place-drawer,
+body.workspace-glass .place-details{border-color:var(--line)!important}
+body.workspace-glass a,body.workspace-glass .link-btn,body.workspace-glass .text-action,
+body.workspace-glass .place-drawer summary,body.workspace-glass .route-link{color:#a9d48d!important}
+body.workspace-glass button{color:inherit}
+body.workspace-glass .primary-btn,
+body.workspace-glass .glass-button-accent,
+body.workspace-glass .floating-add{background:#dce75e!important;color:#20251f!important;border-color:#dce75e!important}
+body.workspace-glass .secondary-btn{border-color:rgba(145,184,120,.70)!important;color:#c3dfa9!important;background:transparent}
+/* Light accent surfaces need dark ink; this keeps links readable against lime/ice fills. */
+body.workspace-glass .primary-map-link,
+body.workspace-glass .navigate-stop,
+body.workspace-glass .glass-button-accent,
+body.workspace-glass .auto-enrich-stop{
+  color:#182018!important;
+}
+body.workspace-glass .primary-map-link{background:#91b878!important;border-color:#91b878!important}
+body.workspace-glass .navigate-stop{background:#e6eee8!important;border-color:transparent!important}
+body.workspace-glass .navigate-stop:hover,
+body.workspace-glass .primary-map-link:hover{background:#b8d89e!important;color:#182018!important}
+body.workspace-glass .trip-card-actions{display:flex;gap:8px;flex-wrap:wrap}
+body.workspace-glass .trip-card-actions button{min-width:0}
+body.workspace-glass .trip-card-actions .share-trip{border-color:rgba(230,212,77,.6)!important;color:#e6d44d!important;background:rgba(230,212,77,.10)!important}
+body.workspace-glass .trip-card-actions .share-trip:hover{background:rgba(230,212,77,.22)!important}
+body.workspace-glass #workspace-share-dialog,
+body.workspace-glass #workspace-import-dialog{width:min(560px,calc(100vw - 32px));padding:0;background:rgba(28,34,29,.72)!important;color:#eef3ec;border:1px solid rgba(233,238,232,.32);border-radius:28px;backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);box-shadow:0 24px 80px rgba(0,0,0,.56)}
+body.workspace-glass #workspace-share-dialog form,
+body.workspace-glass #workspace-import-dialog form{background:transparent!important;border:0!important;box-shadow:none!important;padding:30px}
+body.workspace-glass #workspace-share-dialog h2,
+body.workspace-glass #workspace-import-dialog h2{color:#f5f7f3!important;margin-bottom:12px}
+body.workspace-glass #workspace-share-dialog input{background:rgba(255,255,255,.08)!important;color:#f5f7f3!important;border-color:rgba(233,238,232,.28)!important;border-radius:12px}
+body.workspace-glass .workspace-share-actions{display:flex;align-items:center;gap:10px;margin-top:14px}
+body.workspace-glass .workspace-share-actions .primary-btn{width:auto;margin:0;border-radius:12px}
+body.workspace-glass .workspace-share-email{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 16px;border:1px solid rgba(233,238,232,.35);border-radius:12px;text-decoration:none;color:#eef3ec!important}
+body.workspace-glass .workspace-import-preview{display:flex;gap:18px;padding:16px 0;margin:14px 0;border-top:1px solid rgba(233,238,232,.20);border-bottom:1px solid rgba(233,238,232,.20);color:#c3d0c2}
+body.workspace-glass .workspace-import-preview b{color:#e6d44d}
+body.workspace-glass .workspace-import-preview span{color:rgba(233,238,232,.72)}
+body.workspace-glass input,body.workspace-glass select{background:#242a25!important;color:#eef3ec!important;border-color:rgba(233,238,232,.28)!important}
+body.workspace-glass dialog form{background:#242a25!important;color:#eef3ec!important;border-color:rgba(233,238,232,.24)!important}
+body.workspace-glass input::placeholder,body.workspace-glass textarea::placeholder{color:#aeb9ae!important}
+body.workspace-glass dialog h2,body.workspace-glass dialog label,body.workspace-glass dialog p{color:#eef3ec!important}
+body.workspace-glass dialog .close-modal,body.workspace-glass dialog .cancel-add{color:#b7c0b7!important}
+body.workspace-glass .status{background:rgba(145,184,120,.22)!important;color:#cfe5be!important}
+body.workspace-glass .hotel-list .hotel-card{border-left:3px solid #d8c39e!important}
+body.workspace-glass .hotel-list .hotel-remove-photo{color:#d58a70!important;border-color:rgba(213,138,112,.55)!important}
+body.workspace-glass .google-saved-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.75fr);gap:0;background:rgba(38,45,39,.88)!important}
+body.workspace-glass .google-saved-embed{min-height:520px;background:#1d241f}
+body.workspace-glass .google-saved-embed iframe{display:block;width:100%;height:100%;min-height:520px;border:0;filter:saturate(.9)}
+body.workspace-glass .google-saved-detail{padding:28px;background:rgba(28,34,29,.72);color:var(--ink)}
+body.workspace-glass .google-saved-tabs{display:flex;gap:8px;overflow:auto;padding:12px 16px;background:rgba(17,21,18,.72);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+body.workspace-glass .google-saved-tab{flex:none;border:1px solid rgba(233,238,232,.25);border-radius:999px;padding:8px 13px;background:transparent;color:rgba(233,238,232,.72);font:11px var(--sans);cursor:pointer}
+body.workspace-glass .google-saved-tab.is-active{background:#91b878;color:#182018;border-color:#91b878}
+body.workspace-glass .saved-google-rating{margin:8px 0 0;color:#e6d44d!important;font-size:13px}
+body.workspace-glass .saved-google-rating-muted{color:#b7c0b7!important;font-size:11px}
+body.workspace-glass .saved-card-rating{color:#e6d44d!important}
+body.workspace-glass .google-world-layout{grid-template-columns:minmax(0,1.55fr) minmax(300px,.72fr);min-height:520px;background:rgba(38,45,39,.88)!important}
+body.workspace-glass .google-world-layout .saved-leaflet-map{min-height:520px;background:#1c2924}
+/* Re-tint the public map tiles to match Orbis' charcoal / moss palette while
+   keeping the underlying geographic detail, zoom controls and markers intact. */
+body.workspace-glass .google-world-layout .saved-leaflet-map .leaflet-tile-pane{filter:grayscale(.78) sepia(.16) hue-rotate(52deg) saturate(.58) brightness(.62) contrast(1.08)}
+body.workspace-glass .google-world-layout .saved-leaflet-map .leaflet-control-container{filter:none}
+body.workspace-glass .google-world-layout .leaflet-control-zoom a{background:#26342c;color:#dcebd4;border-color:rgba(233,238,232,.22)}
+body.workspace-glass .google-world-layout .leaflet-popup-content-wrapper{background:#202a23;color:#eef3ec;border:1px solid rgba(233,238,232,.25);border-radius:14px}
+body.workspace-glass .google-world-layout .leaflet-popup-tip{background:#202a23}
+body.workspace-glass .orbis-leaflet-icon{background:transparent!important;border:0!important}
+body.workspace-glass .orbis-leaflet-orbit{position:relative;display:grid;place-items:center;width:34px;height:34px;border:2px solid #b8df9b;border-radius:50%;background:#1d2c23;box-shadow:0 5px 18px rgba(0,0,0,.45);transition:transform .18s ease,background .18s ease}
+body.workspace-glass .orbis-leaflet-orbit:before{content:"";position:absolute;inset:5px;border:1px solid rgba(230,212,77,.9);border-radius:50%;transform:rotate(-30deg) scaleX(1.45)}
+body.workspace-glass .orbis-leaflet-orbit:after{content:"";position:absolute;width:5px;height:5px;right:1px;top:3px;border-radius:50%;background:#e6d44d}
+body.workspace-glass .orbis-leaflet-orbit span{position:relative;z-index:1;color:#f4f7f2;font-size:18px;line-height:1}
+body.workspace-glass .orbis-leaflet-orbit:hover,body.workspace-glass .orbis-leaflet-orbit.is-selected{background:#91b878;color:#182018;transform:scale(1.16)}
+@media(max-width:760px){body.workspace-glass .google-saved-layout,body.workspace-glass .google-world-layout{grid-template-columns:1fr}body.workspace-glass .google-saved-embed,body.workspace-glass .google-saved-embed iframe,body.workspace-glass .google-world-layout .saved-leaflet-map{min-height:360px}}
+body.workspace-glass .saved-card{border-left:3px solid var(--forest)!important}
+body.workspace-glass .avatar{background:#d8a98f!important;color:#242923!important}
+body.workspace-glass .nearby-pick,
+body.workspace-glass .finder-card,
+body.workspace-glass .search-result,
+body.workspace-glass .finder-think{background:#2b322c!important;border-color:rgba(233,238,232,.18)!important;color:#f1f5ef!important}
+body.workspace-glass .nearby-pick b,
+body.workspace-glass .nearby-pick small,
+body.workspace-glass .finder-card b,
+body.workspace-glass .finder-card small,
+body.workspace-glass .search-result b,
+body.workspace-glass .search-result span{color:#eef3ec!important}
+body.workspace-glass .nearby-pick button{background:transparent!important;color:#b8df9b!important;border-color:#91b878!important}
+body.workspace-glass .auto-enrich-stop,
+body.workspace-glass .enrich-btn{background:#91b878!important;color:#182018!important;border-color:#91b878!important}
+body.workspace-glass textarea{background:#242a25!important;color:#eef3ec!important;border-color:rgba(233,238,232,.28)!important}
+body.workspace-glass textarea::placeholder{color:#aeb9ae!important}
+body.workspace-glass .mobile-menu-panel{background:#242a25!important;border-color:rgba(233,238,232,.24)!important;color:#eef3ec!important}
+body.workspace-glass .mobile-menu-panel p,
+body.workspace-glass .mobile-menu-panel button{color:#eef3ec!important}
+body.workspace-glass .mobile-menu-panel button:hover,
+body.workspace-glass .mobile-menu-panel button:focus-visible{background:rgba(145,184,120,.18)!important;color:#b8df9b!important}
+/* Balance the itinerary's right rail into three intentional, equal-weight bubbles. */
+body.workspace-glass #itinerary .context-panel{border:0!important;padding:0!important;margin:0!important;background:transparent!important;background-image:none!important;box-shadow:none!important;display:flex;flex-direction:column;gap:14px;align-self:start;justify-self:stretch;align-items:stretch}
+body.workspace-glass #itinerary .context-panel .place-glance,
+body.workspace-glass #itinerary .context-panel .route-link,
+body.workspace-glass #itinerary .context-panel .hotel-context{margin:0;border:1px solid rgba(233,238,232,.20)!important;border-radius:24px!important;background:rgba(38,45,39,.88)!important;box-sizing:border-box}
+body.workspace-glass #itinerary .context-panel .place-glance{min-height:206px;padding:28px 30px;display:flex;align-items:flex-end}
+body.workspace-glass #itinerary .context-panel .place-glance b{font-size:clamp(22px,1.8vw,32px);line-height:1.08;color:#f5f7f3!important}
+body.workspace-glass #itinerary .context-panel .route-link{min-height:76px;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;font-size:14px}
+body.workspace-glass #itinerary .context-panel .place-glance,
+body.workspace-glass #itinerary .context-panel .route-link,
+body.workspace-glass #itinerary .context-panel .hotel-context{background:rgba(83,89,84,.48)!important;border-color:rgba(190,198,190,.28)!important;text-align:left}
+body.workspace-glass #itinerary .context-panel .hotel-context{min-height:180px;padding:28px 30px}
+body.workspace-glass #itinerary .context-panel .hotel-context b{font-size:24px;color:#f5f7f3!important}
+body.workspace-glass #itinerary .context-panel .hotel-context button{color:#c0d0bb!important}
+body.workspace-glass #itinerary .context-panel .route-link{color:#c5d0c3!important}
+body.workspace-glass #itinerary #place-glance,
+body.workspace-glass #itinerary #today-route-link{display:none!important}
+body.workspace-glass #itinerary .timeline-side .notice{display:none!important}
+body.workspace-glass #itinerary .timeline-side .weather,
+body.workspace-glass #itinerary .timeline-side dl,
+body.workspace-glass #itinerary .context-panel .hotel-context{min-height:214px;height:214px;box-sizing:border-box;align-self:stretch}
+body.workspace-glass #itinerary .context-panel{justify-content:flex-start}
+body.workspace-glass #itinerary .context-panel .hotel-context{width:100%;align-self:stretch}
+body.workspace-glass #itinerary > .nearby-picks{width:100%;max-width:none;margin:42px 0 10px;padding:28px 0 0;border-top:1px solid var(--line)}
+body.workspace-glass #itinerary > .nearby-picks .pick-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+body.workspace-glass #itinerary > .nearby-picks .nearby-pick{min-height:62px}
+@media(max-width:700px){body.workspace-glass #itinerary > .nearby-picks .pick-list{grid-template-columns:1fr}}
+@media(max-width:920px){body.workspace-glass #itinerary .timeline-side .weather,body.workspace-glass #itinerary .timeline-side dl,body.workspace-glass #itinerary .context-panel .hotel-context{min-height:0;height:auto}}
+@media(max-width:580px){body.workspace-glass .mobile-nav{background:#1b211c!important;border-color:var(--line)!important}body.workspace-glass .mobile-nav a{color:var(--muted)!important}body.workspace-glass .mobile-nav a.active{color:#b5da98!important}}
+
+/* A contained bookmark affordance shared by saved places and itinerary stops. */
+body.workspace-glass .save-stop{
+  width:34px!important;height:34px!important;padding:0!important;margin:0!important;
+  display:grid!important;place-items:center!important;box-sizing:border-box!important;
+  border:1px solid rgba(233,238,232,.34)!important;border-radius:10px!important;
+  background:rgba(20,25,21,.42)!important;color:transparent!important;
+  overflow:hidden!important;flex:none!important;
+}
+body.workspace-glass .bookmark-glyph{
+  display:block;width:16px;height:20px;flex:none;
+  background:#c0c8be;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.5 3h13v18l-6.5-4.5L5.5 21V3Z' fill='none' stroke='black' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.5 3h13v18l-6.5-4.5L5.5 21V3Z' fill='none' stroke='black' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+body.workspace-glass .save-stop.saved{
+  border-color:rgba(230,212,77,.7)!important;background:rgba(230,212,77,.12)!important;
+}
+body.workspace-glass .save-stop.saved .bookmark-glyph,
+body.workspace-glass .bookmark-glyph.is-saved{background:#e6d44d}
+body.workspace-glass .save-stop:hover,body.workspace-glass .save-stop:focus-visible{
+  border-color:#e6d44d!important;outline:2px solid rgba(230,212,77,.24);outline-offset:2px;
+}
+body.workspace-glass .saved-card summary>span{display:flex;align-items:center;gap:8px}
+body.workspace-glass .saved-card summary .bookmark-glyph{width:14px;height:18px}
+
+/* Booking photos dissolve in from the left so the copy stays legible while the
+   right side carries the visual memory of the stay. */
+body.workspace-glass .hotel-list .hotel-card:before{
+  background-image:linear-gradient(90deg,
+    rgba(8,10,10,.94) 0%,
+    rgba(8,10,10,.82) 34%,
+    rgba(8,10,10,.48) 62%,
+    rgba(8,10,10,.10) 80%,
+    rgba(8,10,10,.04) 100%),var(--hotel-photo)!important;
+  background-position:center;background-size:cover;background-repeat:no-repeat;
+  opacity:.84!important;
+}
+body.workspace-glass .hotel-list .hotel-card-photo{
+  position:absolute;inset:0 0 0 30%;z-index:0;width:70%;height:100%;
+  object-fit:cover;object-position:center;opacity:.92;filter:saturate(.9) contrast(1.02);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.18) 12%,#000 34%,#000 100%);
+  mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.18) 12%,#000 34%,#000 100%);
+  pointer-events:none;
+}
+body.workspace-glass .hotel-list .hotel-photo-slot{cursor:pointer!important}
+body.workspace-glass .hotel-list .hotel-photo-slot:hover,
+body.workspace-glass .hotel-list .hotel-photo-slot:focus-visible{
+  border-color:#e6d44d!important;background:rgba(230,212,77,.18)!important;outline:0;
+}
+
+/* Keep the assistant quiet until it is needed: a small AI sparkle opens the glass panel. */
+body.workspace-glass .ai-assistant-orb{
+  position:fixed;right:32px;bottom:88px;z-index:81;width:48px;height:48px;
+  display:grid;place-items:center;border:1px solid rgba(233,238,232,.42);
+  border-radius:18px;background:rgba(35,43,37,.72);color:#e6d44d;
+  box-shadow:0 16px 38px rgba(0,0,0,.42);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  transition:transform .2s ease,background .2s ease,border-color .2s ease;
+}
+body.workspace-glass .ai-assistant-orb span{font-size:27px;line-height:1;text-shadow:0 0 18px rgba(230,212,77,.45)}
+body.workspace-glass .ai-assistant-orb:hover,body.workspace-glass .ai-assistant-orb:focus-visible{
+  transform:translateY(-3px) scale(1.04);background:rgba(87,103,76,.88);border-color:#e6d44d;outline:0;
+}
+body.workspace-glass .ai-planner.global-ai-dialog[hidden]{display:none!important}
+body.workspace-glass .ai-planner.global-ai-dialog{
+  position:fixed;right:24px;bottom:24px;z-index:80;width:min(390px,calc(100vw - 32px));
+  margin:0;padding:24px;background:rgba(28,34,29,.64)!important;
+  border:1px solid rgba(233,238,232,.28)!important;border-radius:28px!important;
+  box-shadow:0 24px 80px rgba(0,0,0,.54)!important;
+  backdrop-filter:blur(30px) saturate(1.1)!important;-webkit-backdrop-filter:blur(30px) saturate(1.1)!important;
+}
+body.workspace-glass .ai-planner.global-ai-dialog .ai-dialog-close{
+  position:absolute;top:14px;right:16px;border:0;background:transparent;color:rgba(238,244,237,.68);
+  font-size:25px;line-height:1;padding:3px 6px;cursor:pointer;
+}
+body.workspace-glass .ai-planner.global-ai-dialog .ai-dialog-close:hover,
+body.workspace-glass .ai-planner.global-ai-dialog .ai-dialog-close:focus-visible{color:#e6d44d;outline:0}
+@media(max-width:580px){
+  body.workspace-glass .ai-assistant-orb{right:18px;bottom:84px;width:48px;height:48px;border-radius:16px}
+  body.workspace-glass .ai-planner.global-ai-dialog{right:12px;bottom:78px;width:calc(100vw - 24px);padding:20px;border-radius:24px!important}
+}
+
+/* Trip covers are intentionally quiet: a blurred 30% visual layer behind the card copy. */
+body.workspace-glass .workspace-trip-card{isolation:isolate}
+body.workspace-glass .workspace-trip-card:before{z-index:0!important;opacity:.30!important;filter:blur(12px) saturate(.9)!important;transform:scale(1.05);background:radial-gradient(circle at 78% 20%,color-mix(in srgb,var(--trip-color,#91b878) 78%,white 22%),transparent 64%),linear-gradient(135deg,color-mix(in srgb,var(--trip-color,#91b878) 34%,#121512 66%),#121512)!important}
+body.workspace-glass .workspace-trip-card>*{position:relative;z-index:1}
+body.workspace-glass .trip-menu-wrap{position:relative;z-index:3}
+body.workspace-glass .trip-card-menu{position:absolute;right:10px;top:48px;z-index:100;width:178px;padding:6px;background:rgba(23,28,24,.98);border:1px solid rgba(233,238,232,.34);border-radius:14px;box-shadow:0 16px 36px rgba(0,0,0,.55);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+body.workspace-glass .workspace-trip-card:has(.trip-card-menu:not([hidden])) h2{max-width:42%!important}
+body.workspace-glass .workspace-trip-card .trip-card-top{position:relative;z-index:10}
+body.workspace-glass .workspace-trip-card:has(.trip-card-menu:not([hidden])){overflow:visible!important}
+body.workspace-glass .trip-card-menu[hidden]{display:none}
+body.workspace-glass .trip-card-menu button{display:block;width:100%;padding:10px 11px;border:0;border-radius:9px;background:transparent;color:#eef3ec!important;text-align:left;font-size:12px}
+body.workspace-glass .trip-card-menu button:hover,body.workspace-glass .trip-card-menu button:focus-visible{background:rgba(145,184,120,.18);color:#dce75e!important;outline:0}
+body.workspace-glass .trip-color-picker{display:flex!important;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:10px 11px;border-radius:9px;color:#eef3ec!important;text-align:left;font:12px var(--sans);cursor:pointer;box-sizing:border-box}
+body.workspace-glass .trip-color-picker:hover{background:rgba(145,184,120,.18);color:#dce75e!important}
+body.workspace-glass .trip-color-picker input{width:28px!important;height:22px!important;padding:0!important;border:1px solid rgba(255,255,255,.45)!important;border-radius:6px!important;background:transparent!important;cursor:pointer}
+/* The presence dot belongs only to the first status span; the account name
+   must remain normal inline text (the base selector used to style both). */
+body.workspace-glass .presence>span:first-child{width:7px;height:7px;border-radius:50%;display:inline-block;background:#4d7d65;margin-right:5px}
+body.workspace-glass .presence>#workspace-user-name{width:auto;height:auto;border-radius:0;display:inline;color:inherit;background:transparent;margin:0}
+body.workspace-glass .trip-card-top .trip-menu-wrap{display:flex;align-items:center;gap:8px}
+body.workspace-glass .workspace-trip-card .trip-card-top{align-items:center!important}
+body.workspace-glass .trip-favorite{width:34px;height:34px;display:grid;place-items:center;padding:0;margin:0;border:1px solid rgba(233,238,232,.28);border-radius:50%;background:rgba(0,0,0,.14);color:rgba(233,238,232,.86);font:22px/1 var(--sans);cursor:pointer;box-sizing:border-box}
+body.workspace-glass .trip-favorite:hover,body.workspace-glass .trip-favorite.is-favorite{color:#e6d44d;border-color:#e6d44d;background:rgba(230,212,77,.14)}
+body.workspace-glass .trip-menu{display:grid;place-items:center;padding:0;line-height:1;align-self:center}
+body.workspace-glass .visited-stop{width:28px;height:28px;display:grid;place-items:center;padding:0;margin:0;border:1px solid rgba(233,238,232,.32);border-radius:50%;background:rgba(0,0,0,.12);color:rgba(233,238,232,.72);font:14px/1 var(--sans);cursor:pointer}
+body.workspace-glass .visited-stop:hover,body.workspace-glass .visited-stop.is-visited{background:#dce75e;border-color:#dce75e;color:#20251f}
+body.workspace-glass .journal-page{max-width:1370px}
+body.workspace-glass .journal-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;border-bottom:1px solid rgba(233,238,232,.2);padding-bottom:28px;margin-bottom:24px}
+body.workspace-glass .journal-head h1{margin:10px 0;font-size:clamp(46px,7vw,84px)}
+body.workspace-glass .journal-head>div>p:last-child{max-width:540px;color:rgba(233,238,232,.72)!important}
+body.workspace-glass .journal-map-shell{overflow:hidden;border:1px solid rgba(233,238,232,.22);border-radius:26px;background:rgba(38,45,39,.72);margin-bottom:24px}
+body.workspace-glass .journal-map-head{display:flex;align-items:flex-end;justify-content:space-between;padding:22px 26px;border-bottom:1px solid rgba(233,238,232,.18)}
+body.workspace-glass .journal-map-head h2{margin:7px 0 0;font-size:28px}
+body.workspace-glass .journal-map-head>span{color:#e6d44d;font:11px var(--mono);text-transform:uppercase;letter-spacing:.08em}
+body.workspace-glass #journal-map{height:360px;background:#1c2924}
+body.workspace-glass #journal-map .leaflet-tile-pane{filter:grayscale(.78) sepia(.16) hue-rotate(52deg) saturate(.58) brightness(.62) contrast(1.08)}
+body.workspace-glass .journal-map-empty,.journal-empty{padding:46px;text-align:center;color:rgba(233,238,232,.6);font-size:13px}
+body.workspace-glass .journal-list{display:grid;gap:14px;padding-bottom:70px}
+body.workspace-glass .journal-entry{display:grid;grid-template-columns:minmax(220px,.72fr) minmax(0,1.28fr);gap:24px;padding:22px;border:1px solid rgba(233,238,232,.2);border-radius:24px;background:rgba(38,45,39,.82);box-shadow:0 16px 42px rgba(0,0,0,.18)}
+body.workspace-glass .journal-entry h2{margin:8px 0 6px;font-size:27px}
+body.workspace-glass .journal-entry-copy p{margin:0 0 8px;color:rgba(233,238,232,.72)!important}
+body.workspace-glass .journal-entry-copy small{color:rgba(183,192,183,.76)!important}
+body.workspace-glass .journal-photos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-content:start}
+body.workspace-glass .journal-photos figure,.journal-photo-add{position:relative;aspect-ratio:1.25;margin:0;border:1px dashed rgba(233,238,232,.3);border-radius:14px;overflow:hidden;background:rgba(0,0,0,.16)}
+body.workspace-glass .journal-photos img{width:100%;height:100%;object-fit:cover;display:block}
+body.workspace-glass .journal-photos figure button{position:absolute;top:6px;right:6px;width:23px;height:23px;border:0;border-radius:50%;background:rgba(16,20,17,.72);color:#fff;cursor:pointer}
+body.workspace-glass .journal-photo-add{display:grid;place-items:center;align-content:center;gap:4px;color:#dce75e;font-size:26px;cursor:pointer}
+body.workspace-glass .journal-photo-add span{font:10px var(--mono);color:rgba(233,238,232,.62)}
+body.workspace-glass .journal-photo-add input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+@media(max-width:760px){body.workspace-glass .journal-head{display:block}.journal-head .glass-button{margin-top:14px}.journal-entry{grid-template-columns:1fr!important}.journal-photos{grid-template-columns:repeat(3,minmax(0,1fr))!important}body.workspace-glass #journal-map{height:300px}}

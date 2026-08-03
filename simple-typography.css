@@ -1,0 +1,34 @@
+/* Clean editorial sans typography inspired by the supplied plant magazine. */
+body.workspace-glass,
+body.workspace-glass *{
+  font-family:"DM Sans","Noto Sans JP",Arial,sans-serif!important;
+}
+body.workspace-glass h1,
+body.workspace-glass h2,
+body.workspace-glass h3,
+body.workspace-glass h4,
+body.workspace-glass .brand,
+body.workspace-glass .workspace-trip-card h2,
+body.workspace-glass .hotel-copy b,
+body.workspace-glass .saved-card summary b,
+body.workspace-glass .restaurant-booking b{
+  font-weight:600!important;
+  letter-spacing:-.045em!important;
+}
+body.workspace-glass h1 i,
+body.workspace-glass h2 i,
+body.workspace-glass h3 i{
+  font-family:inherit!important;
+  font-style:normal!important;
+  font-weight:400!important;
+}
+body.workspace-glass .eyebrow,
+body.workspace-glass .location-label,
+body.workspace-glass .item-type,
+body.workspace-glass .item-time,
+body.workspace-glass .date-tab small,
+body.workspace-glass .day-row span,
+body.workspace-glass .day-row em{
+  letter-spacing:.12em!important;
+  font-weight:500!important;
+}

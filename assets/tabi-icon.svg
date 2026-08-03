@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Tabi for two">
+  <rect width="512" height="512" rx="112" fill="#274a40"/>
+  <circle cx="256" cy="256" r="157" fill="#f7f3ec"/>
+  <circle cx="256" cy="256" r="91" fill="#b55d4d"/>
+  <path d="M137 314c49-35 91-51 119-51s70 16 119 51" fill="none" stroke="#274a40" stroke-width="18" stroke-linecap="round"/>
+  <text x="256" y="285" text-anchor="middle" font-family="Georgia, serif" font-size="142" fill="#f7f3ec">日</text>
+</svg>

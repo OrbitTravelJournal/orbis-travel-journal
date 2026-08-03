@@ -1,0 +1,29 @@
+/* Reverted visual baseline: pure black field with a brighter travel green. */
+:root{
+  --ink:#8fbd73;
+  --forest:#8fbd73;
+  --deep:#8fbd73;
+  --muted:#b8c9ad;
+  --luma-kite:#8fbd73;
+}
+body.workspace-glass,
+body.workspace-glass:before,
+body.workspace-glass:after{background:#000!important}
+body.workspace-glass:before,
+body.workspace-glass:after{display:none!important}
+body.workspace-glass .main-nav .nav-link,
+body.workspace-glass .location-label,
+body.workspace-glass .eyebrow,
+body.workspace-glass .link-btn,
+body.workspace-glass .text-action,
+body.workspace-glass .route-caption,
+body.workspace-glass .saved-card a,
+body.workspace-glass .hotel-card a,
+body.workspace-glass .ai-planner,
+body.workspace-glass .item-card a{color:#8fbd73!important}
+body.workspace-glass .main-nav .nav-link.active{background:rgba(143,189,115,.18)!important;border-color:rgba(143,189,115,.42)!important}
+body.workspace-glass .timeline-item .item-card,
+body.workspace-glass .hotel-list .hotel-card,
+body.workspace-glass .saved-card,
+body.workspace-glass .booking-section,
+body.workspace-glass .workspace-trip-card{border-color:rgba(143,189,115,.42)!important}

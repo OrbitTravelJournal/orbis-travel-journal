@@ -1,0 +1,50 @@
+/* iOS Safari zooms the viewport when a focused form control is below 16px. */
+@media (max-width: 920px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  .ai-planner input,
+  .item-time-input {
+    font-size: 16px !important;
+  }
+
+  /* Keep essential itinerary controls available to touch, rather than hover-only. */
+  .timeline-item .item-menu {
+    opacity: 1;
+    min-width: 36px;
+    min-height: 36px;
+    padding: 6px;
+  }
+
+  .timeline-item .item-card:has(.action-popover) {
+    overflow: visible;
+  }
+
+  .timeline-item .action-popover {
+    top: 36px;
+    z-index: 12;
+    width: 164px;
+    padding: 6px;
+  }
+
+  .timeline-item .action-popover button {
+    min-height: 42px;
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  dialog {
+    width: min(720px, calc(100vw - 20px));
+    max-height: min(78dvh, 720px);
+    margin: auto;
+  }
+
+  dialog form {
+    max-height: min(78dvh, 720px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

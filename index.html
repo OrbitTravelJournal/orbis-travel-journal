@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6f2eb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Orbis" />
+    <title>Orbis — travel journal</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="./assets/orbis-icon.svg" />
+    <link rel="apple-touch-icon" href="./assets/orbis-icon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css?v=20260726-hidden-file-inputs" />
+    <link rel="stylesheet" href="./refinements.css" />
+    <link rel="stylesheet" href="./features.css" />
+    <link rel="stylesheet" href="./live-tools.css" />
+    <link rel="stylesheet" href="./no-budget.css" />
+    <link rel="stylesheet" href="./links-refine.css" />
+    <link rel="stylesheet" href="./mobile-inputs.css?v=20260726-mobile-stability" />
+    <link rel="stylesheet" href="./itinerary-cards.css?v=20260726-mobile-card-fix" />
+    <link rel="stylesheet" href="./nearby-picks.css" />
+    <link rel="stylesheet" href="./nearby-picks-refine.css?v=20260726-mobile-recommendations-below" />
+    <link rel="stylesheet" href="./saved-places.css?v=20260726-real-saved-map" />
+    <link rel="stylesheet" href="./visual-refinement.css?v=20260726-clean-heart" />
+    <link rel="stylesheet" href="./bookings.css?v=20260726-stay-dates" />
+    <link rel="stylesheet" href="./glass-workspace.css?v=20260803-multi-user" />
+    <link rel="stylesheet" href="./itinerary-glass.css?v=20260803-photo-bubbles" />
+    <link rel="stylesheet" href="./glass-overrides.css?v=20260803-full-photo-vertical-gradient" />
+    <link rel="stylesheet" href="./ambient-background.css?v=20260803-flowing-photo-gradient" />
+    <link rel="stylesheet" href="./simple-typography.css?v=20260803-clean-sans" />
+    <link rel="stylesheet" href="./luma-palette.css?v=20260803-luma-colors" />
+    <link rel="stylesheet" href="./bright-green-black.css?v=20260803-bright-green-black" />
+    <link rel="stylesheet" href="./harmonious-theme.css?v=20260803-journal-checkins" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar" aria-label="Primary navigation">
+        <a class="brand orbis-brand" href="#trips" data-page="trips" aria-label="Orbis travel journal"><svg class="orbis-mark" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><ellipse cx="18" cy="18" rx="16" ry="6.5" fill="none" stroke="currentColor" stroke-width="1.5" transform="rotate(-24 18 18)"/><circle cx="29" cy="10" r="2.5" fill="currentColor"/></svg><span>Orbis<br><em>travel journal</em></span></a>
+        <nav class="main-nav">
+          <a class="nav-link active" href="#trips" data-page="trips"><i>01</i> Trips</a>
+          <a class="nav-link" href="#itinerary" data-page="itinerary"><i>02</i> Itinerary</a>
+          <a class="nav-link" href="#map" data-page="map"><i>03</i> Route map</a>
+          <a class="nav-link" href="#restaurants" data-page="restaurants"><i>04</i> Saved places</a>
+          <a class="nav-link" href="#stays" data-page="stays"><i>05</i> Stays & bookings</a>
+          <a class="nav-link" href="#journal" data-page="journal"><i>06</i> Journal</a>
+        </nav>
+        <div class="side-foot"><div class="presence"><span></span> <span id="workspace-user-name">Evon & Ivan</span></div><p id="workspace-trip-caption">Private trip<br>29 Oct — 08 Nov 2026</p><button class="glass-text-button" id="workspace-sign-out" type="button">Sign out</button></div>
+      </aside>
+
+      <main>
+        <header class="topbar"><button class="mobile-menu" aria-label="Open menu">☰</button><span class="location-label" id="top-location">TRIP OVERVIEW</span><div class="top-actions"><div class="language-switch" aria-label="Language"><button data-lang="en" class="active">EN</button><button data-lang="zh">中文</button><button data-lang="ja">日本語</button></div><button class="quiet-btn" id="open-search">⌘ K&nbsp; Search</button><button class="avatar workspace-avatar" id="workspace-profile" aria-label="Open account menu">E</button></div></header>
+
+        <section class="page active" id="dashboard">
+          <section class="workspace-welcome glass-panel" aria-label="Your travel workspace"><div><p class="eyebrow">YOUR TRAVEL JOURNAL</p><h1>your journey,<br><i>your story.</i></h1><p class="workspace-welcome-copy" id="workspace-welcome-copy">A calm place for every trip, detail and memory.</p></div><div class="workspace-welcome-actions"><button type="button" class="glass-button glass-button-accent" id="workspace-new-trip">+ New trip</button><button type="button" class="glass-button" data-go="trips">View all trips <span>↗</span></button></div></section>
+          <div class="hero editorial-rule">
+            <div><p class="eyebrow">PRIVATE JOURNEY · AUTUMN 2026</p><h1>Japan <i>for two</i></h1><p class="route">Osaka · Kyoto · Amanohashidate · Kinosaki · Awaji</p></div>
+            <div class="hero-date"><span>29 OCT</span><b>—</b><span>08 NOV</span><small>11 days · 2 travellers</small></div>
+          </div>
+          <section class="snapshot" aria-label="Trip snapshot">
+            <article><span>DEPARTURE</span><strong id="countdown">—</strong><small>days to go</small></article>
+            <article><span>STAYS</span><strong>6<span>/6</span></strong><small>confirmed</small></article>
+            <article><span>SAVED</span><strong>28</strong><small>places to eat</small></article>
+          </section>
+          <section class="enrich-strip" aria-label="Complete place details">
+            <div><p class="eyebrow">PLACE DETAILS</p><b>Make the itinerary easier to recognise.</b><small id="enrich-status">Find a photo and official website when there is a confident public match. Your existing links stay untouched.</small></div>
+            <button class="enrich-btn" id="auto-enrich" type="button">Auto-fill places <span>↗</span></button>
+          </section>
+          <div class="dashboard-grid">
+            <section class="today-panel paper-card">
+              <div class="section-head"><div><p class="eyebrow">NEXT UP</p><h2>Kyoto, <i>day two</i></h2></div><button class="link-btn" data-go="itinerary">View day <span>→</span></button></div>
+              <div class="next-stop"><div class="time">08:20<small>FRI · 30 OCT</small></div><div class="line-dot"></div><div><span class="pill transit">TRAIN · 47 MIN</span><h3>Yodoyabashi to Kyoto</h3><p>Leave luggage at Hotel Resol Trinity Kyoto</p></div><button class="circle-btn" aria-label="Open route">↗</button></div>
+              <div class="stay-strip"><span class="building">⌂</span><div><small>YOUR NEXT STAY</small><b>Hotel Resol Trinity Kyoto</b><p>30 Oct — 02 Nov · Check-in from 15:00</p></div><button class="text-action">Booking</button></div>
+            </section>
+            <section class="route-card"><div class="route-map"><div class="map-label osaka">OSAKA</div><div class="map-label kyoto">KYOTO</div><div class="map-label miyazu">MIYAZU</div><div class="map-label kinosaki">KINOSAKI</div><div class="map-label awaji">AWAJI</div><svg viewBox="0 0 520 250" preserveAspectRatio="none" aria-hidden="true"><path d="M70 190 C130 150 90 95 165 80 S260 18 320 70 S360 142 430 155 S470 195 475 210" /></svg></div><div class="route-caption"><div><p class="eyebrow">THE LONG WAY ROUND</p><b>10 stops, one winding route</b></div><button class="map-open" data-go="map">Open map ↗</button></div></section>
+            <section class="days-panel paper-card"><div class="section-head"><div><p class="eyebrow">THE DAYS AHEAD</p><h2>Small moments,<br><i>well placed.</i></h2></div><button class="link-btn" data-go="itinerary">All days <span>→</span></button></div><div class="day-list" id="dashboard-days"></div></section>
+            <section class="reminders paper-card"><div class="section-head"><div><p class="eyebrow">BEFORE YOU GO</p><h2>Loose ends</h2></div><span class="count">3</span></div><ul><li><span class="check"></span><div><b>Reserve Kyoto dinner</b><small>Pontocho · 31 Oct</small></div><button>···</button></li><li><span class="check"></span><div><b>Pick up international permit</b><small>Needed before 02 Nov</small></div><button>···</button></li><li><span class="check"></span><div><b>Forward luggage details</b><small>Kyoto → Osaka</small></div><button>···</button></li></ul><button class="add-task">+ Add a task</button></section>
+          </div>
+        </section>
+
+        <section class="page trips-page" id="trips">
+          <div class="workspace-page-heading"><div><p class="eyebrow">YOUR COLLECTION</p><h1>Trips <i>to remember.</i></h1><p>Every journey in one private, personal archive.</p></div><button type="button" class="glass-button glass-button-accent" id="workspace-new-trip-inline">+ New trip</button></div>
+          <div class="trip-filter-row"><button class="trip-filter active" data-trip-filter="upcoming">Upcoming</button><button class="trip-filter" data-trip-filter="archive">Past trips</button></div>
+          <div id="workspace-trip-grid" class="workspace-trip-grid"></div>
+        </section>
+
+        <section class="page" id="itinerary">
+          <div class="itinerary-head"><div><p class="eyebrow" id="day-kicker">DAY 03 · SATURDAY</p><h1 id="day-title">Higashiyama <i>at first light</i></h1><p id="day-subtitle">31 October 2026 · Kyoto</p></div><div class="saved-state"><span></span> Saved just now<br><small>Last updated by Evon</small></div></div>
+          <div class="date-rail" id="date-rail" aria-label="Choose trip date"></div>
+          <div class="day-meta" id="day-meta"></div>
+          <div class="itinerary-layout"><aside class="timeline-side"><div class="weather"><span id="weather-icon">☀</span><b id="weather-temp">—</b><small id="weather-summary">Loading local weather…</small></div><dl><div><dt>Sunset</dt><dd>17:05</dd></div><div><dt>Walking</dt><dd id="walking-time">1h 42m</dd></div><div><dt>Planned</dt><dd id="planned-time">8h 15m</dd></div></dl><div class="notice"><b>Good to know</b><p id="daily-notice">Leave early for quieter temple paths.</p></div><section class="ai-planner"><p class="eyebrow">AI TRIP ASSISTANT</p><h3>Plan a <i>place</i></h3><p class="ai-copy">Name a spot. I’ll suggest the best time and a simple next stop.</p><label class="sr-only" for="ai-place">Place name</label><input id="ai-place" placeholder="e.g. Fushimi Inari" /><div class="ai-type-toggle" aria-label="Place type"><button data-ai-type="Activity" class="active">Activity</button><button data-ai-type="Meal">Meal</button></div><button id="ask-ai" class="ai-ask">Suggest a plan →</button><div id="ai-answer" class="ai-answer" aria-live="polite"></div></section></aside>
+            <section class="timeline-wrap"><div class="timeline-heading"><h2>Today’s <i>rhythm</i></h2><button class="secondary-btn" id="quick-add-day">+ Add stop</button></div><div id="timeline" class="timeline"></div></section>
+            <aside class="context-panel"><div class="place-glance" id="place-glance"></div><a class="route-link" id="today-route-link" href="https://www.google.com/maps" target="_blank" rel="noreferrer">Open today’s route in Google Maps <span>↗</span></a><div class="hotel-context"><p class="eyebrow">TONIGHT’S STAY</p><b>Hotel Resol Trinity Kyoto</b><small>Check in by 00:00 · 14 min taxi</small><button>View details</button></div></aside>
+          </div>
+        </section>
+
+        <section class="page map-page" id="map"><div class="map-page-head"><div><p class="eyebrow">GOOGLE MAPS · TODAY’S ROUTE</p><h1>Where to <i>next?</i></h1></div><a id="google-route" class="primary-map-link" target="_blank" rel="noreferrer">Open full route in Google Maps ↗</a></div><div class="map-experience"><div class="google-map-frame"><iframe id="google-map-preview" title="Google Maps place preview" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><div class="map-frame-caption"><span>GOOGLE MAPS PREVIEW</span><b id="map-preview-name">Choose a place</b></div></div><aside class="map-stops"><div class="section-head"><div><p class="eyebrow">TODAY’S STOPS</p><h2>Tap to <i>navigate</i></h2></div></div><div id="map-stop-list"></div></aside></div></section>
+        <section class="page saved-page" id="restaurants"><div class="saved-page-head"><div><p class="eyebrow">SAVED PLACES · 收藏地点</p><h1>Places worth <i>keeping.</i></h1><p>Save a special place, group it by country and city, then add it to any day.</p></div></div><div class="saved-search"><label for="saved-place-search">SEARCH & SAVE A PLACE</label><div><input id="saved-place-search" placeholder="Search a landmark, restaurant or city…" autocomplete="off" /><button type="button" id="save-search-place">Save place</button></div><div id="saved-search-options" class="saved-search-options"></div></div><section class="saved-map" id="saved-place-map" aria-label="Saved places map"></section><div id="saved-place-list" class="saved-place-list"></div></section>
+        <section class="page booking-page" id="stays"><p class="eyebrow">STAYS & BOOKINGS</p><h1>Places to <i>unpack.</i></h1><div class="hotel-list" id="hotel-list"></div><div id="booking-manager"></div></section>
+        <section class="page journal-page" id="journal"><div class="journal-head"><div><p class="eyebrow">TRAVEL JOURNAL · 去过的地方</p><h1>Places I’ve <i>been.</i></h1><p>Check in at a stop, keep up to six photos, and trace the route as your journey unfolds.</p></div><button type="button" class="glass-button glass-button-accent" id="journal-share">Share journal ↗</button></div><section class="journal-map-shell"><div class="journal-map-head"><div><p class="eyebrow">CHECKED-IN MAP</p><h2>Your route in memories.</h2></div><span id="journal-visited-count">0 visited</span></div><div id="journal-map" aria-label="Map of visited places"></div></section><div id="journal-list" class="journal-list"></div></section>
+      </main>
+      <nav class="mobile-nav" aria-label="Mobile navigation"><a class="active" href="#itinerary" data-page="itinerary">◫<span>Itinerary</span></a><a href="#map" data-page="map">⌖<span>Map</span></a><button id="mobile-add" aria-label="Add something">+</button><a href="#restaurants" data-page="restaurants">♡<span>Saved</span></a><a href="#journal" data-page="journal">•••<span>Journal</span></a></nav>
+      <button class="floating-add" id="floating-add" aria-label="Add to trip">+</button>
+    </div>
+    <dialog id="add-dialog"><form id="add-form"><button type="button" class="close-modal" id="close-add" aria-label="Close">×</button><p class="eyebrow">QUICK ADD · <span id="modal-context">HIGASHIYAMA</span></p><h2>Add a stop</h2><label>What are you adding?<input id="new-title" required placeholder="e.g. Coffee at Weekenders" autofocus /></label><div class="form-row"><label>Time<input id="new-time" type="time" value="13:30" /></label><label>Category<select id="new-category"><option>Activity</option><option>Meal</option><option>Transport</option><option>Free time</option></select></label></div><label>Short note <input id="new-note" placeholder="Optional details" /></label><details class="place-details"><summary>Add place links & photo <span>optional</span></summary><label>Address / Google Maps search<input id="new-place" placeholder="e.g. Kiyomizu-dera, Kyoto" /></label><label>Google Maps link<input id="new-map" type="url" placeholder="https://maps.google.com/..." /></label><label>Website link<input id="new-website" type="url" placeholder="Restaurant, attraction, Instagram…" /></label><label>Photo image URL<input id="new-photo" type="url" placeholder="Paste an image URL for a visual reminder" /></label></details><button class="primary-btn" type="submit">Add to itinerary</button><button class="cancel-add" type="button" id="cancel-add">Cancel</button></form></dialog>
+    <input id="photo-upload" type="file" accept="image/*" hidden />
+    <input id="journal-photo-upload" type="file" accept="image/*" multiple hidden />
+    <input id="hotel-photo-upload" type="file" accept="image/*" hidden />
+    <dialog id="search-dialog"><form id="search-form"><button type="button" class="close-modal" id="close-search" aria-label="Close">×</button><p class="eyebrow">AI PLACE FINDER</p><h2>Find a place</h2><input id="search-input" placeholder="Try: 京都饭团 / Kyoto onigiri" autofocus /><div id="search-results" class="search-results"></div></form></dialog>
+    <dialog id="link-dialog"><form id="link-form"><button type="button" class="close-modal" id="close-link" aria-label="Close">×</button><p class="eyebrow">STOP LINKS</p><h2 id="link-title">Edit links</h2><label>Paste one link — auto-detects map, booking/site, or direct photo<input id="smart-link" type="url" placeholder="Paste Agoda, Booking, Google Maps or an image link" /></label><label>Place / address<input id="edit-place" placeholder="Exact venue name for navigation" /></label><label>Google Maps link<input id="edit-map" type="url" placeholder="https://maps.google.com/..." /></label><label>Website / booking link<input id="edit-website" type="url" placeholder="Agoda, Booking, restaurant or official site" /></label><label>Photo image URL<input id="edit-photo" type="url" placeholder="Optional visual reminder" /></label><button class="primary-btn" type="submit">Save links</button><button class="cancel-add" type="button" id="cancel-link">Cancel</button></form></dialog>
+    <dialog id="calendar-dialog"><form id="calendar-form"><button type="button" class="close-modal" id="close-calendar" aria-label="Close">×</button><p class="eyebrow">TRIP CALENDAR</p><h2>Your travel days</h2><p class="calendar-copy">Choose any date, then give the day a city and a loose theme. You can edit the itinerary after adding it.</p><div id="calendar-days" class="calendar-days"></div><div class="calendar-add"><label>Date<input id="calendar-date" type="date" required /></label><label>Country<input id="calendar-country" required placeholder="e.g. China" /></label><label>City<input id="calendar-city" required placeholder="e.g. Shanghai" /></label><label>Day theme<input id="calendar-theme" placeholder="e.g. First night in the city" /></label></div><button class="primary-btn" type="submit">Add day to itinerary</button><button class="cancel-add" type="button" id="cancel-calendar">Done</button></form></dialog>
+    <dialog id="workspace-trip-dialog"><form id="workspace-trip-form"><button type="button" class="close-modal" id="workspace-trip-close" aria-label="Close">×</button><p class="eyebrow">NEW JOURNEY</p><h2>Make room for a new story.</h2><p class="calendar-copy">Start with the destination and dates. You can shape every stop later.</p><label>Trip name<input id="workspace-trip-name" required placeholder="e.g. Summer in Italy" /></label><div class="form-row"><label>Start date<input id="workspace-trip-start" type="date" required /></label><label>End date<input id="workspace-trip-end" type="date" required /></label></div><label>Places / route<input id="workspace-trip-route" placeholder="e.g. Rome · Florence · Amalfi" /></label><button class="primary-btn" type="submit">Create trip</button><button class="cancel-add" type="button" id="workspace-trip-cancel">Cancel</button></form></dialog>
+    <dialog id="workspace-edit-trip-dialog"><form id="workspace-edit-trip-form"><button type="button" class="close-modal" id="edit-trip-close" aria-label="Close">×</button><input id="edit-trip-id" type="hidden" /><p class="eyebrow">EDIT JOURNEY</p><h2>Shape this trip.</h2><label>Trip name<input id="edit-trip-name" required /></label><div class="form-row"><label>Start date<input id="edit-trip-start" type="date" required /></label><label>End date<input id="edit-trip-end" type="date" required /></label></div><label>Places / route<input id="edit-trip-route" placeholder="e.g. Rome · Florence · Amalfi" /></label><button class="primary-btn" type="submit">Save changes</button><button class="cancel-add" type="button" id="edit-trip-cancel">Cancel</button></form></dialog>
+    <dialog id="workspace-share-dialog"><form id="workspace-share-form"><button type="button" class="close-modal" id="workspace-share-close" aria-label="Close">×</button><p class="eyebrow">SHARE THIS JOURNEY</p><h2>Pass it on.</h2><p class="calendar-copy">Send this link to a friend. They can preview the full trip and add a copy to their own account.</p><label>Share link<input id="workspace-share-link" readonly /></label><div class="workspace-share-actions"><button type="button" class="primary-btn" id="workspace-share-copy">Copy link</button><a class="secondary-btn workspace-share-email" id="workspace-share-email" href="#">Email link ↗</a></div><button class="cancel-add" type="button" id="workspace-share-cancel">Done</button></form></dialog>
+    <dialog id="workspace-import-dialog"><form id="workspace-import-form"><button type="button" class="close-modal" id="workspace-import-close" aria-label="Close">×</button><p class="eyebrow">SHARED JOURNEY</p><h2 id="workspace-import-title">A trip to add.</h2><p class="calendar-copy" id="workspace-import-copy">This shared journey will be copied into your account. Your existing trips stay unchanged.</p><div class="workspace-import-preview" id="workspace-import-preview"></div><button class="primary-btn" type="submit">Add to my trips</button><button class="cancel-add" type="button" id="workspace-import-cancel">Not now</button></form></dialog>
+    <dialog id="workspace-auth-dialog"><form id="workspace-auth-form"><p class="eyebrow">WELCOME TO ORBIS</p><h2>Your trips, together.</h2><p class="calendar-copy">Sign in with Google to keep your trips separated by account. Your personal browser workspace stays private on this device.</p><button class="glass-button workspace-google-button" type="button" id="workspace-google-sign-in">Continue with Google</button><div class="workspace-auth-divider"><span>or use a local profile</span></div><label>Your name<input id="workspace-auth-name" placeholder="e.g. Ivan Lei" /></label><label>Email<input id="workspace-auth-email" type="email" placeholder="you@example.com" /></label><button class="primary-btn" type="submit">Enter my workspace</button></form></dialog>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="./app.js?v=20260803-journal-label"></script>
+    <script>
+      // Google Identity Services OAuth client for the personal Orbis workspace.
+      // This identifier is safe to expose in a browser; keep API secrets server-side.
+      window.TABI_GOOGLE_CLIENT_ID = '410563003589-0gt2acjlughfar1kgsril4dlumgq4ikr.apps.googleusercontent.com';
+    </script>
+    <script src="./workspace.js?v=20260803-trip-list-live-final"></script>
+    <script src="./trip-scope.js?v=20260803-trip-linked-pages"></script>
+    <script src="./google-saved-map.js?v=20260803-google-saved-map"></script>
+    <script src="./layout-adjustments.js?v=20260803-itinerary-recommendations-bottom"></script>
+    <script>
+      /* Keep the mobile page switcher available even if an optional feature fails to initialise. */
+      (() => {
+        const trigger = document.querySelector('.mobile-menu');
+        if (!trigger || document.querySelector('.mobile-menu-panel')) return;
+        const panel = document.createElement('nav');
+        panel.className = 'mobile-menu-panel';
+        panel.hidden = true;
+        panel.setAttribute('aria-label', 'Travel pages');
+        panel.innerHTML = '<p>TRIP PAGES</p><button type="button" data-fallback-page="trips">Trips <span>01</span></button><button type="button" data-fallback-page="itinerary">Itinerary <span>02</span></button><button type="button" data-fallback-page="map">Route map <span>03</span></button><button type="button" data-fallback-page="restaurants">Saved places <span>04</span></button><button type="button" data-fallback-page="stays">Stays & bookings <span>05</span></button><button type="button" data-fallback-page="journal">Journal <span>06</span></button>';
+        document.body.append(panel);
+        const close = () => { panel.hidden = true; trigger.setAttribute('aria-expanded', 'false'); };
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.addEventListener('click', event => { event.stopPropagation(); panel.hidden = !panel.hidden; trigger.setAttribute('aria-expanded', String(!panel.hidden)); });
+        panel.querySelectorAll('[data-fallback-page]').forEach(button => button.addEventListener('click', () => {
+          const page = button.dataset.fallbackPage;
+          document.querySelectorAll('.page').forEach(section => section.classList.toggle('active', section.id === page));
+          document.querySelectorAll('[data-page]').forEach(link => link.classList.toggle('active', link.dataset.page === page));
+          document.querySelector('#top-location').textContent = page === 'dashboard' ? 'TRIP OVERVIEW' : page.toUpperCase();
+          close(); window.scrollTo({ top: 0, behavior: 'smooth' });
+        }));
+        document.addEventListener('click', event => { if (!panel.hidden && !panel.contains(event.target) && event.target !== trigger) close(); });
+      })();
+    </script>
+    <script>if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));</script>
+  </body>
+</html>

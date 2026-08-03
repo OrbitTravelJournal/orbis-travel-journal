@@ -1,0 +1,48 @@
+/* Adaptive Travel Theme: quiet landscape colours with a cursor-responsive glow. */
+:root{
+  --travel-sky:#eef2f4;
+  --travel-fog:#d9ddde;
+  --travel-stone:#9ea4a0;
+  --travel-moss:#66755b;
+  --travel-olive:#7b7a58;
+  --travel-sand:#d5c9b6;
+  --travel-charcoal:#232323;
+  --travel-accent:#e6d44d;
+  --travel-flight:#74a9d8;
+  --travel-hotel:#d9c4a1;
+  --travel-cafe:#7a8260;
+  --travel-restaurant:#af6e54;
+  --travel-museum:#6c7a86;
+  --cursor-x:50%;
+  --cursor-y:35%;
+  --travel-aura:rgba(102,117,91,.46);
+  --travel-aura-2:rgba(123,122,88,.34);
+}
+body.workspace-glass{background:var(--travel-charcoal)!important;color:var(--travel-sky)}
+body.workspace-glass:after{content:"";position:fixed;inset:-18%;z-index:0;pointer-events:none;background:radial-gradient(ellipse 42% 38% at var(--cursor-x) var(--cursor-y),var(--travel-aura),transparent 72%),radial-gradient(ellipse 54% 48% at calc(100% - var(--cursor-x)) calc(100% - var(--cursor-y)),var(--travel-aura-2),transparent 74%),linear-gradient(135deg,rgba(35,35,35,.86),rgba(35,35,35,.48) 48%,rgba(35,35,35,.88)),var(--workspace-photo),var(--ambient-gradient);background-size:cover;background-position:center;filter:blur(48px) saturate(.86);opacity:.9;transform:scale(1.08);animation:travel-aura-drift 24s ease-in-out infinite alternate}
+body.workspace-glass:before{opacity:.12!important;filter:blur(38px) saturate(.6)!important}
+body.workspace-glass .shell{position:relative;z-index:1}
+body.workspace-glass .glass-panel,
+body.workspace-glass .glass-card,
+body.workspace-glass .workspace-trip-card,
+body.workspace-glass .booking-section,
+body.workspace-glass .hotel-card,
+body.workspace-glass .saved-card{background-color:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.22)!important;backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);box-shadow:0 16px 50px rgba(0,0,0,.15);border-radius:28px}
+body.workspace-glass .topbar,
+body.workspace-glass .sidebar{background:rgba(35,35,35,.24)!important;border-color:rgba(255,255,255,.16)!important;backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px)}
+body.workspace-glass h1,body.workspace-glass h2,body.workspace-glass h3,body.workspace-glass h4{color:#fff}
+body.workspace-glass p,body.workspace-glass li,body.workspace-glass label{color:rgba(255,255,255,.82)}
+body.workspace-glass small,.workspace-glass .eyebrow,.workspace-glass .caption{color:rgba(255,255,255,.55)}
+body.workspace-glass button,body.workspace-glass input,body.workspace-glass select,body.workspace-glass textarea{font-variant-numeric:tabular-nums}
+@keyframes travel-aura-drift{0%{transform:translate3d(-1.5%,-.5%,0) scale(1.08)}50%{transform:translate3d(1%,1.2%,0) scale(1.13)}100%{transform:translate3d(-.5%,0,0) scale(1.08)}}
+@media(prefers-reduced-motion:reduce){body.workspace-glass:after{animation:none}}
+body.workspace-glass .timeline-item.meal .item-card{border-left-color:var(--travel-restaurant)!important}
+body.workspace-glass .timeline-item.transport .item-card{border-left-color:var(--travel-flight)!important}
+body.workspace-glass .timeline-item:not(.meal):not(.transport) .item-card{border-left-color:var(--travel-moss)!important}
+body.workspace-glass .item-type{background:rgba(102,117,91,.3)!important}
+body.workspace-glass .timeline-item.meal .item-type{background:rgba(175,110,84,.34)!important}
+body.workspace-glass .timeline-item.transport .item-type{background:rgba(116,169,216,.34)!important}
+body.workspace-glass .hotel-list .hotel-card{border-left:3px solid var(--travel-hotel)!important}
+body.workspace-glass .saved-card{border-left:3px solid var(--travel-moss)!important}
+body.workspace-glass .primary-btn,.workspace-glass .glass-button-accent{background:var(--travel-accent)!important;color:var(--travel-charcoal)!important}
+body.workspace-glass .date-tab.active{border-color:var(--travel-accent)!important;background:rgba(230,212,77,.13)!important}
