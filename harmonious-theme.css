@@ -322,3 +322,6 @@ body #workspace-auth-dialog h2,
 body #workspace-auth-dialog h2 :is(i,em,span){
   color:#f5f7f3!important;
 }
+
+/* Respect the auth flow's hidden state despite the button's flex display. */
+#workspace-google-sign-in[hidden]{display:none!important}
