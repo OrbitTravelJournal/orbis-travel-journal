@@ -92,18 +92,66 @@
   function loadGoogleIdentity(){
     if(window.google?.accounts?.id)return Promise.resolve(window.google);
     if(googleLoader)return googleLoader;
-    googleLoader=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://accounts.google.com/gsi/client';script.async=true;script.defer=true;script.onload=()=>resolve(window.google);script.onerror=reject;document.head.appendChild(script)});
+    googleLoader=new Promise((resolve,reject)=>{
+      const script=document.createElement('script');
+      const fail=()=>{clearTimeout(timer);script.onload=script.onerror=null;script.remove();reject(new Error('Google Identity Services could not load'))};
+      const timer=setTimeout(fail,15000);
+      script.src='https://accounts.google.com/gsi/client';script.async=true;script.defer=true;
+      script.onload=()=>{if(!window.google?.accounts?.id){fail();return}clearTimeout(timer);script.onload=script.onerror=null;resolve(window.google)};
+      script.onerror=fail;document.head.appendChild(script);
+    }).catch(error=>{googleLoader=null;throw error});
     return googleLoader;
   }
   function decodeGoogleCredential(credential){try{const payload=credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(atob(payload).split('').map(c=>`%${(`00${c.charCodeAt(0).toString(16)}`).slice(-2)}`).join('')))}catch{return null}}
+  let googleSignInAttempt;
   function startGoogleSignIn(){
+    if(googleSignInAttempt)return;
+    const button=document.querySelector('#workspace-google-sign-in');if(!button)return;
+    let status=document.querySelector('#workspace-google-status');
+    if(!status){status=document.createElement('p');status.id='workspace-google-status';status.className='calendar-copy';status.setAttribute('role','status');status.setAttribute('aria-live','polite');button.after(status)}
     const clientId=window.TABI_GOOGLE_CLIENT_ID;
-    if(!clientId){document.querySelector('#workspace-auth-name')?.focus();return}
-    const button=document.querySelector('#workspace-google-sign-in');if(button){button.disabled=true;button.textContent='Connecting to Google…'}
+    if(!clientId){status.textContent='Google sign-in is not configured. Please contact the site owner.';return}
+    const attempt={};googleSignInAttempt=attempt;
+    const controls=document.createElement('div'),target=document.createElement('div'),cancel=document.createElement('button');
+    controls.append(target,cancel);status.before(controls);
+    cancel.type='button';cancel.className='glass-text-button';cancel.textContent='Cancel Google sign-in';
+    const dialog=document.querySelector('#workspace-auth-dialog'),form=document.querySelector('#workspace-auth-form');
+    let timer;
+    const active=()=>googleSignInAttempt===attempt;
+    const finish=message=>{
+      if(!active())return;
+      clearTimeout(timer);googleSignInAttempt=null;controls.remove();button.hidden=false;button.disabled=false;button.textContent='Continue with Google';status.textContent=message||'';
+      dialog?.removeEventListener('cancel',onCancel);dialog?.removeEventListener('close',onClose);form?.removeEventListener('submit',onClose);
+      if(message)button.focus();
+    };
+    const onCancel=()=>finish('Google sign-in was cancelled. Please try again.');
+    const onClose=()=>finish('');
+    cancel.onclick=onCancel;dialog?.addEventListener('cancel',onCancel);dialog?.addEventListener('close',onClose);form?.addEventListener('submit',onClose);
+    button.disabled=true;button.textContent='Connecting to Google…';status.textContent='Loading Google sign-in…';
     loadGoogleIdentity().then(()=>{
-      window.google.accounts.id.initialize({client_id:clientId,callback:response=>{const profile=decodeGoogleCredential(response.credential);if(profile?.email)signIn(profile.name,profile.email,profile.sub,profile.picture);else toast?.('Google sign-in did not return an account');}});
-      window.google.accounts.id.prompt(notification=>{if(notification.isNotDisplayed?.()||notification.isSkippedMoment?.()){if(button){button.disabled=false;button.textContent='Continue with Google'}toast?.('Google sign-in was closed. You can use the local profile below.')}});
-    }).catch(()=>{if(button){button.disabled=false;button.textContent='Continue with Google'}toast?.('Google sign-in could not load. Check your connection.')});
+      if(!active())return;
+      window.google.accounts.id.initialize({client_id:clientId,ux_mode:'popup',auto_select:false,callback:response=>{
+        if(!active())return;
+        const profile=decodeGoogleCredential(response?.credential||'');
+        if(!profile?.email||!profile?.sub){finish('Google sign-in did not return an account. Please try again.');return}
+        try{signIn(profile.name,profile.email,profile.sub,profile.picture);finish('')}
+        catch{finish('Google sign-in could not finish. Please try again.')}
+      }});
+      // prompt() is One Tap, not the explicit button sign-in flow. Let the user
+      // click Google's real button so the popup starts with a user gesture.
+      // Render inside the modal: a body-level One Tap iframe can sit behind
+      // showModal()'s top layer and be inert on mobile, regardless of z-index.
+      window.google.accounts.id.renderButton(target,{type:'standard',theme:'outline',size:'large',text:'continue_with',click_listener:()=>{
+        if(!active())return;
+        status.textContent='Complete sign-in in the Google window. If you closed it, cancel here and try again.';
+        clearTimeout(timer);timer=setTimeout(()=>finish('Google sign-in did not complete. It may have been cancelled or blocked. Please try again and check that popups are allowed.'),90000);
+      }});
+      button.hidden=true;button.disabled=false;button.textContent='Continue with Google';status.textContent='Select the Google button to continue.';
+      target.scrollIntoView({block:'nearest',inline:'nearest'});
+      // GIS button popup mode has no documented cancellation/error callback.
+      // Keep Cancel available and bound the wait even when Google stays silent.
+      timer=setTimeout(()=>finish('Google sign-in did not complete. Please try again. If it keeps failing, ask the site owner to check the OAuth origin: '+location.origin),90000);
+    }).catch(()=>finish('Google sign-in could not load. Check your connection and try again.'));
   }
   function openTripDialog(){const d=document.querySelector('#workspace-trip-dialog');if(d&&!d.open){d.showModal();document.querySelector('#workspace-trip-name')?.focus()}}
   function openEditTripDialog(trip){if(!trip)return;const d=document.querySelector('#workspace-edit-trip-dialog');if(!d)return;document.querySelector('#edit-trip-id').value=trip.id;document.querySelector('#edit-trip-name').value=trip.name||'';document.querySelector('#edit-trip-start').value=trip.start||'';document.querySelector('#edit-trip-end').value=trip.end||'';document.querySelector('#edit-trip-route').value=trip.route||'';d.showModal()}
