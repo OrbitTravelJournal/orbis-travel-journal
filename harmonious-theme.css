@@ -303,3 +303,22 @@ body.workspace-glass .journal-photo-add{display:grid;place-items:center;align-co
 body.workspace-glass .journal-photo-add span{font:10px var(--mono);color:rgba(233,238,232,.62)}
 body.workspace-glass .journal-photo-add input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 @media(max-width:760px){body.workspace-glass .journal-head{display:block}.journal-head .glass-button{margin-top:14px}.journal-entry{grid-template-columns:1fr!important}.journal-photos{grid-template-columns:repeat(3,minmax(0,1fr))!important}body.workspace-glass #journal-map{height:300px}}
+
+/* Readable text on the original light itinerary cards, before glass mode. */
+body:not(.workspace-glass) #itinerary .timeline-item .item-card,
+body:not(.workspace-glass) #itinerary .timeline-item .item-card :is(h3,p,small,.chinese-place,.priority,.item-menu){
+  color:#282924!important;
+}
+body:not(.workspace-glass) #itinerary .timeline-item .item-card :is(.item-type,.status,a,summary,.photo-upload-btn){
+  color:#274a40!important;
+}
+/* These drawer controls keep their light fill in either workspace mode. */
+body #itinerary .item-card .place-drawer-body :is(button,a),
+body #itinerary .item-card .place-drawer-body .place-rating{
+  color:#274a40!important;
+}
+/* The auth modal is dark even before workspace-glass is applied on sign-in. */
+body #workspace-auth-dialog h2,
+body #workspace-auth-dialog h2 :is(i,em,span){
+  color:#f5f7f3!important;
+}
