@@ -58,7 +58,7 @@
       const text = el.textContent.trim();
       const label = ((text.length > 2 ? text : el.getAttribute('aria-label')) || text || el.title || '').replace(/\s+/g,' ');
       const page = el.dataset.page || el.dataset.go || el.dataset.menuPage || el.dataset.fallbackPage;
-      const icon = pages[page] || (el.matches('#workspace-profile') ? 'user' : el.matches('.save-stop,.trip-favorite') ? 'bookmark' : el.matches('.visited-stop') ? 'pin' : rules.find(([pattern]) => pattern.test(label))?.[1]) || 'more';
+      const icon = pages[page] || (el.matches('.reader-more') ? 'more' : el.matches('#workspace-profile') ? 'user' : el.matches('.save-stop,.trip-favorite') ? 'bookmark' : el.matches('.visited-stop') ? 'pin' : rules.find(([pattern]) => pattern.test(label))?.[1]) || 'more';
       el.classList.add('emoji-control');
       el.style.setProperty('--icon-color',colors[icon]);
       let graphic = el.querySelector(':scope>.orbis-icon');

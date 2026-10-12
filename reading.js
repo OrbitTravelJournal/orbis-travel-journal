@@ -92,16 +92,24 @@ if (typeof document !== 'undefined') (() => {
       topLine.append(cardActions); card.prepend(topLine);
       body.querySelector('.stop-edit-tab')?.remove();
       body.querySelector('.auto-enrich-stop')?.remove();
-      const shortActions = {'.visited-stop':'打卡','.item-menu':'更多操作','.edit-link-btn':'修改链接'};
+      body.querySelector('.visited-stop')?.remove();
+      const shortActions = {'.item-menu':'更多操作','.edit-link-btn':'修改链接'};
       Object.entries(shortActions).forEach(([selector,label]) => body.querySelectorAll(selector).forEach(button => { button.textContent = label; button.setAttribute('aria-label',label); }));
       const menu = body.querySelector('.item-menu'), editLink = body.querySelector('.edit-link-btn');
       if (menu) {
+        cardActions.append(actions);
+        menu.classList.add('reader-more');
+        menu.setAttribute('aria-expanded','false');
         const openMenu = menu.onclick;
         editLink?.remove();
         menu.onclick = () => {
+          const previous = body.querySelector('.action-popover');
+          if (previous) { previous.remove(); menu.setAttribute('aria-expanded','false'); return; }
           openMenu?.();
           const panel = actions?.querySelector('.action-popover');
           if (!panel) return;
+          body.prepend(panel);
+          menu.setAttribute('aria-expanded','true');
           [['[data-skip]','暂时跳过'],['[data-copy]','复制地点'],['[data-delete]','删除地点']].forEach(([selector,label]) => { const button=panel.querySelector(selector); if (button) button.textContent=label; });
           if (editLink) panel.append(editLink);
         };
