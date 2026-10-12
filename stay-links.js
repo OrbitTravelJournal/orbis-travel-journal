@@ -88,6 +88,7 @@ if (typeof document !== 'undefined') (() => {
     document.querySelectorAll('[data-delete-hotel]').forEach(button => {
       const hotel = hotels[Number(button.dataset.deleteHotel)], card = button.closest('.hotel-card');
       card.id = `stay-${hotel[4].id}`;
+      if (hotel[3]) card.querySelector('.hotel-actions a').href = hotel[3];
       const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'stay-edit-button'; edit.textContent = 'Edit stay · 修改酒店'; edit.onclick = () => openEdit(hotel);
       button.before(edit);
       const remove = button.onclick;
