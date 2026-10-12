@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tabi-app-shell-v47-editable-stops';
+const CACHE_NAME = 'tabi-app-shell-v48-linked-stays';
 const APP_SHELL = [
   './',
   './index.html',
@@ -6,6 +6,8 @@ const APP_SHELL = [
   './schedule.js',
   './stop-editor.js',
   './stop-editor.css',
+  './stay-links.js',
+  './stay-links.css',
   './styles.css',
   './refinements.css',
   './features.css',
