@@ -165,3 +165,6 @@ html body.apple-ui.reader-mode .map-frame-caption{background:#ffffffa8!important
 html body.apple-ui.reader-mode :is(.saved-map,.google-map-frame){overflow:hidden;border-radius:22px!important}
 html body.apple-ui.reader-mode .reader-home-actions{display:flex!important;flex-direction:row!important;flex-wrap:wrap;gap:12px}
 html body.apple-ui.reader-mode .reader-home-actions :is(#reader-open-day,#reader-open-stays){width:56px!important;min-width:56px!important;justify-content:center!important}
+html body.apple-ui.reader-mode #workspace-auth-dialog h2{color:#1d1d1f!important}
+html body.apple-ui.reader-mode #workspace-auth-dialog .workspace-auth-divider{color:#6e6e73!important}
+html body.apple-ui.reader-mode #workspace-auth-dialog .workspace-auth-divider:before,html body.apple-ui.reader-mode #workspace-auth-dialog .workspace-auth-divider:after{background:#d2d2d7!important}
