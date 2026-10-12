@@ -6,6 +6,16 @@
   const mapsUrl=place=>`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query(place))}`;
   const embedUrl=place=>`https://www.google.com/maps?q=${encodeURIComponent(query(place))}&output=embed`;
   const detail=place=>{const rating=place.rating?`<p class="saved-google-rating">★ ${escValue(place.rating)} Google rating</p>`:'<p class="saved-google-rating saved-google-rating-muted">Live Google rating available in Maps</p>';return `<div class="saved-map-place"><div class="saved-map-photo">${place.photo?`<img src="${escValue(place.photo)}" alt="">`:'<span class="saved-map-photo-fallback">⌁</span>'}</div><div><p class="eyebrow">${escValue(place.type||'Saved place')}</p><h3>${escValue(place.name)}</h3><p>${escValue(place.zh||'')} ${place.city?`· ${escValue(place.city)}`:''}</p>${rating}</div></div><iframe title="Google Maps preview for ${escValue(place.name)}" src="${embedUrl(place)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><div class="saved-map-links"><a class="saved-map-google" href="${mapsUrl(place)}" target="_blank" rel="noopener">Open Google Maps ↗</a>${place.website?`<a href="${escValue(place.website)}" target="_blank" rel="noopener">Website ↗</a>`:''}</div><p class="saved-map-note">Open Google Maps for live ratings, photos, reviews and navigation.</p>`};
+  window.setSavedMapSelection=function(place,panToPlace=true){
+    if(!place)return;
+    selectedSavedMapKey=place.key;
+    const pane=document.querySelector('#saved-map-detail');if(pane)pane.innerHTML=detail(place);
+    const entry=window.savedLeafletMarkers?.find(row=>row.place.key===place.key);
+    document.querySelectorAll('.orbis-leaflet-orbit').forEach(node=>node.classList.remove('is-selected'));
+    entry?.marker.getElement()?.querySelector('.orbis-leaflet-orbit')?.classList.add('is-selected');
+    document.querySelectorAll('.saved-card').forEach(card=>card.classList.toggle('saved-map-selected',card.querySelector('[data-saved-add]')?.dataset.savedAdd===place.key));
+    if(panToPlace&&window.savedLeafletMap){window.savedLeafletMap.invalidateSize();window.savedLeafletMap.flyTo(savedPlaceCoordinatesFor(place),13,{duration:.35});entry?.marker.openPopup();}
+  };
   window.renderSavedPlaceMap=function(){
     const host=document.querySelector('#saved-place-map');if(!host||typeof savedPlaces==='undefined')return;
     if(!savedPlaces.length){host.innerHTML='';return}
@@ -17,11 +27,23 @@
     const map=L.map('saved-leaflet-map',{scrollWheelZoom:true,worldCopyJump:true,zoomControl:true,attributionControl:true});window.savedLeafletMap=map;
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
     const orbitIcon=L.divIcon({className:'orbis-leaflet-icon',html:'<span class="orbis-leaflet-orbit"><span>·</span></span>',iconSize:[42,42],iconAnchor:[21,21],popupAnchor:[0,-24]});
-    const markers=savedPlaces.map(place=>{const coords=savedPlaceCoordinatesFor(place),marker=L.marker(coords,{icon:orbitIcon,keyboard:true,title:place.name}).addTo(map);marker.bindPopup(`<b>${escValue(place.name)}</b><br><small>${escValue(place.zh||place.city||'')}</small>${place.rating?`<br><strong>★ ${escValue(place.rating)} Google</strong>`:''}`);marker.on('click',()=>{selectedSavedMapKey=place.key;const pane=document.querySelector('#saved-map-detail');if(pane)pane.innerHTML=detail(place);document.querySelectorAll('.orbis-leaflet-orbit').forEach(node=>node.classList.remove('is-selected'));marker.getElement()?.querySelector('.orbis-leaflet-orbit')?.classList.add('is-selected')});return {place,marker}});
+    const markers=savedPlaces.map(place=>{const coords=savedPlaceCoordinatesFor(place),marker=L.marker(coords,{icon:orbitIcon,keyboard:true,title:place.name}).addTo(map);marker.bindPopup(`<b>${escValue(place.name)}</b><br><small>${escValue(place.zh||place.city||'')}</small>${place.rating?`<br><strong>★ ${escValue(place.rating)} Google</strong>`:''}`);marker.on('click',()=>window.setSavedMapSelection(place,false));return {place,marker}});
     window.savedLeafletMarkers=markers;
     const bounds=L.latLngBounds(savedPlaces.map(savedPlaceCoordinatesFor));
-    if(savedPlaces.length===1)map.setView([20,0],2);else map.fitBounds(bounds.pad(.35),{maxZoom:2});
+    if(savedPlaces.length===1)map.setView(savedPlaceCoordinatesFor(selected),12);else map.fitBounds(bounds.pad(.35),{maxZoom:12});
+    window.setSavedMapSelection(selected,false);
     setTimeout(()=>map.invalidateSize(),50);
+    if(typeof geocodeSavedPlaces==='function')geocodeSavedPlaces();
+  };
+  const renderCards=window.renderSavedPlaces;
+  window.renderSavedPlaces=function(){
+    renderCards();
+    document.querySelectorAll('.saved-card').forEach(card=>{
+      const key=card.querySelector('[data-saved-add]')?.dataset.savedAdd;
+      const summary=card.querySelector('summary');
+      if(summary)summary.onclick=()=>{const place=savedPlaces.find(item=>item.key===key);window.setSavedMapSelection(place);document.querySelector('#saved-place-map')?.scrollIntoView({block:'start',behavior:'smooth'});};
+    });
   };
   window.renderSavedPlaceMap();
+  window.renderSavedPlaces();
 })();
