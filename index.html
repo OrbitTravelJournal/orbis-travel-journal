@@ -135,8 +135,8 @@
     <link rel="stylesheet" href="./stay-links.css?v=20261012-stays" />
     <script src="./stay-links.js?v=20261012-luminous"></script>
     <link rel="stylesheet" href="./reading.css?v=20261012-luminous" />
-    <script src="./reading.js?v=20261012-luminous"></script>
-    <link rel="stylesheet" href="./apple-ui.css?v=20261012-luminous-2" />
+    <script src="./reading.js?v=20261012-card-actions"></script>
+    <link rel="stylesheet" href="./apple-ui.css?v=20261012-card-actions" />
     <script>
       /* Keep the mobile page switcher available even if an optional feature fails to initialise. */
       (() => {
@@ -161,7 +161,7 @@
         document.addEventListener('click', event => { if (!panel.hidden && !panel.contains(event.target) && event.target !== trigger) close(); });
       })();
     </script>
-    <script src="./emoji-ui.js?v=20261012-luminous"></script>
+    <script src="./emoji-ui.js?v=20261012-card-actions"></script>
     <script>if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));</script>
   </body>
 </html>

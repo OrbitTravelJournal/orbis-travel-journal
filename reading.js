@@ -63,26 +63,34 @@ if (typeof document !== 'undefined') (() => {
       const originalNote = card.querySelector('.item-top p'), full = text(item[3]);
       const preview = document.createElement('p'); preview.className = 'reader-short-note'; preview.textContent = full.length > 110 ? `${full.slice(0,110)}…` : full;
       const details = document.createElement('details'); details.className = 'reader-details';
-      const toggle = document.createElement('summary'); toggle.textContent = '展开详情 · 完整攻略与编辑'; details.append(toggle);
+      const toggle = document.createElement('summary'); toggle.textContent = '展开攻略与更多操作'; details.append(toggle);
       const body = document.createElement('div'); body.className = 'reader-details-body'; details.append(body);
       if (originalNote) body.append(originalNote);
       const links = card.querySelector('.place-links'), navigation = links?.querySelector('a');
       const primary = document.createElement('div'); primary.className = 'reader-stop-primary';
       if (navigation) { navigation.textContent = '导航 · Google Maps ↗'; navigation.classList.add('reader-navigate'); primary.append(navigation); }
       const flags = R.labels(item), foot = card.querySelector('.item-foot');
-      if (foot) { foot.innerHTML = `<span>${safe(flags.priority)}</span><span>${safe(flags.booking)}</span>`; primary.append(foot); }
+      if (foot) { foot.innerHTML = [flags.priority,flags.booking].filter(value => !value.endsWith('未标注')).map(value => `<span>${safe(value)}</span>`).join(''); if (foot.childElementCount) primary.append(foot); else foot.remove(); }
       for (const element of [card.querySelector('.stop-edit-tab'),card.querySelector('.item-actions'),card.querySelector('.place-photo'),links,card.querySelector('.place-drawer'),card.querySelector('.stop-recommendation')]) if (element) body.append(element);
       const time = row.querySelector('.item-time'); if (time) card.prepend(time);
       card.append(preview, primary, details);
       const actions = body.querySelector('.item-actions');
+      const cardActions = document.createElement('div'); cardActions.className = 'reader-card-actions';
+      const edit = body.querySelector('[data-edit-stop]');
+      if (edit) { edit.title = '修改地点信息'; edit.setAttribute('aria-label','修改地点信息'); cardActions.append(edit); }
       if (actions) {
         const bookmark = actions.querySelector('.save-stop');
         if (bookmark) {
           bookmark.classList.add('reader-bookmark');
           bookmark.title = bookmark.getAttribute('aria-label');
-          card.querySelector('.item-top').append(bookmark);
+          cardActions.append(bookmark);
         }
       }
+      const topLine = document.createElement('div'); topLine.className = 'reader-card-topline';
+      if (time) topLine.append(time);
+      topLine.append(cardActions); card.prepend(topLine);
+      const shortActions = {'[data-move-up]':'↑ 上移','[data-move-down]':'↓ 下移','.visited-stop':'打卡','.item-menu':'更多操作','.auto-enrich-stop':'补充地点资料','.edit-link-btn':'修改链接','.photo-upload-btn':'上传照片'};
+      Object.entries(shortActions).forEach(([selector,label]) => body.querySelectorAll(selector).forEach(button => { button.textContent = label; button.setAttribute('aria-label',label); }));
       details.addEventListener('toggle', () => { row.draggable = !details.open; });
     });
     // Existing planning controls and supplemental notes remain available on demand.
