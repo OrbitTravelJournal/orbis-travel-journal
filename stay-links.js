@@ -50,6 +50,7 @@ if (typeof document !== 'undefined') (() => {
   dialog.innerHTML = `<form id="stay-edit-form"><button class="close-modal" type="button" data-stay-close aria-label="Close">×</button><p class="eyebrow">STAYS & BOOKINGS · 住宿与预订</p><h2>Change your stay</h2><label>Hotel name · 酒店名称<input name="name" required></label><div class="stay-dates"><label>Check-in date · 入住日期<input name="checkinDate" type="date" required></label><label>Time<input name="checkinTime" type="time" value="15:00"></label><label>Check-out date · 退房日期<input name="checkoutDate" type="date" required></label><label>Time<input name="checkoutTime" type="time" value="11:00"></label></div><label>City / confirmation · 城市与预订信息<input name="details"></label><label>Booking link · 预订链接<input name="link" type="url"></label><p class="stay-link-note">Updates every night from check-in through the night before check-out. · 自动同步入住日至退房前一晚的所有行程页。</p><button type="submit" class="primary-btn">Save stay · 保存住宿</button><button type="button" class="cancel-add" data-stay-close>Cancel</button></form>`;
   document.body.append(dialog);
   const form = dialog.querySelector('form');
+  form.querySelector('.stay-link-note').insertAdjacentHTML('beforebegin', '<label>Address · 酒店地址<input name="address"></label><label>Map link · 地图链接<input name="map" type="url"></label>');
   const field = name => form.elements.namedItem(name);
   dialog.querySelectorAll('[data-stay-close]').forEach(button => button.onclick = () => dialog.close());
   dialog.addEventListener('close', () => { editing = null; });
@@ -58,14 +59,14 @@ if (typeof document !== 'undefined') (() => {
   function openEdit(hotel, day = days[selected]) {
     visible(); editing = hotel || null;
     const info = hotel?.[4] || {};
-    const values = { name: hotel?.[1] || '', details: hotel?.[2] || day?.city || '', link: hotel?.[3] || '', checkinDate: info.checkinDate || day?.iso || '', checkoutDate: info.checkoutDate || (day?.iso ? S.nextDate(day.iso) : ''), checkinTime: info.checkinTime || '15:00', checkoutTime: info.checkoutTime || '11:00' };
+    const values = { name: hotel?.[1] || '', details: hotel?.[2] || day?.city || '', link: hotel?.[3] || '', address: info.address || '', map: info.map || '', checkinDate: info.checkinDate || day?.iso || '', checkoutDate: info.checkoutDate || (day?.iso ? S.nextDate(day.iso) : ''), checkinTime: info.checkinTime || '15:00', checkoutTime: info.checkoutTime || '11:00' };
     Object.entries(values).forEach(([key, value]) => { field(key).value = value; });
     field('checkoutDate').setCustomValidity(''); dialog.showModal();
   }
   function saveHotel(data, hotel) {
     const start = data.get('checkinDate'), end = data.get('checkoutDate');
     if (!S.validDate(start) || !S.validDate(end) || end <= start) return false;
-    const info = { ...(hotel?.[4] || {}), id: hotel?.[4]?.id || crypto.randomUUID(), migrated: true, checkinDate: start, checkoutDate: end, checkinTime: data.get('checkinTime') || '15:00', checkoutTime: data.get('checkoutTime') || '11:00' };
+    const info = { ...(hotel?.[4] || {}), address: String(data.get('address') ?? hotel?.[4]?.address ?? '').trim(), map: String(data.get('map') ?? hotel?.[4]?.map ?? '').trim(), id: hotel?.[4]?.id || crypto.randomUUID(), migrated: true, checkinDate: start, checkoutDate: end, checkinTime: data.get('checkinTime') || '15:00', checkoutTime: data.get('checkoutTime') || '11:00' };
     const next = [`${start} ${info.checkinTime} → ${end} ${info.checkoutTime}`, String(data.get('name')).trim(), String(data.get('details') || ''), String(data.get('link') || ''), info];
     if (hotel) {
       hiddenHotelBookings.delete(hotelBookingKey(hotel)); hotel.splice(0, 5, ...next);
@@ -96,6 +97,7 @@ if (typeof document !== 'undefined') (() => {
     });
     const add = document.querySelector('#hotel-booking-form');
     if (add) {
+      add.insertAdjacentHTML('beforeend', '<label>Address · 酒店地址<input name="address"></label><label>Map link · 地图链接<input name="map" type="url"></label>');
       add.onsubmit = event => {
         event.preventDefault(); const end = add.elements.namedItem('checkoutDate'); end.setCustomValidity('');
         if (!saveHotel(new FormData(add), null)) { end.setCustomValidity('Check-out must be after check-in.'); end.reportValidity(); }

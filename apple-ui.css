@@ -1,0 +1,167 @@
+/* Apple-inspired light presentation. Existing application and data stay intact. */
+:root{color-scheme:light;--sans:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;--serif:var(--sans);--mono:ui-monospace,SFMono-Regular,Menlo,monospace;--ink:#1d1d1f;--muted:#6e6e73;--forest:#007aff;--deep:#1d1d1f;--paper:#f5f5f7;--cream:#fff;--stone:#86868b;--line:#e5e5ea;--red:#c34c3b;--glass-ink:#1d1d1f;--glass-muted:#6e6e73;--glass-accent:#007aff;--glass-border:#e5e5ea;--glass-shadow:0 2px 12px #00000005;--glass-bg:#fff}
+html:has(body.apple-ui),html body.apple-ui.reader-mode{background:#f5f5f7!important;color:#1d1d1f!important;font-family:var(--sans);-webkit-font-smoothing:antialiased}
+html body.apple-ui:before,html body.apple-ui:after{display:none!important;animation:none!important}
+html body.apple-ui .shell{background:#f5f5f7!important;color:#1d1d1f!important}
+html body.apple-ui.reader-mode :is(.sidebar,.topbar){background:rgba(250,250,252,.94)!important;color:#1d1d1f!important;border-color:#e5e5ea!important;box-shadow:none!important}
+html body.apple-ui .sidebar{width:215px!important;backdrop-filter:blur(20px)}
+html body.apple-ui.reader-mode :is(.brand,.main-nav .nav-link,.location-label,.quiet-btn,.side-foot,.presence,.workspace-avatar){color:#515156!important}
+html body.apple-ui .brand{color:#1d1d1f!important}.apple-ui .orbis-mark{color:#007aff}
+html body.apple-ui.reader-mode .main-nav .nav-link{border:0!important;border-radius:9px;padding:12px 14px;min-height:44px;font-size:14px}
+html body.apple-ui.reader-mode .main-nav .nav-link.active{background:#e5edf9!important;color:#0066cc!important}
+html body.apple-ui .side-foot{border-color:#e5e5ea!important}.apple-ui .sidebar .presence>span:first-child{background:#34c759!important}
+html body.apple-ui.reader-mode .page{max-width:1120px;padding-top:32px}
+html body.apple-ui.reader-mode :is(h1,h2,h3){font-family:var(--sans)!important;letter-spacing:-.035em;font-weight:650;color:#1d1d1f!important}
+html body.apple-ui.reader-mode :is(h1,h2,h3) :is(i,em){font-style:normal!important;color:inherit!important;font-weight:inherit}
+html body.apple-ui.reader-mode .page>h1,html body.apple-ui.reader-mode .map-page-head h1,html body.apple-ui.reader-mode .saved-page-head h1{font-size:36px!important;line-height:1.2;margin:8px 0 24px}
+html body.apple-ui.reader-mode :is(.eyebrow,.saved-state,.trip-card-meta,.trip-status,.item-type){font-family:var(--sans);color:#6e6e73!important;letter-spacing:.03em}
+html body.apple-ui.reader-mode :is(#reader-home,#reader-day-summary,.workspace-trip-card,.hotel-card,.saved-card,.saved-group,.saved-search,.booking-section,.journal-entry,.journal-map-shell,.map-experience,.hotel-context){background:#fff!important;background-image:none!important;border:1px solid #e5e5ea!important;border-radius:18px!important;box-shadow:0 2px 12px #00000004!important;color:#1d1d1f!important;backdrop-filter:none!important}
+html body.apple-ui .workspace-trip-card:before,html body.apple-ui .hotel-card:before{display:none!important}
+html body.apple-ui.reader-mode :is(#trips,#itinerary,#map,#stays,#restaurants,#journal) :is(p,small,b,strong,span,label,summary){color:#515156!important;opacity:1!important}
+html body.apple-ui.reader-mode :is(#trips,#itinerary,#map,#stays,#restaurants,#journal) :is(h1,h2,h3,b,strong){color:#1d1d1f!important}
+html body.apple-ui.reader-mode #reader-home{padding:26px;margin:0 0 28px}
+html body.apple-ui.reader-mode #reader-home h1{font-size:32px!important}
+html body.apple-ui.reader-mode #reader-home p{color:#6e6e73!important}
+html body.apple-ui.reader-mode #reader-day-summary{padding:18px;background:#fff!important}
+html body.apple-ui.reader-mode #reader-day-summary small{color:#6e6e73!important}
+html body.apple-ui.reader-mode .workspace-page-heading{margin:20px 0 18px}
+html body.apple-ui.reader-mode .workspace-page-heading h1{font-size:26px!important}
+html body.apple-ui.reader-mode :is(button,a,summary){transition:background-color .15s,color .15s;touch-action:manipulation}
+html body.apple-ui.reader-mode :is(.glass-button,.trip-filter,.trip-card-actions button,.primary-map-link,.navigate-stop,.hotel-actions button,.hotel-actions a,.booking-section button,.stop-edit-tab button){background:#f0f0f3!important;color:#0066cc!important;border:1px solid transparent!important;border-radius:10px!important;box-shadow:none!important;font-family:var(--sans);font-weight:500}
+html body.apple-ui.reader-mode :is(.glass-button-accent,.primary-btn,.open-trip,.ai-ask,#reader-open-day){background:#007aff!important;color:#fff!important;border-color:transparent!important;border-radius:12px!important}
+html body.apple-ui.reader-mode :is(.glass-button-accent,.primary-btn,.open-trip,#reader-open-day) span{color:#fff!important}
+html body.apple-ui.reader-mode :is(.glass-button,.trip-filter,.primary-map-link):hover{transform:none;filter:brightness(.97)}
+html body.apple-ui.reader-mode .trip-filter-row{display:inline-flex;gap:3px;background:#e9e9ee;border-radius:10px;padding:3px}
+html body.apple-ui.reader-mode .trip-filter{border-radius:8px!important;min-height:36px;padding:7px 15px;background:transparent!important;color:#6e6e73!important}
+html body.apple-ui.reader-mode .trip-filter.active{background:#fff!important;color:#1d1d1f!important;box-shadow:0 1px 4px #0000000d!important}
+html body.apple-ui.reader-mode :is(.trip-menu,.trip-favorite,.visited-stop,.item-menu){background:#f0f0f3!important;color:#6e6e73!important;border-color:#e5e5ea!important}
+html body.apple-ui.reader-mode .trip-card-actions{gap:8px;flex-wrap:wrap}
+html body.apple-ui.reader-mode .workspace-trip-card{min-height:230px;border-left:1px solid #e5e5ea!important}
+html body.apple-ui.reader-mode #date-rail{background:rgba(245,245,247,.96)!important;backdrop-filter:blur(16px);scrollbar-color:#c7c7cc #f5f5f7}
+html body.apple-ui.reader-mode #date-rail::-webkit-scrollbar-track{background:#f5f5f7}
+html body.apple-ui.reader-mode #date-rail::-webkit-scrollbar-thumb{background:#c7c7cc}
+html body.apple-ui.reader-mode #date-rail .date-tab{background:#fff!important;border:1px solid #e5e5ea!important;color:#515156!important;border-radius:12px}
+html body.apple-ui.reader-mode #date-rail .date-tab.active{background:#eaf3ff!important;border:1px solid #007aff!important;color:#0066cc!important}
+html body.apple-ui.reader-mode #date-rail .date-tab.active :is(small,span,strong){color:#0066cc!important}
+html body.apple-ui.reader-mode #date-rail .calendar-trigger{background:#fff;color:#007aff;border-color:#e5e5ea;border-radius:12px}
+html body.apple-ui.reader-mode #timeline .item-card{background:#fff!important;border:1px solid #e5e5ea!important;border-left:1px solid #e5e5ea!important;border-radius:18px!important;padding:22px!important;box-shadow:0 2px 12px #00000004!important}
+html body.apple-ui.reader-mode #timeline .timeline-item .item-card{border-left:1px solid #e5e5ea!important}
+html body.apple-ui.reader-mode #quick-add-day{background:#eaf3ff!important;color:#0066cc!important;border:0!important;border-radius:10px;min-height:44px;padding:8px 14px;font-size:14px}
+html body.apple-ui.reader-mode #timeline .item-card :is(h3,.item-time){color:#1d1d1f!important}
+html body.apple-ui.reader-mode #timeline .item-card :is(p,.chinese-place,.item-time small){color:#515156!important}
+html body.apple-ui.reader-mode #timeline .item-card h3{font-size:21px;font-weight:650}
+html body.apple-ui.reader-mode #timeline .item-type{background:#f0f0f3!important;color:#6e6e73!important;font-size:11px;padding:4px 8px;font-weight:600;border-radius:6px}
+html body.apple-ui.reader-mode #timeline .reader-stop-primary .item-foot span{background:#f5f5f7!important;color:#6e6e73!important;border-radius:6px;font-size:12px}
+html body.apple-ui.reader-mode #timeline .reader-navigate,html body.apple-ui.reader-mode #hotel-list .hotel-card .hotel-actions a.reader-navigate{background:#eaf3ff!important;color:#0066cc!important;border:0!important;border-radius:10px!important;font-weight:500}
+html body.apple-ui.reader-mode #timeline .item-top .reader-bookmark{background:#f5f5f7!important;border:0!important;border-radius:10px!important}
+html body.apple-ui.reader-mode #timeline .reader-bookmark .bookmark-glyph{background:#86868b!important}
+html body.apple-ui.reader-mode #timeline .reader-bookmark.saved{background:#eaf3ff!important}
+html body.apple-ui.reader-mode #timeline .reader-bookmark.saved .bookmark-glyph{background:#007aff!important}
+html body.apple-ui.reader-mode :is(.reader-details,.reader-schedule,#reader-day-notes,.reader-hotel-details,.itinerary-head,.saved-page-head,.journal-head,.booking-manager,.map-stop){border-color:#e5e5ea!important}
+html body.apple-ui.reader-mode :is(.reader-details,.reader-schedule,#reader-day-notes,.reader-hotel-details)>summary{color:#0066cc!important;font-size:14px}
+html body.apple-ui.reader-mode :is(.travel-segment,.add-between,.stop-recommendation,.hotel-context small){color:#6e6e73!important}
+html body.apple-ui.reader-mode #itinerary .hotel-context :is(small,button){color:#0066cc!important}
+html body.apple-ui.reader-mode :is(input,select,textarea){background:#f5f5f7!important;color:#1d1d1f!important;border:1px solid #d2d2d7!important;border-radius:9px!important;font-family:var(--sans);font-size:16px}
+html body.apple-ui.reader-mode :is(input,textarea)::placeholder{color:#86868b!important}
+html body.apple-ui.reader-mode :is(button,a,input,textarea,select,summary):focus-visible{outline:3px solid #007aff55!important;outline-offset:2px}
+html body.apple-ui.reader-mode dialog,html body.apple-ui.reader-mode dialog form{background:#fff!important;color:#1d1d1f!important;border-color:#e5e5ea!important;border-radius:20px!important;box-shadow:none!important}
+html body.apple-ui.reader-mode dialog{box-shadow:0 16px 60px #00000024!important}
+html body.apple-ui.reader-mode dialog form{border:0!important;border-radius:0!important;background:transparent!important}
+html body.apple-ui.reader-mode dialog :is(h2,p,label,small){color:#1d1d1f!important}
+html body.apple-ui.reader-mode #workspace-auth-dialog h2 :is(i,em,span){color:#1d1d1f!important}
+html body.apple-ui.reader-mode dialog::backdrop{background:#00000032;backdrop-filter:blur(6px)}
+html body.apple-ui.reader-mode dialog :is(.close-modal,.cancel-add){color:#007aff!important;background:transparent!important}
+html body.apple-ui.reader-mode :is(.map-stops,.google-map-frame,.saved-map,.nearby-pick,.saved-map-detail,.saved-search-option,.journal-photo-add,.journal-map-empty){background:#fff!important;border-color:#e5e5ea!important;color:#1d1d1f!important}
+html body.apple-ui.reader-mode .map-frame-caption{background:#fffffff0!important;color:#515156!important}
+html body.apple-ui.reader-mode #journal-map{background:#f5f5f7!important}
+html body.apple-ui.reader-mode #journal-map .leaflet-tile-pane{filter:none!important}
+html body.apple-ui.reader-mode :is(.journal-empty,#workspace-trip-caption,.workspace-trip-caption,.workspace-trip-caption small){color:#6e6e73!important}
+html body.apple-ui.reader-mode :is(.nearby-pick,.saved-card,.journal-entry) :is(b,small,p,summary){color:#515156!important}
+html body.apple-ui.reader-mode :is(.bookmark-glyph,.saved-card .bookmark-glyph){background:#007aff!important}
+html body.apple-ui.reader-mode .mobile-menu-panel{background:#fff!important;color:#1d1d1f!important;border-color:#e5e5ea!important;box-shadow:0 8px 32px #00000014}
+html body.apple-ui.reader-mode .mobile-menu-panel :is(button,p){color:#515156!important}
+html body.apple-ui.reader-mode .mobile-nav{background:rgba(250,250,252,.96)!important;border-color:#e5e5ea!important;backdrop-filter:blur(20px);box-shadow:none}
+html body.apple-ui.reader-mode .mobile-nav a,html body.apple-ui.reader-mode .mobile-nav a span{color:#86868b!important}
+html body.apple-ui.reader-mode .mobile-nav a.active{background:transparent!important}
+html body.apple-ui.reader-mode .mobile-nav a.active,html body.apple-ui.reader-mode .mobile-nav a.active span{color:#007aff!important}
+@media(max-width:920px){html body.apple-ui.reader-mode .page{padding-top:20px!important}html body.apple-ui.reader-mode #reader-home{padding:22px}html body.apple-ui.reader-mode #reader-home h1{font-size:28px!important}html body.apple-ui.reader-mode .page>h1{font-size:30px!important}html body.apple-ui.reader-mode #timeline .item-card{padding:18px!important}html body.apple-ui.reader-mode #reader-day-summary{padding:16px}}
+@media(prefers-reduced-motion:reduce){html body.apple-ui *{scroll-behavior:auto!important;transition:none!important}}
+
+/* System Chinese typography and translucent iOS-style surfaces. */
+:root{--sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif;--glass-bg:rgba(255,255,255,.58);--glass-border:rgba(255,255,255,.8)}
+html body.apple-ui.reader-mode,html body.apple-ui.reader-mode :is(button,input,textarea,select,summary,p,span,small,label,a,b,strong,h1,h2,h3,dt,dd){font-family:var(--sans)!important;letter-spacing:normal!important}
+html body.apple-ui.reader-mode :is(h1,h2,h3){font-weight:600!important}
+html:has(body.apple-ui),html body.apple-ui.reader-mode{background:#eaf0f6!important}
+html body.apple-ui.reader-mode{background-image:radial-gradient(ellipse at 12% 8%,#dbe7ff 0,transparent 48%),radial-gradient(ellipse at 90% 35%,#e9e1f2 0,transparent 48%),radial-gradient(ellipse at 25% 90%,#dcefe9 0,transparent 48%)!important;background-attachment:fixed!important}
+html body.apple-ui .shell{background:transparent!important}
+html body.apple-ui.reader-mode :is(.sidebar,.topbar){background:rgba(255,255,255,.4)!important;border-color:rgba(255,255,255,.65)!important;backdrop-filter:blur(28px) saturate(145%);-webkit-backdrop-filter:blur(28px) saturate(145%)}
+html body.apple-ui.reader-mode :is(#reader-home,#reader-day-summary,.workspace-trip-card,.hotel-card,.saved-card,.saved-group,.saved-search,.booking-section,.journal-entry,.journal-map-shell,.map-experience,.hotel-context),html body.apple-ui.reader-mode #timeline .item-card{background:rgba(255,255,255,.57)!important;border:1px solid rgba(255,255,255,.86)!important;border-radius:26px!important;box-shadow:inset 0 1px 0 #fff9,0 8px 30px #52637d0b!important;backdrop-filter:blur(24px) saturate(130%)!important;-webkit-backdrop-filter:blur(24px) saturate(130%)!important}
+html body.apple-ui.reader-mode #timeline .timeline-item .item-card{border-left:1px solid rgba(255,255,255,.86)!important}
+html body.apple-ui.reader-mode :is(.glass-button,.trip-card-actions button,.primary-map-link,.navigate-stop,.hotel-actions button,.hotel-actions a,.booking-section button,.stop-edit-tab button,.trip-menu,.trip-favorite,.visited-stop,.item-menu,#quick-add-day),html body.apple-ui.reader-mode #timeline :is(.reader-navigate,.item-top .reader-bookmark),html body.apple-ui.reader-mode #hotel-list .hotel-card .hotel-actions a.reader-navigate{background:rgba(255,255,255,.65)!important;border:1px solid #ffffffa6!important;border-radius:999px!important;box-shadow:inset 0 1px 0 #fffc,0 3px 10px #52637d08!important}
+html body.apple-ui.reader-mode :is(.glass-button-accent,.primary-btn,.open-trip,#reader-open-day){background:linear-gradient(160deg,#3298ff,#007aff)!important;border-radius:999px!important;box-shadow:inset 0 1px 0 #ffffff55,0 5px 14px #007aff20!important}
+html body.apple-ui.reader-mode :is(.main-nav .nav-link,.main-nav .nav-link.active){border-radius:16px!important}
+html body.apple-ui.reader-mode .main-nav .nav-link.active{background:#ffffffb0!important;box-shadow:0 3px 12px #52637d08}
+html body.apple-ui.reader-mode .trip-filter-row{background:#ffffff45;border:1px solid #ffffff80;border-radius:999px;padding:4px}
+html body.apple-ui.reader-mode .trip-filter,html body.apple-ui.reader-mode .trip-filter.active{border-radius:999px!important}
+html body.apple-ui.reader-mode #date-rail{background:rgba(234,240,246,.65)!important;border-radius:22px;backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px)}
+html body.apple-ui.reader-mode #date-rail :is(.date-tab,.calendar-trigger){background:#ffffff70!important;border-color:#ffffffb0!important;border-radius:18px!important}
+html body.apple-ui.reader-mode #date-rail .date-tab.active{background:#ffffffd9!important;border-color:#ffffff!important;box-shadow:0 4px 14px #4676ae14}
+html body.apple-ui.reader-mode :is(input,select,textarea){background:#ffffff90!important;border-color:#d4dde8!important;border-radius:14px!important;line-height:1.55}
+html body.apple-ui.reader-mode dialog{background:rgba(249,251,255,.88)!important;border:1px solid #ffffffc0!important;border-radius:28px!important;backdrop-filter:blur(32px) saturate(140%);-webkit-backdrop-filter:blur(32px) saturate(140%);box-shadow:0 24px 80px #26385026!important}
+html body.apple-ui.reader-mode dialog form{background:transparent!important;border:0!important;border-radius:0!important}
+html body.apple-ui.reader-mode :is(.map-stops,.google-map-frame,.saved-map,.nearby-pick,.saved-map-detail,.saved-search-option,.journal-photo-add,.journal-map-empty){background:#ffffff65!important}
+html body.apple-ui.reader-mode #journal-map{background:transparent!important}
+html body.apple-ui.reader-mode .mobile-menu-panel{background:#ffffffb8!important;border:1px solid #ffffffd9!important;border-radius:22px!important;backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px)}
+@media(max-width:920px){
+ html body.apple-ui.reader-mode .mobile-nav{left:12px;right:12px;bottom:max(10px,env(safe-area-inset-bottom));min-height:68px;padding:5px 6px!important;border:1px solid #ffffffd9!important;border-radius:30px!important;background:rgba(255,255,255,.64)!important;backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);box-shadow:inset 0 1px 0 #fff9,0 8px 30px #3347651a!important}
+ html body.apple-ui.reader-mode .mobile-nav a{border-radius:24px!important;min-height:56px}
+ html body.apple-ui.reader-mode .mobile-nav a.active{background:#ffffffb3!important;box-shadow:0 2px 8px #33476508}
+ html body.apple-ui.reader-mode .page{padding-bottom:110px!important}
+ html body.apple-ui.reader-mode #timeline .item-card h3{line-height:1.4}
+}
+@supports not (backdrop-filter:blur(1px)){html body.apple-ui.reader-mode :is(.mobile-nav,.mobile-menu-panel,dialog){background:#f8faff!important}}
+
+/* Reference palette: neutral ink, pearl glass and soft spectral accents. */
+:root{--forest:#27292b;--glass-accent:#27292b}
+html body.apple-ui.reader-mode{background-color:#eeefef!important;background-image:radial-gradient(ellipse at 8% 12%,#ece7f2 0,transparent 42%),radial-gradient(ellipse at 90% 38%,#dff0e9 0,transparent 42%),radial-gradient(ellipse at 22% 95%,#f2e7de 0,transparent 45%)!important}
+html body.apple-ui.reader-mode :is(button,a,summary),html body.apple-ui.reader-mode #timeline .reader-navigate,html body.apple-ui.reader-mode #hotel-list .hotel-card .hotel-actions a.reader-navigate,html body.apple-ui.reader-mode #itinerary .hotel-context :is(small,button){color:#27292b!important;text-decoration:none!important}
+html body.apple-ui.reader-mode :is(.glass-button-accent,.primary-btn,.open-trip,#reader-open-day){background:linear-gradient(140deg,#303337,#1d1f22)!important;box-shadow:inset 0 1px 0 #ffffff30,0 5px 14px #1d1f2215!important;color:#fff!important}
+html body.apple-ui.reader-mode .main-nav .nav-link.active,html body.apple-ui.reader-mode #date-rail .date-tab.active,html body.apple-ui.reader-mode #date-rail .date-tab.active :is(small,span,strong),html body.apple-ui.reader-mode .mobile-nav a.active,html body.apple-ui.reader-mode .mobile-nav a.active span{color:#1d1f22!important}
+html body.apple-ui.reader-mode :is(#hotel-list,.hotel-list){display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:24px!important;align-items:start}
+html body.apple-ui.reader-mode #hotel-list .hotel-card{margin:0!important;padding:26px!important}
+html body.apple-ui.reader-mode .hotel-actions{display:flex;flex-wrap:wrap;gap:12px!important;margin-top:18px}
+html body.apple-ui.reader-mode .emoji-control{font-size:0!important;gap:0!important;min-width:46px!important;min-height:46px!important;width:auto;padding:10px 14px!important;align-items:center;justify-content:center;line-height:1!important;border-radius:999px!important}
+html body.apple-ui.reader-mode .emoji-control>*{display:none!important}
+html body.apple-ui.reader-mode .emoji-control::before{display:none!important}
+html body.apple-ui.reader-mode .emoji-control>.orbis-icon{display:inline-flex!important;align-items:center;justify-content:center;color:inherit!important;width:24px;height:24px;vertical-align:middle;pointer-events:none}
+html body.apple-ui.reader-mode .emoji-control>.orbis-icon svg{display:block!important;width:24px!important;height:24px!important;color:inherit!important}
+html body.apple-ui.reader-mode .emoji-control>.orbis-icon[data-icon]{color:var(--icon-color)!important;filter:drop-shadow(0 0 5px color-mix(in srgb,var(--icon-color) 24%,transparent))}
+html body.apple-ui.reader-mode :is(#trips,#itinerary,#map,#stays,#restaurants,#journal) .emoji-control>.orbis-icon[data-icon]{color:var(--icon-color)!important}
+html body.apple-ui.reader-mode .reader-bookmark.saved>.orbis-icon svg{fill:currentColor}
+html body.apple-ui.reader-mode .emoji-control::after{display:none!important}
+html body.apple-ui.reader-mode .emoji-control:focus-visible{outline-color:#72768088!important}
+html body.apple-ui.reader-mode .reader-home-actions .emoji-control{flex:0 0 auto!important}
+html body.apple-ui.reader-mode .mobile-nav .emoji-control{width:100%;min-width:0!important;min-height:54px!important;padding:10px 0!important}
+html body.apple-ui.reader-mode .main-nav .emoji-control{justify-content:center}
+html body.apple-ui.reader-mode .main-nav{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+html body.apple-ui.reader-mode .reader-bookmark.saved{background:#d9eee4!important;box-shadow:inset 0 0 0 1px #89b9a3!important}
+html body.apple-ui.reader-mode .reader-details>summary,html body.apple-ui.reader-mode .reader-hotel-details>summary{margin-top:8px;background:#ffffff65!important}
+html body.apple-ui.reader-mode :is(.reader-details,.reader-schedule,#reader-day-notes,.reader-hotel-details)>summary{color:#27292b!important;display:inline-flex;width:auto}
+html body.apple-ui.reader-mode #timeline .item-top .reader-bookmark.saved{background:#d9eee4!important;box-shadow:inset 0 0 0 1px #89b9a3!important}
+@media(max-width:920px){html body.apple-ui.reader-mode #hotel-list{gap:22px!important}html body.apple-ui.reader-mode #hotel-list .hotel-card{padding:22px!important}}
+html body.apple-ui.reader-mode .emoji-control:hover,html body.apple-ui.reader-mode .emoji-control:focus-visible{background:color-mix(in srgb,var(--icon-color) 12%,#fff)!important}
+html body.apple-ui.reader-mode .mobile-nav .emoji-control.active,html body.apple-ui.reader-mode .main-nav .emoji-control.active{background:color-mix(in srgb,var(--icon-color) 12%,#fff)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--icon-color) 18%,transparent)}
+
+/* Shared glass and luminous accents across every travel view. */
+html body.apple-ui.reader-mode{background-image:radial-gradient(ellipse at 8% 6%,#e5dcf6 0,transparent 44%),radial-gradient(ellipse at 95% 32%,#d6eee3 0,transparent 44%),radial-gradient(ellipse at 18% 96%,#f5dfe6 0,transparent 44%)!important}
+html body.apple-ui.reader-mode :is(#reader-home,#reader-day-summary,.workspace-trip-card,.hotel-card,.saved-card,.saved-group,.saved-search,.booking-section,.journal-entry,.journal-map-shell,.map-experience,.hotel-context){box-shadow:inset 0 1px 0 #ffffffd9,0 10px 32px #5863790c!important}
+html body.apple-ui.reader-mode .emoji-control{background:color-mix(in srgb,var(--icon-color) 6%,#ffffffa6)!important;border:1px solid #ffffffb3!important;box-shadow:inset 0 1px 0 #fff9,0 3px 12px #52637d08!important}
+html body.apple-ui.reader-mode :is(.glass-button-accent,.primary-btn,.open-trip,#reader-open-day).emoji-control{background:color-mix(in srgb,var(--icon-color) 18%,#fff)!important;box-shadow:inset 0 1px 0 #ffffffcc,0 5px 16px color-mix(in srgb,var(--icon-color) 14%,transparent)!important}
+html body.apple-ui.reader-mode #date-rail .date-tab.active{background:linear-gradient(140deg,#f6f1ff,#f3fff9)!important;border-color:#c9b4ff!important;box-shadow:0 4px 16px #9762ff15!important}
+html body.apple-ui.reader-mode :is(.map-stop,.nearby-pick,.saved-search-option,.journal-photo-add){border-color:#ffffffb3!important;border-radius:18px!important}
+html body.apple-ui.reader-mode .map-stop.active{background:#e9faf4!important;border-color:#8adbc7!important}
+html body.apple-ui.reader-mode :is(input,textarea,select):focus{outline:2px solid #a8cfc8;outline-offset:2px;border-color:#a8cfc8!important}
+html body.apple-ui.reader-mode .map-frame-caption{background:#ffffffa8!important;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+html body.apple-ui.reader-mode :is(.saved-map,.google-map-frame){overflow:hidden;border-radius:22px!important}
+html body.apple-ui.reader-mode .reader-home-actions{display:flex!important;flex-direction:row!important;flex-wrap:wrap;gap:12px}
+html body.apple-ui.reader-mode .reader-home-actions :is(#reader-open-day,#reader-open-stays){width:56px!important;min-width:56px!important;justify-content:center!important}

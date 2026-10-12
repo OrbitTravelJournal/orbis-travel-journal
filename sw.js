@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tabi-app-shell-v48-linked-stays';
+const CACHE_NAME = 'tabi-app-shell-v49-luminous-glass';
 const APP_SHELL = [
   './',
   './index.html',
@@ -8,6 +8,10 @@ const APP_SHELL = [
   './stop-editor.css',
   './stay-links.js',
   './stay-links.css',
+  './reading.js',
+  './reading.css',
+  './apple-ui.css',
+  './emoji-ui.js',
   './styles.css',
   './refinements.css',
   './features.css',

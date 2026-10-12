@@ -119,13 +119,13 @@
     <dialog id="workspace-import-dialog"><form id="workspace-import-form"><button type="button" class="close-modal" id="workspace-import-close" aria-label="Close">×</button><p class="eyebrow">SHARED JOURNEY</p><h2 id="workspace-import-title">A trip to add.</h2><p class="calendar-copy" id="workspace-import-copy">This shared journey will be copied into your account. Your existing trips stay unchanged.</p><div class="workspace-import-preview" id="workspace-import-preview"></div><button class="primary-btn" type="submit">Add to my trips</button><button class="cancel-add" type="button" id="workspace-import-cancel">Not now</button></form></dialog>
     <dialog id="workspace-auth-dialog"><form id="workspace-auth-form"><p class="eyebrow">WELCOME TO ORBIS</p><h2>Your trips, together.</h2><p class="calendar-copy">Sign in with Google to keep your trips separated by account. Your personal browser workspace stays private on this device.</p><button class="glass-button workspace-google-button" type="button" id="workspace-google-sign-in">Continue with Google</button><div class="workspace-auth-divider"><span>or use a local profile</span></div><label>Your name<input id="workspace-auth-name" placeholder="e.g. Ivan Lei" /></label><label>Email<input id="workspace-auth-email" type="email" placeholder="you@example.com" /></label><button class="primary-btn" type="submit">Enter my workspace</button></form></dialog>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="./app.js?v=20260803-journal-label"></script>
+    <script src="./app.js?v=20261012-luminous"></script>
     <script>
       // Google Identity Services OAuth client for the personal Orbis workspace.
       // This identifier is safe to expose in a browser; keep API secrets server-side.
       window.TABI_GOOGLE_CLIENT_ID = '410563003589-0gt2acjlughfar1kgsril4dlumgq4ikr.apps.googleusercontent.com';
     </script>
-    <script src="./workspace.js?v=20261006-google-button-fix"></script>
+    <script src="./workspace.js?v=20261012-luminous"></script>
     <script src="./trip-scope.js?v=20260803-trip-linked-pages"></script>
     <script src="./google-saved-map.js?v=20260803-google-saved-map"></script>
     <script src="./layout-adjustments.js?v=20260803-itinerary-recommendations-bottom"></script>
@@ -133,7 +133,10 @@
     <script src="./schedule.js?v=20261012"></script>
     <script src="./stop-editor.js?v=20261012"></script>
     <link rel="stylesheet" href="./stay-links.css?v=20261012-stays" />
-    <script src="./stay-links.js?v=20261012-stays"></script>
+    <script src="./stay-links.js?v=20261012-luminous"></script>
+    <link rel="stylesheet" href="./reading.css?v=20261012-luminous" />
+    <script src="./reading.js?v=20261012-luminous"></script>
+    <link rel="stylesheet" href="./apple-ui.css?v=20261012-luminous" />
     <script>
       /* Keep the mobile page switcher available even if an optional feature fails to initialise. */
       (() => {
@@ -158,6 +161,7 @@
         document.addEventListener('click', event => { if (!panel.hidden && !panel.contains(event.target) && event.target !== trigger) close(); });
       })();
     </script>
+    <script src="./emoji-ui.js?v=20261012-luminous"></script>
     <script>if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));</script>
   </body>
 </html>
