@@ -54,7 +54,7 @@
   function decorate() {
     document.querySelectorAll('.shell button,.shell a[data-page],.shell a[data-go],.shell .hotel-actions a,.shell .reader-navigate,.shell .navigate-stop,.shell .primary-map-link,.shell details>summary,dialog:not(#workspace-auth-dialog) button,dialog:not(#workspace-auth-dialog) .secondary-btn').forEach(el => {
       // Date information and language selectors remain readable.
-      if (el.matches('.brand,.date-tab,[data-lang],summary') || el.closest('.language-switch,.reader-details-body,.reader-schedule,#reader-day-notes,.item-menu-panel') || (el.closest('dialog') && !el.matches('.close-modal'))) return;
+      if (el.matches('.brand,.date-tab,[data-lang],summary') || el.closest('.language-switch,.reader-details-body,.reader-schedule,#reader-day-notes,.item-menu-panel,.booking-add form') || (el.closest('dialog') && !el.matches('.close-modal'))) return;
       const text = el.textContent.trim();
       const label = ((text.length > 2 ? text : el.getAttribute('aria-label')) || text || el.title || '').replace(/\s+/g,' ');
       const page = el.dataset.page || el.dataset.go || el.dataset.menuPage || el.dataset.fallbackPage;

@@ -239,3 +239,18 @@ html body.apple-ui.reader-mode #timeline .reader-details-body .stop-edit-tab>div
 html body.apple-ui.reader-mode #timeline .reader-details-body :is(button,a){background:#ffffffa6!important;border:1px solid #e4e5e9!important;border-radius:12px!important;color:#515156!important;font-size:14px!important;line-height:1.4!important;padding:10px 12px!important;min-height:44px!important;width:auto!important;margin:0!important;box-shadow:none!important}
 html body.apple-ui.reader-mode #timeline .reader-details-body button:disabled{opacity:.4}
 @media(max-width:580px){html body.apple-ui.reader-mode #timeline .item-top{flex-wrap:wrap}html body.apple-ui.reader-mode #timeline .item-top>.reader-card-actions{margin-left:auto}}
+
+/* Booking entry forms share the light glass surface and readable actions. */
+html body.apple-ui.reader-mode #booking-manager{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
+html body.apple-ui.reader-mode .booking-section{min-width:0;padding:24px!important}
+html body.apple-ui.reader-mode .booking-section h2{font-size:24px!important;line-height:1.3;margin-bottom:18px}
+html body.apple-ui.reader-mode .booking-add{background:transparent!important;border:0!important;padding:0!important;margin-top:0!important;box-shadow:none!important}
+html body.apple-ui.reader-mode .booking-add summary{box-sizing:border-box;width:100%!important;min-width:0!important;min-height:48px!important;height:auto!important;padding:12px 16px!important;border:1px solid #ffffffdc!important;border-radius:16px!important;background:#ffffff80!important;color:#515156!important;font:500 15px/1.5 var(--sans)!important;white-space:normal;display:flex!important;align-items:center}
+html body.apple-ui.reader-mode .booking-add[open] summary{background:#ffffffa6!important;color:#333338!important}
+html body.apple-ui.reader-mode .booking-add form{min-width:0;gap:16px!important;padding:18px 0 0!important;background:transparent!important;border:0!important;box-shadow:none!important}
+html body.apple-ui.reader-mode .booking-add label{min-width:0;font-size:14px!important;line-height:1.5!important}
+html body.apple-ui.reader-mode .booking-add input{box-sizing:border-box!important;min-width:0!important;max-width:100%!important;width:100%!important;min-height:48px!important;padding:12px!important;font-size:16px!important;line-height:1.4!important;background:#ffffffa6!important;border:1px solid #dce1e9!important;border-radius:14px!important;margin-top:6px!important}
+html body.apple-ui.reader-mode .booking-add .stay-dates{grid-template-columns:minmax(0,1fr) minmax(130px,.65fr);gap:16px}
+html body.apple-ui.reader-mode .booking-add form>button{width:100%!important;min-height:48px!important;font:500 15px/1.5 var(--sans)!important;color:#333338!important;background:#ffffffb3!important;border:1px solid #ffffff!important;border-radius:16px!important}
+@media(max-width:900px){html body.apple-ui.reader-mode #booking-manager{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:580px){html body.apple-ui.reader-mode .booking-section{padding:20px!important}html body.apple-ui.reader-mode .booking-add .stay-dates{grid-template-columns:minmax(0,1fr)}}
