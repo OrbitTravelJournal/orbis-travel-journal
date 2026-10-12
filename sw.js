@@ -1,8 +1,11 @@
-const CACHE_NAME = 'tabi-app-shell-v46-trip-isolation';
+const CACHE_NAME = 'tabi-app-shell-v47-editable-stops';
 const APP_SHELL = [
   './',
   './index.html',
   './app.js',
+  './schedule.js',
+  './stop-editor.js',
+  './stop-editor.css',
   './styles.css',
   './refinements.css',
   './features.css',

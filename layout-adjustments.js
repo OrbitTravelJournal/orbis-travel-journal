@@ -12,6 +12,7 @@
   };
   const formatDuration = total => `${Math.floor(total / 60)}h ${String(total % 60).padStart(2, '0')}m`;
   const syncDayStats = () => {
+    if (window.OrbisSchedule) return window.OrbisSchedule.updateStats();
     const items = [...document.querySelectorAll('#timeline .timeline-item')];
     if (!items.length) return;
     const times = items.map(item => minutes(item.querySelector('.item-time')?.textContent)).filter(Number.isFinite);

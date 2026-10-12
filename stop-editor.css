@@ -1,0 +1,14 @@
+.stop-edit-tab{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #8884;margin-bottom:14px;padding-bottom:10px}
+.stop-edit-tab button,#stop-schedule-controls button,.editor-location button{font:inherit;border:1px solid #8885;border-radius:9px;padding:8px 12px;background:var(--surface,#ffffff12);color:inherit;cursor:pointer}
+.stop-edit-tab>button{font-size:12px;letter-spacing:.02em}.stop-edit-tab>div{display:flex;gap:5px}.stop-edit-tab button:disabled,#stop-schedule-controls button:disabled{opacity:.4;cursor:default}
+.stop-recommendation{font-size:12px;margin:14px 0 0;color:inherit;opacity:.8}.stop-recommendation.has-conflict{color:#b4502f;opacity:1}
+.travel-segment a{color:inherit;text-decoration:none}
+#stop-schedule-controls{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:0 0 22px;padding:16px;border:1px solid #8884;border-radius:14px}
+#stop-schedule-controls label{font-size:12px;display:flex;align-items:center;gap:8px}#stop-schedule-controls small{flex-basis:100%;opacity:.65}#stop-schedule-controls input{font:inherit;color:inherit;background:transparent;border:1px solid #8885;border-radius:6px;padding:7px;max-width:125px}
+#stop-editor-dialog{width:min(680px,calc(100% - 28px));max-height:90dvh;overflow:auto;padding:28px;border:1px solid #8885;border-radius:20px;background:#f6f5f0;color:#222}
+#stop-editor-dialog::backdrop{background:#0008;backdrop-filter:blur(5px)}#stop-editor-dialog form{position:relative}#stop-editor-dialog h2{margin:8px 0 22px}
+.stop-editor-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}.stop-editor-grid label{display:flex;flex-direction:column;gap:6px;font-size:12px;min-width:0}
+.stop-editor-grid input,.stop-editor-grid textarea,.stop-editor-grid select{box-sizing:border-box;width:100%;min-width:0;padding:10px;border:1px solid #bbb;border-radius:8px;background:#fff;color:#222;font:inherit;font-size:16px}
+.stop-editor-grid .editor-fixed{flex-direction:row;align-items:center}.editor-fixed input{width:auto}.editor-wide,.editor-location{grid-column:1/-1}.editor-location p,.editor-hint{font-size:12px;line-height:1.6}
+#stop-location-results{display:grid;gap:6px}#stop-location-results button{text-align:left;background:#fff}#stop-editor-dialog .primary-btn{margin-top:12px}
+@media(max-width:540px){.stop-editor-grid{grid-template-columns:minmax(0,1fr)}#stop-editor-dialog{padding:20px}.stop-edit-tab>button{font-size:11px;padding:8px}#stop-schedule-controls{padding:12px}}
