@@ -111,7 +111,7 @@
     });
     document.querySelectorAll('#timeline .travel-segment').forEach((segment, index) => {
       const timing = rows[index + 1].travel;
-      segment.innerHTML = `<a href="${safe(routeLink(day.items[index], day.items[index + 1], day, timing.mode))}" target="_blank" rel="noreferrer">${timing.minutes == null ? 'Location needed · 地点待确认' : `≈ ${timing.minutes} min ${modes[timing.mode].toLowerCase()}`} · Route ↗</a>`;
+      segment.innerHTML = `<a href="${safe(routeLink(day.items[index], day.items[index + 1], day, timing.mode))}" target="_blank" rel="noreferrer">${timing.minutes == null ? '路程待确认' : `约 ${timing.minutes} 分钟 · ${({walking:'步行',cycling:'骑行',driving:'驾车',transit:'公共交通',auto:'交通'})[timing.mode] || '交通'}`} · 查看路线 ↗</a>`;
       segment.title = 'Distance-based estimate with a 30% route allowance; confirm the actual route in Maps.';
     });
     const apply = document.querySelector('#apply-stop-schedule');

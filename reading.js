@@ -61,11 +61,10 @@ if (typeof document !== 'undefined') (() => {
     document.querySelectorAll('#timeline .timeline-item').forEach((row, index) => {
       const item = day.items[index], card = row.querySelector('.item-card'); if (!item || !card) return;
       const originalNote = card.querySelector('.item-top p'), full = text(item[3]);
-      const preview = document.createElement('p'); preview.className = 'reader-short-note'; preview.textContent = full.length > 110 ? `${full.slice(0,110)}…` : full;
-      const details = document.createElement('details'); details.className = 'reader-details';
-      const toggle = document.createElement('summary'); toggle.textContent = '展开攻略与更多操作'; details.append(toggle);
+      const preview = document.createElement('p'); preview.className = 'reader-short-note'; preview.textContent = full;
+      const details = document.createElement('div'); details.className = 'reader-secondary';
       const body = document.createElement('div'); body.className = 'reader-details-body'; details.append(body);
-      if (originalNote) body.append(originalNote);
+      originalNote?.remove();
       const links = card.querySelector('.place-links'), navigation = links?.querySelector('a');
       const primary = document.createElement('div'); primary.className = 'reader-stop-primary';
       if (navigation) { navigation.textContent = '导航 · Google Maps ↗'; navigation.classList.add('reader-navigate'); primary.append(navigation); }
@@ -95,6 +94,18 @@ if (typeof document !== 'undefined') (() => {
       body.querySelector('.auto-enrich-stop')?.remove();
       const shortActions = {'.visited-stop':'打卡','.item-menu':'更多操作','.edit-link-btn':'修改链接'};
       Object.entries(shortActions).forEach(([selector,label]) => body.querySelectorAll(selector).forEach(button => { button.textContent = label; button.setAttribute('aria-label',label); }));
+      const menu = body.querySelector('.item-menu'), editLink = body.querySelector('.edit-link-btn');
+      if (menu) {
+        const openMenu = menu.onclick;
+        editLink?.remove();
+        menu.onclick = () => {
+          openMenu?.();
+          const panel = actions?.querySelector('.action-popover');
+          if (!panel) return;
+          [['[data-skip]','暂时跳过'],['[data-copy]','复制地点'],['[data-delete]','删除地点']].forEach(([selector,label]) => { const button=panel.querySelector(selector); if (button) button.textContent=label; });
+          if (editLink) panel.append(editLink);
+        };
+      }
       row.draggable = true;
     });
     // Existing planning controls and supplemental notes remain available on demand.
