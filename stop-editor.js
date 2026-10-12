@@ -125,6 +125,46 @@
     persistTrip(); renderItinerary(); toast('Stop moved · recommendations updated');
   }
   const baseRender = window.renderItinerary;
+  function touchReorder(row, day, index) {
+    let timer, active = false, origin, pointer, destination = index, frame;
+    const targets = () => [...document.querySelectorAll('#timeline .timeline-item')];
+    const clear = () => {
+      clearTimeout(timer); cancelAnimationFrame(frame); active = false;
+      row.classList.remove('card-dragging');
+      targets().forEach(element => element.classList.remove('card-drop-target'));
+    };
+    const track = () => {
+      if (!active) return;
+      const rows = targets();
+      const speed = pointer.y < 180 ? -8 : pointer.y > innerHeight - 120 ? 8 : 0;
+      if (speed) window.scrollBy(0,speed);
+      let closest = null, distance = Infinity;
+      rows.forEach(element => {
+        if (element === row) return;
+        const rect = element.getBoundingClientRect(), delta = Math.abs(pointer.y - (rect.top + rect.height / 2));
+        if (delta < distance) { distance = delta; closest = element; }
+      });
+      const own = row.getBoundingClientRect();
+      if (pointer.y >= own.top && pointer.y <= own.bottom) closest = null;
+      destination = closest ? +closest.dataset.index : index;
+      rows.forEach(element => element.classList.toggle('card-drop-target',element === closest));
+      frame = requestAnimationFrame(track);
+    };
+    row.addEventListener('touchstart', event => {
+      clear(); if (event.touches.length !== 1 || event.target.closest('button,a,input,textarea,select,summary,[contenteditable]')) return;
+      const touch = event.touches[0]; origin = pointer = {x:touch.clientX,y:touch.clientY}; destination = index;
+      timer = setTimeout(() => { active = true; row.classList.add('card-dragging'); track(); },350);
+    },{passive:true});
+    row.addEventListener('touchmove', event => {
+      if (!origin || event.touches.length !== 1) { clear(); return; }
+      const touch = event.touches[0]; pointer = {x:touch.clientX,y:touch.clientY};
+      if (!active) { if (Math.hypot(pointer.x-origin.x,pointer.y-origin.y)>8) { clearTimeout(timer); origin=null; } return; }
+      event.preventDefault();
+    },{passive:false});
+    row.addEventListener('touchend', event => { const shouldMove = active, to = destination; if (active) event.preventDefault(); clear(); origin=null; if (shouldMove) move(day,index,to); },{passive:false});
+    row.addEventListener('touchcancel', () => { clear(); origin=null; });
+    row.addEventListener('contextmenu', event => { if (active) event.preventDefault(); });
+  }
   window.renderItinerary = function () {
     if (!days[selected]?.items) return;
     baseRender();
@@ -132,14 +172,18 @@
     document.querySelectorAll('#timeline .timeline-item').forEach((row, index) => {
       const item = day.items[index], card = row.querySelector('.item-card');
       const bar = document.createElement('div'); bar.className = 'stop-edit-tab';
-      bar.innerHTML = `<button type="button" data-edit-stop aria-haspopup="dialog">地点信息 · Edit place</button><div><button type="button" data-move-up aria-label="Move stop up" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-move-down aria-label="Move stop down" ${index === day.items.length - 1 ? 'disabled' : ''}>↓</button></div>`;
+      bar.innerHTML = `<button type="button" data-edit-stop aria-haspopup="dialog">地点信息 · Edit place</button>`;
       card.prepend(bar); bar.querySelector('[data-edit-stop]').onclick = () => openEditor(item, day);
-      bar.querySelector('[data-move-up]').onclick = () => move(day, index, index - 1);
-      bar.querySelector('[data-move-down]').onclick = () => move(day, index, index + 1);
       const recommendation = document.createElement('p'); recommendation.className = 'stop-recommendation'; card.append(recommendation);
       // Replace the original drag handler, which did not persist the new order.
-      row.ondragstart = event => { if (event.target.closest('button,input,textarea,select,[contenteditable]')) { event.preventDefault(); return; } event.dataTransfer.setData('text/orbis-stop', String(index)); event.dataTransfer.effectAllowed = 'move'; };
+      row.ondragstart = event => { if (event.target.closest('button,a,input,textarea,select,summary,[contenteditable]')) { event.preventDefault(); return; } event.dataTransfer.setData('text/orbis-stop', String(index)); event.dataTransfer.effectAllowed = 'move'; row.classList.add('card-dragging'); };
+      row.ondragend = () => { row.classList.remove('card-dragging'); document.querySelectorAll('.card-drop-target').forEach(element => element.classList.remove('card-drop-target')); };
+      row.ondragover = event => { event.preventDefault(); event.dataTransfer.dropEffect = 'move'; row.classList.add('card-drop-target'); };
+      row.ondragleave = event => { if (!row.contains(event.relatedTarget)) row.classList.remove('card-drop-target'); };
       row.ondrop = event => { event.preventDefault(); const source = event.dataTransfer.getData('text/orbis-stop'); if (/^\d+$/.test(source)) move(day, Number(source), index); };
+      row.tabIndex = 0; row.title = '拖动排序 · 手机长按拖动 · 键盘 Alt + ↑ / ↓';
+      row.onkeydown = event => { if (event.target !== row || !event.altKey || !['ArrowUp','ArrowDown'].includes(event.key)) return; event.preventDefault(); const to = index + (event.key === 'ArrowUp' ? -1 : 1); move(day,index,to); document.querySelectorAll('#timeline .timeline-item')[Math.max(0,Math.min(day.items.length-1,to))]?.focus(); };
+      touchReorder(row,day,index);
       row.querySelectorAll('[contenteditable]').forEach(element => {
         element.onblur = () => {
           const slot = element.tagName === 'H3' ? 2 : 3, text = element.textContent.trim();

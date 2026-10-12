@@ -78,6 +78,8 @@ if (typeof document !== 'undefined') (() => {
       const cardActions = document.createElement('div'); cardActions.className = 'reader-card-actions';
       const edit = body.querySelector('[data-edit-stop]');
       if (edit) { edit.title = '修改地点信息'; edit.setAttribute('aria-label','修改地点信息'); cardActions.append(edit); }
+      const photo = body.querySelector('.photo-upload-btn');
+      if (photo) { photo.title = '上传照片'; photo.setAttribute('aria-label','上传照片'); cardActions.append(photo); }
       if (actions) {
         const bookmark = actions.querySelector('.save-stop');
         if (bookmark) {
@@ -89,9 +91,11 @@ if (typeof document !== 'undefined') (() => {
       const topLine = document.createElement('div'); topLine.className = 'reader-card-topline';
       if (time) topLine.append(time);
       topLine.append(cardActions); card.prepend(topLine);
-      const shortActions = {'[data-move-up]':'↑ 上移','[data-move-down]':'↓ 下移','.visited-stop':'打卡','.item-menu':'更多操作','.auto-enrich-stop':'补充地点资料','.edit-link-btn':'修改链接','.photo-upload-btn':'上传照片'};
+      body.querySelector('.stop-edit-tab')?.remove();
+      body.querySelector('.auto-enrich-stop')?.remove();
+      const shortActions = {'.visited-stop':'打卡','.item-menu':'更多操作','.edit-link-btn':'修改链接'};
       Object.entries(shortActions).forEach(([selector,label]) => body.querySelectorAll(selector).forEach(button => { button.textContent = label; button.setAttribute('aria-label',label); }));
-      details.addEventListener('toggle', () => { row.draggable = !details.open; });
+      row.draggable = true;
     });
     // Existing planning controls and supplemental notes remain available on demand.
     const controls = document.querySelector('#stop-schedule-controls');
