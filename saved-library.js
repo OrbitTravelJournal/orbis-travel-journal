@@ -60,7 +60,7 @@
     list.querySelectorAll('[data-library-category-edit]').forEach(b=>b.onclick=()=>editCategory(b.dataset.libraryCategoryEdit));
     list.querySelectorAll('[data-library-delete]').forEach(b=>b.onclick=()=>{const p=savedPlaces.find(p=>p.key===b.dataset.libraryDelete&&visible(p));if(!p)return;p.libraryDeletedAt=Date.now();persistSavedPlaces();renderSavedPlaces();renderItinerary();toast('已删除，可在底部恢复');});
     list.querySelectorAll('[data-library-restore]').forEach(b=>b.onclick=()=>{const p=savedPlaces.find(p=>p.key===b.dataset.libraryRestore&&p.libraryDeletedAt);if(!p)return;delete p.libraryDeletedAt;persistSavedPlaces();renderSavedPlaces();renderItinerary();toast('地点已恢复');});
-    list.querySelectorAll('[data-library-photo]').forEach(b=>b.onclick=()=>{photoTarget=savedPlaces.find(p=>p.key===b.dataset.libraryPhoto&&visible(p));photoInput.value='';photoInput.click();});
+    list.querySelectorAll('[data-library-photo]').forEach(b=>b.onclick=()=>{if(photoBusy){toast('图片正在处理，请稍候');return;}photoTarget=savedPlaces.find(p=>p.key===b.dataset.libraryPhoto&&visible(p));photoInput.value='';photoInput.click();});
     list.querySelectorAll('[data-library-new]').forEach(b=>b.onclick=()=>edit(null,b.dataset.libraryNew));
     list.querySelectorAll('[data-library-edit]').forEach(b=>b.onclick=()=>edit(savedPlaces.find(p=>p.key===b.dataset.libraryEdit)));
     list.querySelectorAll('[data-saved-add]').forEach(b=>b.onclick=()=>addSavedPlaceToDay(b.dataset.savedAdd));
@@ -100,14 +100,43 @@
   }
   let photoTarget;
   const photoInput=document.createElement('input');photoInput.type='file';photoInput.accept='image/*';photoInput.hidden=true;document.body.append(photoInput);
+  const photoError=(name,message)=>Object.assign(new Error(message),{name});
+  const readPhoto=file=>new Promise((resolve,reject)=>{
+    const reader=new FileReader();reader.onerror=()=>reject(photoError('PhotoReadError','无法读取图片'));
+    reader.onload=()=>{const image=new Image();image.onerror=()=>reject(photoError('PhotoFormatError','图片格式无法解码'));image.onload=()=>resolve(image);image.src=reader.result;};reader.readAsDataURL(file);
+  });
+  function thumbnail(image,maxSide,quality){
+    const scale=Math.min(1,maxSide/Math.max(image.naturalWidth,image.naturalHeight)),canvas=document.createElement('canvas');
+    canvas.width=Math.max(1,Math.round(image.naturalWidth*scale));canvas.height=Math.max(1,Math.round(image.naturalHeight*scale));
+    const context=canvas.getContext('2d');if(!context)throw photoError('PhotoReadError','无法处理图片');
+    context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);context.drawImage(image,0,0,canvas.width,canvas.height);
+    return canvas.toDataURL('image/jpeg',quality);
+  }
+  let photoBusy=false;
   photoInput.onchange=async()=>{
-    const file=photoInput.files?.[0],p=photoTarget;if(!file||!p)return;
-    const previous=p.photo;
+    const file=photoInput.files?.[0],p=photoTarget;if(!file||!p||photoBusy)return;
+    photoBusy=true;const previous=p.photo,state=window.TabiWorkspace?.state,tripId=state?.currentTripId,trip=state?.trips.find(t=>t.id===state.currentTripId&&t.ownerId===state.currentUserId),tripSaved=trip?.saved;
+    toast('正在处理图片…');
     try{
-      const photo=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=reject;reader.onload=()=>{const image=new Image();image.onerror=reject;image.onload=()=>{try{const scale=Math.min(1,1200/Math.max(image.naturalWidth,image.naturalHeight)),canvas=document.createElement('canvas');canvas.width=Math.round(image.naturalWidth*scale);canvas.height=Math.round(image.naturalHeight*scale);const context=canvas.getContext('2d');context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);context.drawImage(image,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL('image/jpeg',.82));}catch(error){reject(error)}};image.src=reader.result;};reader.readAsDataURL(file);});
-      p.photo=photo;persistSavedPlaces();renderSavedPlaces();renderItinerary();toast('图片已保存');
-    }catch{p.photo=previous;toast('图片未保存，请选择较小的 JPG 或 PNG 图片');}
-    photoInput.value='';
+      const image=await readPhoto(file);let saved=false,lastError;
+      for(const [side,quality] of [[960,.72],[800,.65],[640,.58],[480,.5],[320,.45]]){
+        const photo=thumbnail(image,side,quality);if(photo.length>180000&&side>320)continue;
+        try{
+          if(window.TabiWorkspace?.state?.currentTripId!==tripId||!savedPlaces.includes(p))throw photoError('PhotoTargetError','当前地点已变化');
+          p.photo=photo;persistSavedPlaces();
+          if(trip){trip.saved=JSON.parse(JSON.stringify(savedPlaces));if(window.TabiWorkspace.persist()===false)throw photoError('QuotaExceededError','存储空间不足');}
+          saved=true;break;
+        }catch(error){lastError=error;if(!['QuotaExceededError','NS_ERROR_DOM_QUOTA_REACHED'].includes(error?.name))throw error;}
+      }
+      if(!saved)throw lastError||photoError('QuotaExceededError','存储空间不足');
+      renderSavedPlaces();renderItinerary();toast('图片已保存');
+    }catch(error){
+      if(previous===undefined)delete p.photo;else p.photo=previous;
+      if(trip)trip.saved=tripSaved;
+      try{persistSavedPlaces();window.TabiWorkspace?.persist();}catch{}
+      const message=error?.name==='PhotoFormatError'?'浏览器无法读取这张图片，请先转换成 JPG 或 PNG。':error?.name==='QuotaExceededError'||error?.name==='NS_ERROR_DOM_QUOTA_REACHED'?'浏览器存储空间不足，图片未保存。已有攻略和图片保留。':error?.name==='PhotoTargetError'?'地点已切换，请重新选择图片。':'图片读取失败，请重新选择 JPG 或 PNG。';
+      toast(message);
+    }finally{photoInput.value='';photoBusy=false;}
   };
   document.querySelector('#library-add-category').onclick=()=>editCategory();
   const showBase=window.showPage;window.showPage=function(id){showBase(id);if(id==='restaurants')document.querySelector('#top-location').textContent='SAVED PLACES';};

@@ -4,7 +4,7 @@
 (function(){
   const clone=value=>JSON.parse(JSON.stringify(value??[]));
   const state=()=>window.TabiWorkspace?.state;
-  const trip=()=>{const s=state();return s?.trips?.find(item=>item.id===s.currentTripId)};
+  const trip=()=>{const s=state();return s?.trips?.find(item=>item.id===s.currentTripId&&item.ownerId===s.currentUserId)};
   const saveWorkspace=()=>window.TabiWorkspace?.persist?.();
   function capture(){
     const active=trip();if(!active)return;
@@ -41,7 +41,7 @@
   const originalPersist=window.persistTrip;
   window.persistTrip=function(){if(originalPersist)originalPersist();capture()};
   document.querySelector('#notes textarea')?.addEventListener('input',capture);
-  // The existing Japan data is captured once before another account can switch in.
-  if(trip())capture();
+  // Restore the account's trip before legacy browser caches can overwrite it.
+  if(trip())window.loadTripScopedData(trip());else clearLegacy();
   window.addEventListener('beforeunload',capture);
 })();

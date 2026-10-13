@@ -16,7 +16,7 @@
   const currentUser=()=>workspace.users.find(u=>u.id===workspace.currentUserId);
   const isLegacyJapanTemplate=trip=>trip.id==='japan-2026'||trip.template==='japan-2026'||(/'s Japan journey$/.test(trip.name||'')&&trip.start==='2026-10-29');
   const ownedTrips=()=>workspace.trips.filter(t=>t.ownerId===workspace.currentUserId&&(!isLegacyJapanTemplate(t)||t.importedFromShare||t.ownerId===workspace.japanOwnerId));
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(workspace))}catch{}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(workspace));return true}catch{return false}}
   function id(prefix){return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`}
   function syncLegacyToTrip(){let trip=workspace.trips.find(t=>t.id===workspace.currentTripId);if(!trip||trip.ownerId!==workspace.currentUserId)return;trip.days=oldDays();trip.hotels=oldHotels();trip.updatedAt=Date.now();save()}
   // Keep the ambient visual field tied to the same photos travellers see in the
