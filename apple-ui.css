@@ -299,3 +299,15 @@ html body.apple-ui.reader-mode .trip-card-menu button.emoji-control:hover{backgr
 html body.apple-ui.reader-mode .trip-card-menu .trip-color-picker{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0!important;padding:10px 12px!important;font-size:14px!important;line-height:1.5}
 html body.apple-ui.reader-mode .trip-card-menu input[type=color]{width:40px!important;min-width:40px!important;height:32px!important;min-height:32px!important;margin:0!important;padding:3px!important;background:#ffffffb8!important}
 html body.apple-ui.reader-mode .workspace-trip-card:has(.trip-card-menu:not([hidden])) h2{max-width:100%!important}
+
+/* Trip color is a subtle tint, with movement confined to the background layer. */
+html:has(body.apple-ui),html body.apple-ui.reader-mode{background:color-mix(in srgb,var(--journey-color,#90aaa3) 6%,#f8fafc)!important}
+html body.apple-ui.reader-mode{background-image:none!important;isolation:isolate}
+html body.apple-ui .shell{position:relative;z-index:1}
+#journey-aura{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#journey-aura:before,#journey-aura:after{content:"";position:absolute;inset:-25%;pointer-events:none;will-change:transform;background:radial-gradient(ellipse at 20% 25%,color-mix(in srgb,var(--journey-color,#90aaa3) 25%,transparent),transparent 55%),radial-gradient(ellipse at 80% 75%,color-mix(in srgb,var(--journey-color,#90aaa3) 15%,transparent),transparent 50%);animation:orbis-aura-flow 26s ease-in-out infinite alternate}
+#journey-aura:after{background:radial-gradient(ellipse at 75% 20%,#ffffffb3,transparent 50%),radial-gradient(ellipse at 30% 75%,color-mix(in srgb,var(--journey-color,#90aaa3) 18%,transparent),transparent 55%);animation-duration:34s;animation-direction:alternate-reverse}
+html body.apple-ui.reader-mode #workspace-trip-grid .workspace-trip-card{background:color-mix(in srgb,var(--trip-color,#90aaa3) 14%,#ffffffe6)!important;border-color:color-mix(in srgb,var(--trip-color,#90aaa3) 22%,#ffffff)!important}
+html body.apple-ui.reader-mode .trip-card-menu input[type=color]{width:48px!important;min-width:48px!important;height:40px!important;min-height:40px!important;cursor:pointer}
+@keyframes orbis-aura-flow{from{transform:translate3d(-3%,-2%,0) scale(1)}50%{transform:translate3d(3%,4%,0) scale(1.06)}to{transform:translate3d(5%,-3%,0) scale(1.12)}}
+@media(prefers-reduced-motion:reduce){#journey-aura:before,#journey-aura:after{animation:none!important;will-change:auto}}
