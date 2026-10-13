@@ -91,6 +91,21 @@ if (typeof document !== 'undefined') (() => {
         if (bookmark) {
           bookmark.classList.add('reader-bookmark');
           bookmark.title = bookmark.getAttribute('aria-label');
+          bookmark.onclick = () => {
+            const key = savedKey(item[2], day.city), wasSaved = isSavedPlace(item[2], day.city);
+            if (wasSaved) {
+              savedPlaces = savedPlaces.filter(place => place.key !== key);
+              persistSavedPlaces(); renderSavedPlaces();
+            } else {
+              const extra = item[5] || {};
+              savePlace({name:item[2],zh:chinesePlace(item[2]),city:day.city,country:inferredCountry(day)||cityCountry(day.city),type:item[1],photo:extra.photo||'',website:extra.website||'',map:extra.map||'',rating:extra.rating||''});
+            }
+            bookmark.classList.toggle('saved', !wasSaved);
+            const label = `${wasSaved ? 'Save' : 'Remove'} ${item[2]}`;
+            bookmark.setAttribute('aria-label', label); bookmark.title = label;
+            bookmark.setAttribute('aria-pressed', String(!wasSaved));
+            toast(wasSaved ? '已取消收藏' : '已收藏');
+          };
           cardActions.append(bookmark);
         }
       }
@@ -103,13 +118,19 @@ if (typeof document !== 'undefined') (() => {
       if (!visited) {
         visited = document.createElement('button');
         visited.type = 'button'; visited.className = 'visited-stop';
-        visited.onclick = () => {
-          item[5] ??= {};
-          item[5].visited = !item[5].visited;
-          item[5].visitedAt = item[5].visited ? (item[5].visitedAt || new Date().toISOString()) : '';
-          persistTrip(); renderItinerary(); renderJournal();
-        };
       }
+      // Toggle this control in place instead of rebuilding every itinerary card.
+      visited.onclick = () => {
+        item[5] ??= {};
+        item[5].visited = !item[5].visited;
+        item[5].visitedAt = item[5].visited ? (item[5].visitedAt || new Date().toISOString()) : '';
+        visited.classList.toggle('is-visited', item[5].visited);
+        visited.setAttribute('aria-pressed', String(item[5].visited));
+        const label = item[5].visited ? '取消打卡' : '打卡';
+        visited.setAttribute('aria-label', label); visited.title = label;
+        persistTrip(); renderJournal();
+        toast(item[5].visited ? '已打卡' : '已取消打卡');
+      };
       visited.classList.toggle('is-visited', !!item[5]?.visited);
       visited.setAttribute('aria-pressed', String(!!item[5]?.visited));
       visited.setAttribute('aria-label', item[5]?.visited ? '取消打卡' : '打卡');
