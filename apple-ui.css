@@ -477,3 +477,11 @@ html body.apple-ui.reader-mode .top-actions{align-items:center;flex:0 0 auto;mar
 html body.apple-ui.reader-mode .top-actions>:is(#open-search,#workspace-profile){align-items:center;justify-content:center;box-sizing:border-box!important;width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;max-width:44px!important;flex:0 0 44px!important;padding:10px!important;margin:0!important}
 html body.apple-ui.reader-mode #restaurants .library-trash>div{display:flex;align-items:center;gap:10px}
 html body.apple-ui.reader-mode #restaurants .library-trash>div>span{flex:1;min-width:0;overflow-wrap:anywhere}
+
+html body.apple-ui.reader-mode #restaurants .library-stars{display:flex;gap:0;width:100%;max-width:240px;align-items:center}
+html body.apple-ui.reader-mode #restaurants .library-stars .library-star{flex:1;min-width:0;min-height:44px!important;padding:8px 0!important;border:0!important;background:transparent!important;border-radius:10px!important;color:#9299a6!important;box-shadow:none!important}
+html body.apple-ui.reader-mode #restaurants .library-star svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round}
+html body.apple-ui.reader-mode #restaurants .library-stars .library-star.is-lit{color:#d99a15!important}
+html body.apple-ui.reader-mode #restaurants .library-star.is-lit svg{fill:#ffc94b;stroke:#d99a15}
+html body.apple-ui.reader-mode #restaurants .library-star:focus-visible{outline:2px solid #d99a15;outline-offset:1px}
+html body.apple-ui.reader-mode #restaurants .library-star:active svg{transform:scale(.9)}
