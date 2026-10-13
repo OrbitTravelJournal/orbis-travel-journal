@@ -15,7 +15,7 @@
     active.hotelMedia=clone(typeof hotelMedia!=='undefined'?hotelMedia:active.hotelMedia||{});
     active.hiddenHotelBookings=clone(typeof hiddenHotelBookings!=='undefined'?[...hiddenHotelBookings]:active.hiddenHotelBookings||[]);
     active.note=document.querySelector('#notes textarea')?.value||active.note||'';
-    active.updatedAt=Date.now();saveWorkspace();
+    active.updatedAt=Date.now();return saveWorkspace();
   }
   function clearLegacy(){
     if(typeof days!=='undefined')days.splice(0,days.length);
@@ -40,6 +40,9 @@
   };
   const originalPersist=window.persistTrip;
   window.persistTrip=function(){if(originalPersist)originalPersist();capture()};
+  // Library edits must update the owned trip and notify cloud sync immediately.
+  // The old global cache is redundant and can exhaust storage with duplicate photos.
+  window.persistSavedPlaces=function(){if(!trip())return false;return capture()};
   document.querySelector('#notes textarea')?.addEventListener('input',capture);
   // Restore the account's trip before legacy browser caches can overwrite it.
   if(trip())window.loadTripScopedData(trip());else clearLegacy();
