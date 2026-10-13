@@ -99,7 +99,7 @@
         </section>
 
         <section class="page map-page" id="map"><div class="map-page-head"><div><p class="eyebrow">GOOGLE MAPS · TODAY’S ROUTE</p><h1>Where to <i>next?</i></h1></div><a id="google-route" class="primary-map-link" target="_blank" rel="noreferrer">Open full route in Google Maps ↗</a></div><div class="map-experience"><div class="google-map-frame"><iframe id="google-map-preview" title="Google Maps place preview" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><div class="map-frame-caption"><span>GOOGLE MAPS PREVIEW</span><b id="map-preview-name">Choose a place</b></div></div><aside class="map-stops"><div class="section-head"><div><p class="eyebrow">TODAY’S STOPS</p><h2>Tap to <i>navigate</i></h2></div></div><div id="map-stop-list"></div></aside></div></section>
-        <section class="page saved-page" id="restaurants"><div class="saved-page-head"><div><p class="eyebrow">SAVED PLACES · 收藏地点</p><h1>Places worth <i>keeping.</i></h1><p>Save a special place, group it by country and city, then add it to any day.</p></div></div><div class="saved-search"><label for="saved-place-search">SEARCH & SAVE A PLACE</label><div><input id="saved-place-search" placeholder="Search a landmark, restaurant or city…" autocomplete="off" /><button type="button" id="save-search-place">Save place</button></div><div id="saved-search-options" class="saved-search-options"></div></div><section class="saved-map" id="saved-place-map" aria-label="Saved places map"></section><div id="saved-place-list" class="saved-place-list"></div></section>
+        <section class="page saved-page" id="restaurants"><div class="saved-page-head"><div><p class="eyebrow">SAVED PLACES · 收藏地点</p><h1>Places worth <i>keeping.</i></h1><p>Save a special place, group it by country and city, then add it to any day.</p></div></div><div class="saved-search"><label for="saved-place-search">SEARCH & SAVE A PLACE</label><div><input id="saved-place-search" placeholder="Search a landmark, restaurant or city…" autocomplete="off" /><button type="button" id="save-search-place">Save place</button></div><div id="saved-search-options" class="saved-search-options"></div></div><div id="saved-place-list" class="saved-place-list"></div></section>
         <section class="page booking-page" id="stays"><p class="eyebrow">STAYS & BOOKINGS</p><h1>Places to <i>unpack.</i></h1><div class="hotel-list" id="hotel-list"></div><div id="booking-manager"></div></section>
         <section class="page journal-page" id="journal"><div class="journal-head"><div><p class="eyebrow">TRAVEL JOURNAL · 去过的地方</p><h1>Places I’ve <i>been.</i></h1><p>Check in at a stop, keep up to six photos, and trace the route as your journey unfolds.</p></div><button type="button" class="glass-button glass-button-accent" id="journal-share">Share journal ↗</button></div><section class="journal-map-shell"><div class="journal-map-head"><div><p class="eyebrow">CHECKED-IN MAP</p><h2>Your route in memories.</h2></div><span id="journal-visited-count">0 visited</span></div><div id="journal-map" aria-label="Map of visited places"></div></section><div id="journal-list" class="journal-list"></div></section>
       </main>
@@ -127,7 +127,6 @@
     </script>
     <script src="./workspace.js?v=20261013-trip-aura"></script>
     <script src="./trip-scope.js?v=20260803-trip-linked-pages"></script>
-    <script src="./google-saved-map.js?v=20261013-mobile-map"></script>
     <script src="./layout-adjustments.js?v=20260803-itinerary-recommendations-bottom"></script>
     <link rel="stylesheet" href="./stop-editor.css?v=20261012" />
     <script src="./schedule.js?v=20261012"></script>
@@ -135,8 +134,8 @@
     <link rel="stylesheet" href="./stay-links.css?v=20261012-stays" />
     <script src="./stay-links.js?v=20261013-region-fallback"></script>
     <link rel="stylesheet" href="./reading.css?v=20261012-luminous" />
-    <script src="./reading.js?v=20261013-category-glass"></script>
-    <link rel="stylesheet" href="./apple-ui.css?v=20261013-flowing-glass" />
+    <script src="./reading.js?v=20261013-library"></script>
+    <link rel="stylesheet" href="./apple-ui.css?v=20261013-library" />
     <script>
       /* Keep the mobile page switcher available even if an optional feature fails to initialise. */
       (() => {
@@ -162,10 +161,11 @@
       })();
     </script>
     <script src="./travel-info.js?v=20261013-flight-name"></script>
-    <script src="./meal-cards.js?v=20261013-meal-choice"></script>
+    <script src="./saved-library.js?v=20261013-library"></script>
+    <script src="./meal-cards.js?v=20261013-library"></script>
     <script src="./mobile-nav.js?v=20261013-mobile-account"></script>
     <script>if(!document.getElementById("journey-aura")){const aura=document.createElement("div");aura.id="journey-aura";aura.setAttribute("aria-hidden","true");document.body.prepend(aura);}</script>
-    <script src="./emoji-ui.js?v=20261013-meal-choice"></script>
+    <script src="./emoji-ui.js?v=20261013-library"></script>
     <script>if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));</script>
   </body>
 </html>

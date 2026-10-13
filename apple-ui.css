@@ -381,3 +381,42 @@ html body.apple-ui.reader-mode #timeline .item-card[data-stop-kind="transport"]{
 html body.apple-ui.reader-mode #timeline .item-card[data-stop-kind="activity"]{--bloom-duration:32s;--bloom-delay:-16s}
 @keyframes orbis-card-bloom{0%{--bloom-x:92%;--bloom-y:10%}50%{--bloom-x:55%;--bloom-y:70%}100%{--bloom-x:12%;--bloom-y:35%}}
 @media(prefers-reduced-motion:reduce){html body.apple-ui.reader-mode #timeline .timeline-item .item-card[data-stop-kind]{animation:none!important;background-position:50% 50%,50% 50%,0 0}}
+
+/* Compact manual library, grouped by category and explicit city / landmark. */
+html body.apple-ui.reader-mode #restaurants .library-head{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:24px}
+html body.apple-ui.reader-mode #restaurants h1{font-size:clamp(28px,4vw,42px);margin:8px 0 12px}
+html body.apple-ui.reader-mode #restaurants .library-head p{font-size:16px;line-height:1.6;color:#515156}
+html body.apple-ui.reader-mode #restaurants .library-category{margin:0 0 24px;padding:22px;border:1px solid #ffffffdc;border-radius:24px;background:#ffffff80}
+html body.apple-ui.reader-mode #restaurants .library-category>header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+html body.apple-ui.reader-mode #restaurants .library-category h2{display:flex;align-items:center;gap:12px;font-size:23px;margin:0}
+html body.apple-ui.reader-mode #restaurants .library-category small{font-size:14px;color:#6e6e73}
+html body.apple-ui.reader-mode #restaurants .library-region{margin-top:22px}
+html body.apple-ui.reader-mode #restaurants .library-region h3{font-size:16px;color:#515156;margin:0 0 12px}
+html body.apple-ui.reader-mode #restaurants .library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr));gap:16px}
+html body.apple-ui.reader-mode #restaurants .library-card{min-width:0;padding:18px;border:1px solid #ffffffed;border-radius:20px;background:linear-gradient(135deg,#ffffffc9,#ffffff80);box-shadow:0 6px 20px #52637d0a;display:flex;flex-direction:column;gap:10px}
+html body.apple-ui.reader-mode #restaurants .library-card h4{font-size:19px;line-height:1.4;margin:0;overflow-wrap:anywhere;color:#1d1d1f}
+html body.apple-ui.reader-mode #restaurants .library-card p{margin:0;line-height:1.6;font-size:15px;color:#515156;overflow-wrap:anywhere}
+html body.apple-ui.reader-mode #restaurants .library-card img{width:100%;height:130px;object-fit:cover;border-radius:12px}
+html body.apple-ui.reader-mode #restaurants .library-card-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:8px}
+html body.apple-ui.reader-mode #restaurants :is(button,.library-card a),html body.apple-ui.reader-mode #saved-library-dialog button{display:inline-flex!important;align-items:center;justify-content:center;min-height:44px!important;width:auto!important;padding:10px 14px!important;border:1px solid #ffffffed!important;border-radius:14px!important;background:#ffffffbd!important;color:#515156!important;font:500 14px/1.5 var(--sans)!important;box-shadow:none!important;cursor:pointer}
+html body.apple-ui.reader-mode #restaurants .library-category[data-library-kind=Meal]{background:#fff5e680}
+html body.apple-ui.reader-mode #restaurants .library-category[data-library-kind=Stay]{background:#edf8f480}
+html body.apple-ui.reader-mode #restaurants .library-category[data-library-kind=Activity]{background:#f2ecff80}
+html body.apple-ui.reader-mode #restaurants .library-empty{color:#6e6e73;font-size:15px;margin:18px 0 0}
+html body.apple-ui.reader-mode #saved-library-dialog{width:min(540px,calc(100vw - 32px));max-width:calc(100vw - 32px);max-height:85dvh;padding:24px;box-sizing:border-box;overflow-y:auto;border:1px solid #ffffffed;border-radius:26px;background:#f8faffed;color:#1d1d1f;backdrop-filter:blur(28px)}
+#saved-library-dialog::backdrop{background:#27324835;backdrop-filter:blur(8px)}
+html body.apple-ui.reader-mode #saved-library-dialog .library-form{display:grid;gap:16px;min-width:0}
+html body.apple-ui.reader-mode #saved-library-dialog .library-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+html body.apple-ui.reader-mode #saved-library-dialog h2{font-size:24px;margin:0}
+html body.apple-ui.reader-mode #saved-library-dialog label{display:grid;gap:6px;font-size:15px;line-height:1.5;min-width:0;color:#515156}
+html body.apple-ui.reader-mode #saved-library-dialog :is(input,select,textarea),html body.apple-ui.reader-mode .meal-city-filter select{width:100%;min-width:0;max-width:100%;box-sizing:border-box;min-height:46px;padding:10px 12px;border:1px solid #dce1e9;border-radius:12px;background:#ffffffb8;color:#1d1d1f;font:16px/1.5 var(--sans)}
+html body.apple-ui.reader-mode #saved-library-dialog textarea{min-height:86px}
+html body.apple-ui.reader-mode #saved-library-dialog .library-field-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+html body.apple-ui.reader-mode #saved-library-dialog .library-form-actions{display:flex;justify-content:flex-end;gap:12px}
+html body.apple-ui.reader-mode #saved-library-dialog .library-form-actions button{flex:1}
+html body.apple-ui.reader-mode .meal-city-filter{display:grid;gap:6px;max-width:260px;font-size:14px;margin:10px 0;color:#515156}
+html body.apple-ui.reader-mode .meal-choice[hidden]{display:none!important}
+@media(max-width:580px){html body.apple-ui.reader-mode #restaurants .library-head{align-items:flex-start;flex-direction:column;gap:8px}html body.apple-ui.reader-mode #restaurants .library-category{padding:16px}html body.apple-ui.reader-mode #saved-library-dialog{padding:20px}html body.apple-ui.reader-mode #saved-library-dialog .library-field-row{grid-template-columns:minmax(0,1fr)}}
+html body.apple-ui.reader-mode #restaurants .library-card :is(h4,p,summary){color:#515156!important;opacity:1!important;text-shadow:none!important}
+html body.apple-ui.reader-mode #restaurants .library-card h4{color:#1d1d1f!important}
+@media(max-width:920px){html body.apple-ui.reader-mode #restaurants{padding-bottom:100px!important}}

@@ -6,22 +6,20 @@
   const area=day=>window.OrbisStays?.areaForDay(hotels,day,hiddenHotelBookings)||day.city;
   const normalize=v=>String(v||'').trim().toLowerCase();
   function choices(day,mealSlot){
-    const city=normalize(area(day)),list=[];
-    for(const place of savedPlaces||[])if(/meal|restaurant|餐厅|餐饮/i.test(place.type||'')&&normalize(place.city)===city)list.push({...place,note:place.notes||place.description||'',source:'收藏'});
-    for(const d of days)for(const item of d.items||[])if(item[1]==='Meal'&&(mealSlot==='other'||slot(item)==='other'||slot(item)===mealSlot)&&(d===day||normalize(item[5]?.city||area(d))===city)){
-      const e=item[5]||{};list.push({name:item[2],note:item[3],city:e.city||area(d),country:e.country||d.country,map:e.map,website:e.website,photo:e.photo,address:e.address,coordinates:e.coordinates,duration:item[4],source:'已有攻略'});
-    }
-    return list.filter((p,i)=>p.name&&list.findIndex(x=>normalize(x.name)===normalize(p.name))===i);
+    const city=normalize(area(day));
+    return (savedPlaces||[]).filter(p=>window.OrbisSavedLibrary?.category(p)==='Meal').map(p=>({...p,note:p.notes||p.description||'',source:'收藏',duration:p.duration||'—'})).sort((a,b)=>Number(normalize(b.city)===city)-Number(normalize(a.city)===city));
   }
+
   function chooser(day,mealSlot,item){
-    const candidates=choices(day,mealSlot),details=document.createElement('details');details.className='meal-options';
-    details.innerHTML=`<summary>${item?'更换餐厅':'选择餐厅'}</summary>${item?'':`<label class="meal-time-label">用餐时间<input type="time" aria-label="${labels[mealSlot]}时间" required></label>`}<div class="meal-choice-rail">${candidates.map((p,i)=>`<article class="meal-choice"><small>${safe(p.source)} · ${safe(p.city||'')}</small><b>${safe(p.name)}</b><p>${safe(p.note||'')}</p><a href="${safe(/^https?:\/\//i.test(p.map||'')?p.map:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([p.name,p.address,p.city].filter(Boolean).join(', '))}`)}" target="_blank" rel="noreferrer">导航 ↗</a><button type="button" data-meal-choice="${i}">选这家</button></article>`).join('')||'<p class="meal-empty">暂时没有该区域的餐厅。先在收藏中保存餐厅，或按原方式添加用餐地点。</p>'}</div>${item?.[5]?.mealOriginal?'<button type="button" class="meal-restore">恢复原安排</button>':''}`;
+    const candidates=choices(day,mealSlot),cities=[...new Set(candidates.map(p=>p.city||'区域待填写'))],details=document.createElement('details');details.className='meal-options';
+    details.innerHTML=`<summary>${item?'更换餐厅':'选择餐厅'}</summary>${item?'':`<label class="meal-time-label">用餐时间<input type="time" aria-label="${labels[mealSlot]}时间" required></label>`}<label class="meal-city-filter">城市 / 区域<select aria-label="筛选收藏餐厅城市"><option value="">全部收藏餐厅</option>${cities.map(city=>`<option value="${safe(city)}">${safe(city)}</option>`).join('')}</select></label><div class="meal-choice-rail">${candidates.map((p,i)=>`<article class="meal-choice" data-choice-city="${safe(p.city||'区域待填写')}"><small>${safe(p.source)} · ${safe(p.city||'')}</small><b>${safe(p.name)}</b><p>${safe(p.note||'')}</p><a href="${safe(/^https?:\/\//i.test(p.map||'')?p.map:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([p.name,p.address,p.region,p.city,p.country].filter(Boolean).join(', '))}`)}" target="_blank" rel="noreferrer">导航 ↗</a><button type="button" data-meal-choice="${i}">选这家</button></article>`).join('')||'<p class="meal-empty">收藏中还没有餐厅。到收藏地点的餐饮栏添加，即可在这里选择。</p>'}</div>${item?.[5]?.mealOriginal?'<button type="button" class="meal-restore">恢复原安排</button>':''}`;
+    details.querySelector('.meal-city-filter select').onchange=e=>{details.querySelectorAll('.meal-choice').forEach(card=>card.hidden=!!e.target.value&&card.dataset.choiceCity!==e.target.value);};
     details.querySelectorAll('[data-meal-choice]').forEach(button=>button.onclick=()=>{
       const time=details.querySelector('input');if(time&&!time.reportValidity())return;
       const p=candidates[+button.dataset.mealChoice];
       if(item&&normalize(item[2])===normalize(p.name)){details.open=false;return;}
       const original=item?(item[5]?.mealOriginal||JSON.parse(JSON.stringify(item))):null;
-      const extra={...(item?.[5]||{}),mealSlot,place:p.name,city:p.city||area(day),country:p.country||day.country||'',address:p.address||'',map:p.map||'',website:p.website||'',photo:p.photo||''};
+      const extra={...(item?.[5]||{}),mealSlot,place:p.name,city:p.city||area(day),region:p.region||'',savedPlaceKey:p.key||'',country:p.country||day.country||'',address:p.address||'',map:p.map||'',website:p.website||'',photo:p.photo||''};
       delete extra.coordinates;delete extra.locationKey;delete extra.booked;delete extra.bookingStatus;
       if(p.coordinates)extra.coordinates=p.coordinates;if(original)extra.mealOriginal=original;
       if(item){item[2]=p.name;item[3]=p.note||'';item[5]=extra;}

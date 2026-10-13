@@ -95,17 +95,19 @@ if (typeof document !== 'undefined') (() => {
       if (photo) { photo.title = '上传照片'; photo.setAttribute('aria-label','上传照片'); cardActions.append(photo); }
       if (actions) {
         const bookmark = actions.querySelector('.save-stop');
-        if (bookmark) {
+        if (bookmark && item[1] === 'Transport') bookmark.remove();
+        if (bookmark && item[1] !== 'Transport') {
           bookmark.classList.add('reader-bookmark');
           bookmark.title = bookmark.getAttribute('aria-label');
           bookmark.onclick = () => {
-            const key = savedKey(item[2], day.city), wasSaved = isSavedPlace(item[2], day.city);
+            const savedCity=item[5]?.city||day.city;
+            const key = savedKey(item[2], savedCity), wasSaved = isSavedPlace(item[2], savedCity);
             if (wasSaved) {
               savedPlaces = savedPlaces.filter(place => place.key !== key);
               persistSavedPlaces(); renderSavedPlaces();
             } else {
               const extra = item[5] || {};
-              savePlace({name:item[2],zh:chinesePlace(item[2]),city:day.city,country:inferredCountry(day)||cityCountry(day.city),type:item[1],photo:extra.photo||'',website:extra.website||'',map:extra.map||'',rating:extra.rating||''});
+              savePlace({name:item[2],zh:chinesePlace(item[2]),city:extra.city||day.city,region:extra.region||'',address:extra.address||'',notes:item[3]||'',country:extra.country||inferredCountry(day)||cityCountry(day.city),type:item[1],photo:extra.photo||'',website:extra.website||'',map:extra.map||'',rating:extra.rating||''});
             }
             bookmark.classList.toggle('saved', !wasSaved);
             const label = `${wasSaved ? 'Save' : 'Remove'} ${item[2]}`;
