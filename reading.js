@@ -42,7 +42,7 @@ if (typeof document !== 'undefined') (() => {
   }
   const summary = document.createElement('section'); summary.id = 'reader-day-summary';
   document.querySelector('#date-rail').after(summary);
-  function readDay() {
+  function readDay(scrollPosition = 0) {
     const day = days[selected]; if (!day) return;
     const active = trip(); if (active) { try { localStorage.setItem(key(active), day.iso); } catch {} }
     document.querySelectorAll('#date-rail .date-tab').forEach((button, index) => {
@@ -53,7 +53,14 @@ if (typeof document !== 'undefined') (() => {
       if (index === selected) button.setAttribute('aria-current', 'date'); else button.removeAttribute('aria-current');
     });
     const rail = document.querySelector('#date-rail'), activeTab = rail.querySelector('.active');
-    if (activeTab) rail.scrollLeft = Math.max(0, activeTab.offsetLeft - rail.offsetLeft - 8);
+    // Rebuilding date buttons must preserve the user's horizontal position.
+    rail.scrollLeft = scrollPosition;
+    if (activeTab && rail.clientWidth) {
+      const bounds = rail.getBoundingClientRect(), tabBounds = activeTab.getBoundingClientRect();
+      const left = bounds.left + rail.clientLeft + 8, right = bounds.left + rail.clientLeft + rail.clientWidth - 8;
+      if (tabBounds.left < left) rail.scrollLeft += tabBounds.left - left;
+      else if (tabBounds.right > right) rail.scrollLeft += tabBounds.right - right;
+    }
     const activities = day.items.filter(item => ['Activity','Meal'].includes(item[1])).slice(0,3).map(item => item[2]);
     summary.innerHTML = `<div><small>当天区域</small><b>${safe(day.city)}</b></div><div><small>主要活动</small><p>${safe(activities.join(' · ') || day.theme || '活动未填写')}</p></div><div><small>当晚住宿</small><b>${safe(day.hotel && day.hotel !== '—' ? day.hotel : '暂无当晚住宿')}</b></div><div class="reader-day-actions"><button type="button" class="glass-button" id="reader-day-map">查看当天地图</button><button type="button" class="glass-button" id="reader-day-stays">查看住宿预订</button></div>`;
     summary.querySelector('#reader-day-map').onclick = () => showPage('map');
@@ -143,7 +150,10 @@ if (typeof document !== 'undefined') (() => {
     renderHome();
   }
   const baseItinerary = window.renderItinerary;
-  window.renderItinerary = function () { baseItinerary(); readDay(); window.decorateOrbisIcons?.(); };
+  window.renderItinerary = function () {
+    const scrollPosition = document.querySelector('#date-rail')?.scrollLeft || 0;
+    baseItinerary(); readDay(scrollPosition); window.decorateOrbisIcons?.();
+  };
   const baseHotels = window.renderHotels;
   window.renderHotels = function () {
     baseHotels();
