@@ -362,3 +362,6 @@ html body.apple-ui.reader-mode :is(.meal-empty,.meal-original){font-size:14px!im
 @media(max-width:580px){html body.apple-ui.reader-mode .meal-slot-grid{grid-template-columns:minmax(0,1fr)}html body.apple-ui.reader-mode .meal-slot{padding:10px 12px}html body.apple-ui.reader-mode .meal-choice{flex-basis:220px}}
 html body.apple-ui.reader-mode #timeline .timeline-item .item-card.meal-card{border-left:3px solid #e8bb81!important}
 html body.apple-ui.reader-mode .meal-choice p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+
+html body.apple-ui.reader-mode #timeline .reader-skip-badge{display:inline-block;margin:8px 0;padding:5px 10px;border-radius:10px;background:#ececf180;color:#6d6479!important;font-size:13px;line-height:1.4}
+html body.apple-ui.reader-mode #timeline .item-card.is-skipped h3{color:#6e6e73!important}

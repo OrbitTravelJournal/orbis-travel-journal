@@ -69,7 +69,10 @@ if (typeof document !== 'undefined') (() => {
     summary.querySelector('#reader-day-stays').onclick = () => { const button = document.querySelector('.hotel-context button'); if (button) button.click(); else showPage('stays'); };
     document.querySelectorAll('#timeline .timeline-item').forEach((row, index) => {
       const item = day.items[index], card = row.querySelector('.item-card'); if (!item || !card) return;
-      const originalNote = card.querySelector('.item-top p'), full = text(item[3]);
+      const legacySkip = /^Skipped · preserved in trip history$/.test(String(item[3] || ''));
+      const skipped = item[5]?.skipped ?? legacySkip;
+      card.classList.toggle('is-skipped', !!skipped);
+      const originalNote = card.querySelector('.item-top p'), full = legacySkip ? '' : text(item[3]);
       const preview = document.createElement('p'); preview.className = 'reader-short-note'; preview.textContent = full;
       const details = document.createElement('div'); details.className = 'reader-secondary';
       const body = document.createElement('div'); body.className = 'reader-details-body'; details.append(body);
@@ -82,6 +85,7 @@ if (typeof document !== 'undefined') (() => {
       for (const element of [card.querySelector('.stop-edit-tab'),card.querySelector('.item-actions'),card.querySelector('.place-photo'),links,card.querySelector('.place-drawer')]) if (element) body.append(element);
       const time = row.querySelector('.item-time'); if (time) card.prepend(time);
       card.append(preview, primary, details);
+      if (skipped) { const badge=document.createElement('span');badge.className='reader-skip-badge';badge.textContent='已暂时跳过';card.querySelector('h3')?.after(badge); }
       const actions = body.querySelector('.item-actions');
       const cardActions = document.createElement('div'); cardActions.className = 'reader-card-actions';
       const edit = body.querySelector('[data-edit-stop]');
@@ -155,7 +159,14 @@ if (typeof document !== 'undefined') (() => {
           if (!panel) return;
           body.prepend(panel);
           menu.setAttribute('aria-expanded','true');
-          [['[data-skip]','暂时跳过'],['[data-copy]','复制地点'],['[data-delete]','删除地点']].forEach(([selector,label]) => { const button=panel.querySelector(selector); if (button) button.textContent=label; });
+          [['[data-skip]',skipped?'恢复安排':'暂时跳过'],['[data-copy]','复制地点'],['[data-delete]','删除地点']].forEach(([selector,label]) => { const button=panel.querySelector(selector); if (button) button.textContent=label; });
+          const skip = panel.querySelector('[data-skip]');
+          if (skip) skip.onclick = () => {
+            item[5] ??= {};
+            item[5].skipped = !skipped;
+            persistTrip(); renderItinerary();
+            toast(item[5].skipped ? '已暂时跳过，可从更多菜单恢复' : '已恢复安排');
+          };
           if (editLink) panel.append(editLink);
         };
       }
