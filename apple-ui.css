@@ -337,3 +337,28 @@ html body.apple-ui.reader-mode #trips .trip-filter-row .trip-filter.active{backg
 html body.apple-ui.reader-mode #trips .trip-filter-row .trip-filter:not(.active):hover{background:#ffffff75!important}
 html body.apple-ui.reader-mode #trips .trip-filter-row .orbis-icon{width:22px!important;height:22px!important}
 html body.apple-ui.reader-mode #trips .trip-filter-row .orbis-icon svg{width:22px!important;height:22px!important}
+
+html body.apple-ui.reader-mode #meal-day-picker{margin:18px 0 24px;padding:16px;border:1px solid #ffffffdc;border-radius:20px;background:#ffffff70}
+html body.apple-ui.reader-mode .meal-picker-title{margin:0 0 12px!important;font-size:14px!important;color:#695d50!important}
+html body.apple-ui.reader-mode .meal-slot-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+html body.apple-ui.reader-mode .meal-slot{min-width:0;display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:16px;background:#fff7ea66}
+html body.apple-ui.reader-mode .meal-slot>b{font-size:15px;color:#69503a!important}
+html body.apple-ui.reader-mode .meal-slot>small{font-size:14px;line-height:1.5;color:#515156!important}
+html body.apple-ui.reader-mode #timeline .meal-card{border-left:3px solid #e8bb81!important}
+html body.apple-ui.reader-mode #timeline .meal-card .item-type{background:#fff0d9!important;color:#806037!important}
+html body.apple-ui.reader-mode .meal-options{margin-top:14px;min-width:0;max-width:100%;border-top:1px solid #e6ddd0;padding-top:12px}
+html body.apple-ui.reader-mode .meal-options summary{font-size:15px!important;line-height:1.5;min-height:44px;cursor:pointer;color:#69503a!important;padding:10px 0;box-sizing:border-box}
+html body.apple-ui.reader-mode .meal-choice-rail{display:flex;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;max-width:100%;padding:4px 0 12px}
+html body.apple-ui.reader-mode .meal-choice{flex:0 0 240px;min-width:0;scroll-snap-align:start;box-sizing:border-box;border:1px solid #ffffffdc;border-radius:18px;background:#ffffffa6;padding:16px;display:flex;flex-direction:column;gap:10px}
+html body.apple-ui.reader-mode .meal-choice :is(b,p,small){color:#515156!important;opacity:1!important;overflow-wrap:anywhere}
+html body.apple-ui.reader-mode .meal-choice b{font-size:17px!important;color:#1d1d1f!important}
+html body.apple-ui.reader-mode .meal-choice p{font-size:14px!important;line-height:1.6;margin:0!important}
+html body.apple-ui.reader-mode .meal-choice small{font-size:12px!important}
+html body.apple-ui.reader-mode .meal-options :is(button,a){display:block;min-height:44px;box-sizing:border-box;padding:10px 14px;border:1px solid #ffffffdc;border-radius:12px;background:#fff8ec!important;color:#69503a!important;font:500 14px/1.5 var(--sans)!important;text-align:center;cursor:pointer}
+html body.apple-ui.reader-mode .meal-choice button{margin-top:auto}
+html body.apple-ui.reader-mode .meal-time-label{font-size:14px!important;color:#515156!important;max-width:220px}
+html body.apple-ui.reader-mode .meal-time-label input{min-width:0;width:100%;box-sizing:border-box;font-size:16px;min-height:46px}
+html body.apple-ui.reader-mode :is(.meal-empty,.meal-original){font-size:14px!important;line-height:1.6!important;color:#515156!important}
+@media(max-width:580px){html body.apple-ui.reader-mode .meal-slot-grid{grid-template-columns:minmax(0,1fr)}html body.apple-ui.reader-mode .meal-slot{padding:10px 12px}html body.apple-ui.reader-mode .meal-choice{flex-basis:220px}}
+html body.apple-ui.reader-mode #timeline .timeline-item .item-card.meal-card{border-left:3px solid #e8bb81!important}
+html body.apple-ui.reader-mode .meal-choice p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
