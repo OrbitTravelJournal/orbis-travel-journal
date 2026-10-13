@@ -325,3 +325,8 @@ html body.apple-ui.reader-mode .trip-card-menu input[type=color]{width:48px!impo
 }
 @media(prefers-reduced-motion:reduce){html body.apple-ui.reader-mode :is(#mobile-nav-panel,#mobile-nav-panel a.emoji-control,.mobile-nav-toggle svg){transition:none!important}}
 @media(max-width:920px){html body.apple-ui.reader-mode #mobile-nav-panel a>.orbis-icon{order:-1}}
+
+@media(max-width:920px){
+ html body.apple-ui.reader-mode #mobile-nav-panel .mobile-nav-account{grid-column:1/-1;display:flex!important;align-items:center;justify-content:center;gap:10px;width:100%!important;min-height:46px!important;height:auto!important;padding:10px 16px!important;margin:0!important;transform:none!important;border:1px solid #ffffffdc!important;border-radius:16px!important;background:#ffffffb0!important;box-shadow:none!important;font:500 14px/1.5 var(--sans)!important;color:#515156!important;cursor:pointer}
+ html body.apple-ui.reader-mode #mobile-nav-panel .mobile-nav-account svg{width:22px;height:22px;color:#b48a29!important;flex:none}
+}
