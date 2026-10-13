@@ -7,7 +7,7 @@
   const normalize=v=>String(v||'').trim().toLowerCase();
   function choices(day,mealSlot){
     const city=normalize(area(day));
-    return (savedPlaces||[]).filter(p=>window.OrbisSavedLibrary?.visible(p)&&window.OrbisSavedLibrary?.category(p)==='Meal').map(p=>({...p,note:p.notes||p.description||'',source:'收藏',duration:p.duration||'—'})).sort((a,b)=>Number(normalize(b.city)===city)-Number(normalize(a.city)===city));
+    return (savedPlaces||[]).filter(p=>window.OrbisSavedLibrary?.visible(p)&&window.OrbisSavedLibrary?.baseType(p)==='Meal').map(p=>({...p,note:p.notes||p.description||'',source:'收藏',duration:p.duration||'—'})).sort((a,b)=>Number(normalize(b.city)===city)-Number(normalize(a.city)===city));
   }
 
   function chooser(day,mealSlot,item){
@@ -19,7 +19,7 @@
       const p=candidates[+button.dataset.mealChoice];
       if(item&&normalize(item[2])===normalize(p.name)){details.open=false;return;}
       const original=item?(item[5]?.mealOriginal||JSON.parse(JSON.stringify(item))):null;
-      const extra={...(item?.[5]||{}),mealSlot,place:p.name,city:p.city||area(day),region:p.region||'',savedPlaceKey:p.key||'',country:p.country||day.country||'',address:p.address||'',map:p.map||'',website:p.website||'',photo:p.photo||''};
+      const extra={...(item?.[5]||{}),mealSlot,place:p.name,city:p.city||area(day),region:p.region||'',savedPlaceKey:p.key||'',libraryCategory:window.OrbisSavedLibrary?.category(p)||'Meal',country:p.country||day.country||'',address:p.address||'',map:p.map||'',website:p.website||'',photo:p.photo||''};
       delete extra.coordinates;delete extra.locationKey;delete extra.booked;delete extra.bookingStatus;
       if(p.coordinates)extra.coordinates=p.coordinates;if(original)extra.mealOriginal=original;
       if(item){item[2]=p.name;item[3]=p.note||'';item[5]=extra;}
@@ -50,6 +50,6 @@
       card.append(chooser(day,slot(item),item));
     });
   }
-  const base=window.renderItinerary;window.renderItinerary=function(){base();render();};
+  const base=window.renderItinerary;window.renderItinerary=function(){base();render();window.OrbisSavedLibrary?.decorateItinerary();};
   if(days[selected])renderItinerary();
 })();

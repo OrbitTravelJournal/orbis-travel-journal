@@ -107,7 +107,7 @@ if (typeof document !== 'undefined') (() => {
               persistSavedPlaces(); renderSavedPlaces();
             } else {
               const extra = item[5] || {};
-              savePlace({name:item[2],zh:chinesePlace(item[2]),city:extra.city||day.city,region:extra.region||'',address:extra.address||'',notes:item[3]||'',country:extra.country||inferredCountry(day)||cityCountry(day.city),type:item[1],photo:extra.photo||'',website:extra.website||'',map:extra.map||'',rating:extra.rating||''});
+              savePlace({name:item[2],zh:chinesePlace(item[2]),city:extra.city||day.city,libraryCategory:extra.libraryCategory,region:extra.region||'',address:extra.address||'',notes:item[3]||'',country:extra.country||inferredCountry(day)||cityCountry(day.city),type:item[1],photo:extra.photo||'',website:extra.website||'',map:extra.map||'',rating:extra.rating||''});
             }
             bookmark.classList.toggle('saved', !wasSaved);
             const label = `${wasSaved ? 'Save' : 'Remove'} ${item[2]}`;

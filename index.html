@@ -8,9 +8,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Orbis" />
     <title>Orbis — travel journal</title>
-    <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="icon" type="image/svg+xml" href="./assets/orbis-icon.svg" />
-    <link rel="apple-touch-icon" href="./assets/orbis-icon.svg" />
+    <link rel="manifest" href="./manifest.webmanifest?v=20261013-glass" />
+    <link rel="icon" type="image/svg+xml" href="./assets/orbis-icon.svg?v=20261013-glass" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/orbis-icon-180.png?v=20261013-glass" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -134,8 +134,8 @@
     <link rel="stylesheet" href="./stay-links.css?v=20261012-stays" />
     <script src="./stay-links.js?v=20261013-region-fallback"></script>
     <link rel="stylesheet" href="./reading.css?v=20261012-luminous" />
-    <script src="./reading.js?v=20261013-library-icons"></script>
-    <link rel="stylesheet" href="./apple-ui.css?v=20261013-library-icons" />
+    <script src="./reading.js?v=20261013-custom-categories"></script>
+    <link rel="stylesheet" href="./apple-ui.css?v=20261013-custom-categories" />
     <script>
       /* Keep the mobile page switcher available even if an optional feature fails to initialise. */
       (() => {
@@ -161,11 +161,11 @@
       })();
     </script>
     <script src="./travel-info.js?v=20261013-flight-name"></script>
-    <script src="./saved-library.js?v=20261013-library-icons"></script>
-    <script src="./meal-cards.js?v=20261013-library-icons"></script>
+    <script src="./saved-library.js?v=20261013-custom-categories"></script>
+    <script src="./meal-cards.js?v=20261013-custom-categories"></script>
     <script src="./mobile-nav.js?v=20261013-mobile-account"></script>
     <script>if(!document.getElementById("journey-aura")){const aura=document.createElement("div");aura.id="journey-aura";aura.setAttribute("aria-hidden","true");document.body.prepend(aura);}</script>
-    <script src="./emoji-ui.js?v=20261013-library-icons"></script>
+    <script src="./emoji-ui.js?v=20261013-custom-categories"></script>
     <script>if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));</script>
   </body>
 </html>

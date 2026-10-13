@@ -6,9 +6,20 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f7f3ec",
-  "theme_color": "#274a40",
+  "background_color": "#f8fafc",
+  "theme_color": "#f0edf8",
   "icons": [
-    { "src": "assets/orbis-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    {
+      "src": "assets/orbis-icon-192.png?v=20261013",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/orbis-icon-512.png?v=20261013",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }

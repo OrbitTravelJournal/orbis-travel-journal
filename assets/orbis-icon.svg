@@ -1,7 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Orbis travel journal">
-  <rect width="512" height="512" rx="128" fill="#232323"/>
-  <circle cx="256" cy="256" r="142" fill="none" stroke="#66755B" stroke-width="28"/>
-  <path d="M134 311c37-65 79-98 122-98 42 0 84 33 122 98" fill="none" stroke="#D5C9B6" stroke-width="22" stroke-linecap="round"/>
-  <path d="M256 112l12 29 29 12-29 12-12 29-12-29-29-12 29-12z" fill="#E6D44D"/>
-  <circle cx="256" cy="256" r="14" fill="#E6D44D"/>
+<defs><linearGradient id="glass" x2="1" y2="1"><stop stop-color="#faf9ff"/><stop offset="1" stop-color="#e0f8ed"/></linearGradient><radialGradient id="glow"><stop stop-color="#c9b4fa" stop-opacity=".7"/><stop offset="1" stop-color="#c9b4fa" stop-opacity="0"/></radialGradient></defs>
+<rect width="512" height="512" rx="116" fill="url(#glass)"/><circle cx="160" cy="155" r="240" fill="url(#glow)"/>
+<circle cx="256" cy="256" r="145" fill="#fff" fill-opacity=".45" stroke="#fff" stroke-width="3"/>
+<circle cx="256" cy="256" r="105" fill="none" stroke="#9471df" stroke-width="20"/>
+<ellipse cx="256" cy="256" rx="147" ry="57" transform="rotate(-30 256 256)" fill="none" stroke="#28b8a7" stroke-width="15"/>
+<circle cx="380" cy="184" r="17" fill="#28b8a7" stroke="#fff" stroke-width="5"/>
 </svg>
