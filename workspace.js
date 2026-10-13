@@ -16,7 +16,7 @@
   const currentUser=()=>workspace.users.find(u=>u.id===workspace.currentUserId);
   const isLegacyJapanTemplate=trip=>trip.id==='japan-2026'||trip.template==='japan-2026'||(/'s Japan journey$/.test(trip.name||'')&&trip.start==='2026-10-29');
   const ownedTrips=()=>workspace.trips.filter(t=>t.ownerId===workspace.currentUserId&&(!isLegacyJapanTemplate(t)||t.importedFromShare||t.ownerId===workspace.japanOwnerId));
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(workspace));return true}catch{return false}}
+  function save(){let saved=true;try{localStorage.setItem(KEY,JSON.stringify(workspace))}catch{saved=false}window.dispatchEvent(new Event('orbis-workspace-saved'));return saved}
   function id(prefix){return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`}
   function syncLegacyToTrip(){let trip=workspace.trips.find(t=>t.id===workspace.currentTripId);if(!trip||trip.ownerId!==workspace.currentUserId)return;trip.days=oldDays();trip.hotels=oldHotels();trip.updatedAt=Date.now();save()}
   // Keep the ambient visual field tied to the same photos travellers see in the
@@ -103,6 +103,7 @@
     let trip=ownedTrips()[0];
     workspace.currentTripId=trip?.id||null;save();document.querySelector('#workspace-auth-dialog')?.close();
     if(trip)loadTrip(trip);else{window.loadTripScopedData?.(null);updateWorkspaceChrome();renderTrips();if(typeof showPage==='function')showPage('trips');toast?.(`Welcome, ${cleanName.split(' ')[0]}. Create your first trip when you are ready.`)}
+    window.dispatchEvent(new Event('orbis-account-changed'));
     if(pendingSharedTrip)setTimeout(()=>showSharedTrip(pendingSharedTrip),120);
   }
   let googleLoader;
@@ -151,7 +152,7 @@
         if(!active())return;
         const profile=decodeGoogleCredential(response?.credential||'');
         if(!profile?.email||!profile?.sub){finish('Google sign-in did not return an account. Please try again.');return}
-        try{await signIn(profile.name,profile.email,profile.sub,profile.picture);finish('')}
+        try{await signIn(profile.name,profile.email,profile.sub,profile.picture);finish('');await window.OrbisCloud?.connect(response.credential)}
         catch{finish('Google sign-in could not finish. Please try again.')}
       }});
       // prompt() is One Tap, not the explicit button sign-in flow. Let the user
@@ -176,7 +177,7 @@
   function createTrip(event){event.preventDefault();const name=document.querySelector('#workspace-trip-name').value.trim(),start=document.querySelector('#workspace-trip-start').value,end=document.querySelector('#workspace-trip-end').value,route=document.querySelector('#workspace-trip-route').value.trim();if(!name||!start||!end)return;syncLegacyToTrip();const trip={id:id('trip'),ownerId:workspace.currentUserId,name,start,end,route,color:tripColors[workspace.trips.length%tripColors.length],status:'upcoming',travellers:2,days:[{iso:start,date:String(new Date(`${start}T12:00:00`).getDate()).padStart(2,'0'),dow:new Date(`${start}T12:00:00`).toLocaleDateString('en',{weekday:'short'}).toUpperCase(),city:(route.split('·')[0]||'New place').trim(),title:`${name} <i>at your own pace</i>`,theme:'A day to shape',hotel:'—',notice:'Add your first stop when you are ready.',items:[['10:00','Free time','A blank page','Add your first stop whenever you are ready.','—']]}],hotels:[],saved:[]};workspace.trips.push(trip);workspace.currentTripId=trip.id;save();document.querySelector('#workspace-trip-dialog').close();document.querySelector('#workspace-trip-form').reset();loadTrip(trip);toast?.('New trip created')}
   function deleteTrip(tripId){const trip=workspace.trips.find(t=>t.id===tripId);if(!trip||!confirm(`Delete “${trip.name}”?`))return;workspace.trips=workspace.trips.filter(t=>t.id!==tripId);const remaining=ownedTrips();if(workspace.currentTripId===tripId)workspace.currentTripId=remaining[0]?.id||null;save();renderTrips(document.querySelector('.trip-filter.active')?.dataset.tripFilter||'upcoming');if(workspace.currentTripId){loadTrip(remaining.find(t=>t.id===workspace.currentTripId))}else{window.loadTripScopedData?.(null);updateWorkspaceChrome();if(typeof showPage==='function')showPage('trips')}toast?.('Trip deleted — the list is updated.')}
   function toggleArchive(tripId){const trip=workspace.trips.find(t=>t.id===tripId);if(!trip)return;trip.status=tripStatus(trip)==='archive'?'upcoming':'archive';save();renderTrips(document.querySelector('.trip-filter.active')?.dataset.tripFilter||'upcoming')}
-  function signOut(){syncLegacyToTrip();workspace.currentUserId=null;workspace.currentTripId=null;save();window.loadTripScopedData?.(null);window.OrbisAccountUI?.sync();showPage('trips');openAuth()}
+  function signOut(){syncLegacyToTrip();workspace.currentUserId=null;workspace.currentTripId=null;save();window.dispatchEvent(new Event('orbis-account-changed'));window.loadTripScopedData?.(null);window.OrbisAccountUI?.sync();showPage('trips');openAuth()}
   window.TabiWorkspace={get state(){return workspace},openTripDialog,renderTrips,signIn,signOut,loadTrip,openAuth,persist:save};
   const originalPersist=window.persistTrip;window.persistTrip=function(){if(originalPersist)originalPersist();syncLegacyToTrip()};
   const originalRenderItinerary=window.renderItinerary;
