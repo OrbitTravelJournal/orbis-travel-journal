@@ -10,10 +10,10 @@
   if(fallback){const button=document.createElement('button');button.type='button';button.textContent='个人与航班';button.onclick=()=>showPage('travel-info');fallback.after(button);}
   const fields={
     travelers:[['name','姓名'],['englishName','英文姓名'],['nationality','国籍'],['phone','联系电话','tel'],['notes','个人备注','textarea']],
-    flights:[['airline','航空公司'],['number','航班号'],['departureAirport','出发机场 / 航站楼'],['departureAt','出发日期与时间','datetime-local'],['arrivalAirport','到达机场 / 航站楼'],['arrivalAt','到达日期与时间','datetime-local'],['reference','预订编号'],['bookingLink','机票 / 预订链接','url'],['notes','行李、座位及其他备注','textarea']]
+    flights:[['name','航班名称'],['airline','航空公司'],['number','航班号'],['departureAirport','出发机场 / 航站楼'],['departureAt','出发日期与时间','datetime-local'],['arrivalAirport','到达机场 / 航站楼'],['arrivalAt','到达日期与时间','datetime-local'],['reference','预订编号'],['bookingLink','机票 / 预订链接','url'],['notes','行李、座位及其他备注','textarea']]
   };
   function card(kind,item,index){
-    const heading=kind==='travelers'?(item.name||`旅客 ${index+1}`):(item.number|| (index===0?'去程航班':index===1?'返程航班':`航班 ${index+1}`));
+    const heading=kind==='travelers'?(item.name||`旅客 ${index+1}`):(item.name||item.number||`航班 ${index+1}`);
     const subtitle=kind==='flights'?[item.departureAirport,item.arrivalAirport].filter(Boolean).join(' → '):item.englishName||'';
     return `<details class="travel-info-card" data-kind="${kind}" ${!Object.values(item).some(Boolean)&&index===0?'open':''}><summary><b>${escape(heading)}</b>${subtitle?`<span>${escape(subtitle)}</span>`:''}</summary><div class="travel-info-fields">${fields[kind].map(([key,label,type='text'])=>`<label>${label}${type==='textarea'?`<textarea data-field="${key}" rows="3">${escape(item[key])}</textarea>`:`<input data-field="${key}" type="${type}" value="${escape(item[key])}">`}</label>`).join('')}${kind==='flights'?'<p class="travel-info-time-note">出发与到达时间均填写对应机场的当地时间。</p>':''}</div></details>`;
   }
@@ -30,7 +30,7 @@
       });
       active.travelInfo=updated;active.updatedAt=Date.now();window.TabiWorkspace.persist();
       page.querySelector('#travel-info-status').textContent='已保存';
-      page.querySelectorAll('[data-kind]').forEach((entry,index)=>{const kind=entry.dataset.kind,items=Array.from(page.querySelectorAll(`[data-kind="${kind}"]`)),item=updated[kind][items.indexOf(entry)];entry.querySelector('summary b').textContent=item.name||item.number||(kind==='travelers'?`旅客 ${items.indexOf(entry)+1}`:items.indexOf(entry)===0?'去程航班':items.indexOf(entry)===1?'返程航班':`航班 ${items.indexOf(entry)+1}`);});
+      page.querySelectorAll('[data-kind]').forEach((entry,index)=>{const kind=entry.dataset.kind,items=Array.from(page.querySelectorAll(`[data-kind="${kind}"]`)),item=updated[kind][items.indexOf(entry)];entry.querySelector('summary b').textContent=item.name||item.number||(kind==='travelers'?`旅客 ${items.indexOf(entry)+1}`:`航班 ${items.indexOf(entry)+1}`);});
     };
   }
   const baseShow=window.showPage;
