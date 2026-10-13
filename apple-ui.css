@@ -447,3 +447,10 @@ html body.apple-ui.reader-mode #timeline .reader-action-group .reader-card-actio
 html body.apple-ui.reader-mode #library-itinerary-picker{padding:16px;border:1px solid #ffffffdc;border-radius:20px;background:#ffffff70;margin:18px 0}
 html body.apple-ui.reader-mode #saved-library-dialog input[type=color]{height:48px;padding:6px}
 @media(prefers-reduced-motion:reduce){html body.apple-ui.reader-mode :is(.library-card-actions,.reader-action-group .reader-card-actions){animation:none!important}}
+html body.apple-ui.reader-mode #restaurants .library-head{align-items:flex-start!important;justify-content:space-between!important}
+html body.apple-ui.reader-mode #restaurants .library-head>div:first-child{flex:1;min-width:0}
+html body.apple-ui.reader-mode #restaurants .library-head-actions{display:flex;align-items:center;gap:10px;flex:none;margin-top:8px}
+html body.apple-ui.reader-mode #timeline .reader-action-group>.library-icon{color:#7e79ad!important}
+html body.apple-ui.reader-mode #timeline .reader-action-group>.library-icon svg{color:#7e79ad!important}
+html body.apple-ui.reader-mode #timeline .reader-action-group .reader-card-actions{grid-template-columns:repeat(3,44px)!important;width:174px!important}
+@media(max-width:580px){html body.apple-ui.reader-mode #restaurants .library-head{flex-direction:row!important;gap:12px!important}html body.apple-ui.reader-mode #restaurants h1{font-size:28px!important}html body.apple-ui.reader-mode #restaurants .library-head-actions{gap:6px;flex-direction:row;margin-top:6px}}

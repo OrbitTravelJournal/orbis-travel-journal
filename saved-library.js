@@ -17,7 +17,7 @@
   const saveBase=window.savePlace;
   window.savePlace=place=>{const old=savedPlaces.find(p=>p.key===savedKey(place.name,place.city)&&p.libraryDeletedAt);if(old){delete old.libraryDeletedAt;Object.assign(old,place);persistSavedPlaces();renderSavedPlaces();}else saveBase(place);};
   const page=document.querySelector('#restaurants');
-  page.innerHTML='<div class="library-head"><div><p class="eyebrow">SAVED PLACES · 收藏地点</p><h1>你的地点卡片库</h1><p>按类别、城市和区域整理，随时加入当天行程。</p></div>'+icon('plus','添加地点','id="library-add"')+icon('palette','添加分类','id="library-add-category"')+'</div><div id="saved-place-list"></div>';
+  page.innerHTML='<div class="library-head"><div><p class="eyebrow">SAVED PLACES · 收藏地点</p><h1>你的地点卡片库</h1><p>按类别、城市和区域整理，随时加入当天行程。</p></div><div class="library-head-actions">'+icon('plus','添加地点','id="library-add"')+icon('palette','添加分类','id="library-add-category"')+'</div></div><div id="saved-place-list"></div>';
   const dialog=document.createElement('dialog');dialog.id='saved-library-dialog';document.body.append(dialog);
   function openForm(title,fields,submit){
     dialog.innerHTML=`<form class="library-form"><div class="library-dialog-head"><h2>${safe(title)}</h2><button type="button" class="library-close" aria-label="关闭地点表单">×</button></div>${fields}<div class="library-form-actions"><button type="button" class="library-cancel">取消</button><button type="submit">保存</button></div></form>`;
@@ -89,7 +89,7 @@
     document.querySelectorAll('#timeline .reader-card-actions').forEach(panel=>{
       if(panel.parentElement.classList.contains('reader-action-group'))return;
       const group=document.createElement('div');group.className='reader-action-group';panel.before(group);group.innerHTML=icon('more','展开卡片操作','data-reader-action-toggle aria-expanded="false"');group.append(panel);panel.hidden=true;panel.inert=true;
-      const button=group.querySelector('button');button.onclick=()=>{const open=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(open));button.setAttribute('aria-label',open?'收起卡片操作':'展开卡片操作');panel.hidden=!open;panel.inert=!open;group.classList.toggle('is-open',open);};
+      const button=group.querySelector('button');button.onclick=()=>{document.querySelectorAll('#timeline .reader-action-group.is-open').forEach(other=>{if(other!==group){other.classList.remove('is-open');other.querySelector('.reader-card-actions').hidden=true;other.querySelector('.reader-card-actions').inert=true;other.querySelector('[data-reader-action-toggle]').setAttribute('aria-expanded','false');}});const open=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(open));button.setAttribute('aria-label',open?'收起卡片操作':'展开卡片操作');panel.hidden=!open;panel.inert=!open;group.classList.toggle('is-open',open);};
     });
     document.querySelector('#library-itinerary-picker')?.remove();
     const available=savedPlaces.filter(visible);if(!available.length)return;

@@ -149,29 +149,17 @@ if (typeof document !== 'undefined') (() => {
       Object.entries(shortActions).forEach(([selector,label]) => body.querySelectorAll(selector).forEach(button => { button.textContent = label; button.setAttribute('aria-label',label); }));
       const menu = body.querySelector('.item-menu'), editLink = body.querySelector('.edit-link-btn');
       if (menu) {
-        cardActions.append(actions);
-        menu.classList.add('reader-more');
-        menu.setAttribute('aria-expanded','false');
-        const openMenu = menu.onclick;
-        editLink?.remove();
-        menu.onclick = () => {
-          const previous = body.querySelector('.action-popover');
-          if (previous) { previous.remove(); menu.setAttribute('aria-expanded','false'); return; }
-          openMenu?.();
-          const panel = actions?.querySelector('.action-popover');
-          if (!panel) return;
-          body.prepend(panel);
-          menu.setAttribute('aria-expanded','true');
-          [['[data-skip]',skipped?'恢复安排':'暂时跳过'],['[data-copy]','复制地点'],['[data-delete]','删除地点']].forEach(([selector,label]) => { const button=panel.querySelector(selector); if (button) button.textContent=label; });
-          const skip = panel.querySelector('[data-skip]');
-          if (skip) skip.onclick = () => {
-            item[5] ??= {};
-            item[5].skipped = !skipped;
-            persistTrip(); renderItinerary();
-            toast(item[5].skipped ? '已暂时跳过，可从更多菜单恢复' : '已恢复安排');
-          };
-          if (editLink) panel.append(editLink);
-        };
+        // Flatten the legacy overflow actions into the one card control panel.
+        menu.onclick?.();
+        const panel=actions?.querySelector('.action-popover');
+        if(panel){
+          panel.querySelector('[data-skip]')?.remove();
+          panel.querySelector('[data-copy]')?.remove();
+          const remove=panel.querySelector('[data-delete]');if(remove){remove.textContent='删除地点';remove.setAttribute('aria-label','删除地点');remove.dataset.actionIcon='trash';}
+          [...panel.querySelectorAll('button')].forEach(button=>cardActions.append(button));panel.remove();
+        }
+        if(editLink){editLink.setAttribute('aria-label','修改链接');editLink.dataset.actionIcon='edit';cardActions.append(editLink);}
+        menu.remove();actions?.remove();
       }
       row.draggable = true;
     });

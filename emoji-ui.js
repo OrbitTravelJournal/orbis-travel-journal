@@ -2,6 +2,7 @@
 (() => {
   // Original 24px line icons: one stroke, rounded ends, no font dependency.
   const icons = {
+    pause:'<path d="M8 5v14M16 5v14"/>',
     plane:'<path d="m21 3-6 18-3-9-9-3zM12 12l9-9"/>',
     home:'<path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/>',
     calendar:'<rect x="4" y="5" width="16" height="15" rx="4"/><path d="M8 3v4m8-4v4M4 10h16m-12 4h3m-3 3h7"/>',
@@ -34,6 +35,7 @@
   };
   const pages = {trips:'home',itinerary:'calendar',map:'map',restaurants:'bookmark',stays:'bed',journal:'journal','travel-info':'plane'};
   const colors = {
+    pause:'#c49700',
     plane:'#18bdaa',home:'#77ce24',calendar:'#9762ff',map:'#00b8d4',bookmark:'#ff4b9b',bed:'#ff9345',journal:'#bc56ed',
     checkbox:'#00b982',check:'#00c886',warning:'#e6b800',close:'#ed6274',trash:'#fa5a48',copy:'#c49700',share:'#18beac',
     edit:'#ab55ec',ticket:'#fa4e9c',compass:'#00b8bc',photo:'#4b83f6',search:'#7283ff',archive:'#df8c36',
@@ -60,7 +62,7 @@
       const text = el.textContent.trim();
       const label = ((text.length > 2 ? text : el.getAttribute('aria-label')) || text || el.title || '').replace(/\s+/g,' ');
       const page = el.dataset.page || el.dataset.go || el.dataset.menuPage || el.dataset.fallbackPage;
-      const icon = pages[page] || (el.matches('.reader-more') ? 'more' : el.matches('[data-photo-upload],[data-place-photo],[data-hotel-upload]') ? 'photo' : el.matches('[data-photo-remove],[data-hotel-remove-photo]') ? 'trash' : el.matches('#workspace-profile') ? 'user' : el.matches('.save-stop,.trip-favorite') ? 'bookmark' : el.matches('.visited-stop') ? 'checkbox' : rules.find(([pattern]) => pattern.test(label))?.[1]) || 'more';
+      const icon = el.dataset.actionIcon || pages[page] || (el.matches('.reader-more') ? 'more' : el.matches('[data-photo-upload],[data-place-photo],[data-hotel-upload]') ? 'photo' : el.matches('[data-photo-remove],[data-hotel-remove-photo]') ? 'trash' : el.matches('#workspace-profile') ? 'user' : el.matches('.save-stop,.trip-favorite') ? 'bookmark' : el.matches('.visited-stop') ? 'checkbox' : rules.find(([pattern]) => pattern.test(label))?.[1]) || 'more';
       if (!el.classList.contains('emoji-control')) el.classList.add('emoji-control');
       if (el.style.getPropertyValue('--icon-color') !== colors[icon]) el.style.setProperty('--icon-color',colors[icon]);
       let graphic = el.querySelector(':scope>.orbis-icon');
