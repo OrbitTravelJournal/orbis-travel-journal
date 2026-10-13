@@ -474,6 +474,6 @@ html body.apple-ui.reader-mode #account-backup .account-backup-download{display:
 html{scrollbar-gutter:stable}
 html body.apple-ui.reader-mode .topbar{width:100%;min-width:0}
 html body.apple-ui.reader-mode .top-actions{align-items:center;flex:0 0 auto;margin-inline-start:auto;gap:16px}
-html body.apple-ui.reader-mode .top-actions>:is(#open-search,#workspace-profile){display:inline-flex!important;align-items:center;justify-content:center;box-sizing:border-box!important;width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;max-width:44px!important;flex:0 0 44px!important;padding:10px!important;margin:0!important}
+html body.apple-ui.reader-mode .top-actions>:is(#open-search,#workspace-profile){align-items:center;justify-content:center;box-sizing:border-box!important;width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;max-width:44px!important;flex:0 0 44px!important;padding:10px!important;margin:0!important}
 html body.apple-ui.reader-mode #restaurants .library-trash>div{display:flex;align-items:center;gap:10px}
 html body.apple-ui.reader-mode #restaurants .library-trash>div>span{flex:1;min-width:0;overflow-wrap:anywhere}
