@@ -330,3 +330,10 @@ html body.apple-ui.reader-mode .trip-card-menu input[type=color]{width:48px!impo
  html body.apple-ui.reader-mode #mobile-nav-panel .mobile-nav-account{grid-column:1/-1;display:flex!important;align-items:center;justify-content:center;gap:10px;width:100%!important;min-height:46px!important;height:auto!important;padding:10px 16px!important;margin:0!important;transform:none!important;border:1px solid #ffffffdc!important;border-radius:16px!important;background:#ffffffb0!important;box-shadow:none!important;font:500 14px/1.5 var(--sans)!important;color:#515156!important;cursor:pointer}
  html body.apple-ui.reader-mode #mobile-nav-panel .mobile-nav-account svg{width:22px;height:22px;color:#b48a29!important;flex:none}
 }
+/* Equal circular targets inside one compact glass segmented control. */
+html body.apple-ui.reader-mode #trips .trip-filter-row{display:inline-flex!important;align-items:center;gap:4px!important;width:fit-content!important;padding:4px!important;border:1px solid #ffffffdc!important;border-radius:999px!important;background:#ffffff55!important;box-shadow:inset 0 1px 0 #ffffff80;overflow:hidden}
+html body.apple-ui.reader-mode #trips .trip-filter-row .trip-filter{display:inline-flex!important;align-items:center;justify-content:center;width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;padding:12px!important;margin:0!important;border:0!important;border-radius:50%!important;background:transparent!important;box-shadow:none!important;transform:none!important}
+html body.apple-ui.reader-mode #trips .trip-filter-row .trip-filter.active{background:#ffffffeb!important;box-shadow:0 2px 8px #52637d12!important}
+html body.apple-ui.reader-mode #trips .trip-filter-row .trip-filter:not(.active):hover{background:#ffffff75!important}
+html body.apple-ui.reader-mode #trips .trip-filter-row .orbis-icon{width:22px!important;height:22px!important}
+html body.apple-ui.reader-mode #trips .trip-filter-row .orbis-icon svg{width:22px!important;height:22px!important}
