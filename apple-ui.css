@@ -268,3 +268,25 @@ html body.apple-ui.reader-mode #timeline .reader-card-actions .visited-stop.is-v
 /* Rendering a card must not animate every icon; feedback belongs to the pressed control. */
 html body.apple-ui.reader-mode .emoji-control,html body.apple-ui.reader-mode .emoji-control .orbis-icon{animation:none!important;transition:none!important}
 html body.apple-ui.reader-mode .emoji-control:active>.orbis-icon{transform:scale(.9);opacity:.7}
+
+html body.apple-ui.reader-mode .travel-info-page{max-width:1100px}
+html body.apple-ui.reader-mode .travel-info-caption{color:#515156;margin-bottom:28px}
+html body.apple-ui.reader-mode #travel-info-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;background:transparent;padding:0;border:0}
+html body.apple-ui.reader-mode .travel-info-section-title{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+html body.apple-ui.reader-mode .travel-info-section-title h2{font-size:22px;margin:0}
+html body.apple-ui.reader-mode #travel-info-form button{min-height:44px;padding:10px 16px;border:1px solid #ffffffdc;border-radius:16px;background:#ffffffa6;color:#333338;font-size:15px}
+html body.apple-ui.reader-mode .travel-info-card{margin-bottom:16px;border:1px solid #ffffffdc;border-radius:22px;background:#ffffff91;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);padding:20px;box-shadow:0 8px 26px #5863790c;min-width:0}
+html body.apple-ui.reader-mode .travel-info-card summary{cursor:pointer;min-height:44px;font-size:17px;color:#1d1d1f}
+html body.apple-ui.reader-mode .travel-info-card summary span{display:block;color:#515156;font-size:14px;margin-top:8px;overflow-wrap:anywhere}
+html body.apple-ui.reader-mode .travel-info-fields{display:grid;gap:16px;padding-top:16px;min-width:0}
+html body.apple-ui.reader-mode .travel-info-fields label{margin:0;font-size:14px;color:#515156;min-width:0}
+html body.apple-ui.reader-mode .travel-info-fields :is(input,textarea){width:100%;max-width:100%;min-width:0;box-sizing:border-box;min-height:48px;padding:12px;border:1px solid #dce1e9;border-radius:14px;background:#ffffffa6;color:#1d1d1f;font:16px/1.5 var(--sans);margin-top:6px}
+html body.apple-ui.reader-mode .travel-info-fields textarea{min-height:90px;resize:vertical}
+html body.apple-ui.reader-mode .travel-info-time-note{font-size:14px;color:#515156;margin:0;line-height:1.5}
+html body.apple-ui.reader-mode #travel-info-form .travel-info-save{grid-column:1/-1;justify-self:start;min-width:160px;background:#dff7ef}
+html body.apple-ui.reader-mode #travel-info-status{grid-column:1/-1;margin:0;font-size:15px;color:#337d62}
+@media(max-width:700px){html body.apple-ui.reader-mode #travel-info-form{grid-template-columns:minmax(0,1fr);gap:20px}html body.apple-ui.reader-mode .travel-info-card{padding:18px}html body.apple-ui.reader-mode .mobile-nav a{min-width:0;flex:1}html body.apple-ui.reader-mode .mobile-nav a span{font-size:10px}}
+html body.apple-ui.reader-mode #travel-info :is(label,p,summary){color:#515156!important;opacity:1!important}
+html body.apple-ui.reader-mode #travel-info :is(h1,h2,summary b){color:#1d1d1f!important;opacity:1!important}
+html body.apple-ui.reader-mode #travel-info .travel-info-caption{margin:8px 0 24px!important;font-size:15px!important}
+html body.apple-ui.reader-mode #travel-info-status:empty{display:none}
