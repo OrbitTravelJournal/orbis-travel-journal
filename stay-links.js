@@ -37,20 +37,35 @@
     });
     return visible;
   }
-  const area = hotel => String(hotel?.[4]?.city || (String(hotel?.[2] || '').includes('·') ? String(hotel[2]).split('·')[0] : '')).trim();
-  function areaForDay(bookings, day, hidden = new Set()) {
-    const matches = bookings.filter(hotel => !hidden.has(`${hotel[0]}|${hotel[1]}|${hotel[2]}`) && covers(hotel, day?.iso));
-    const booking = matches.find(hotel => hotel[4]?.id === day?.stayBookingId) || matches.at(-1);
-    return area(booking) || day?.city || '';
+  const cleanArea = value => {
+    const text = String(value || '').trim();
+    return /^(new place|confirmed|pending confirmation|reservation|unconfirmed|已确认|待确认|—)$/i.test(text) ? '' : text;
+  };
+  const area = hotel => cleanArea(hotel?.[4]?.city) || cleanArea(String(hotel?.[2] || '').split('·')[0]);
+  function bookingForDay(bookings, day, hidden = new Set()) {
+    const visible = bookings.filter(hotel => !hidden.has(`${hotel[0]}|${hotel[1]}|${hotel[2]}`));
+    const matches = visible.filter(hotel => covers(hotel, day?.iso));
+    const dated = matches.find(hotel => hotel[4]?.id === day?.stayBookingId) || matches.at(-1);
+    if (dated) return dated;
+    // Older nights may refer to one undated booking by its hotel name.
+    const legacy = visible.filter(hotel => hotel[1] === day?.hotel && !validDate(hotel[4]?.checkinDate));
+    return legacy.length === 1 ? legacy[0] : undefined;
   }
-  globalThis.OrbisStays = { prepare, synchronize, covers, nextDate, validDate, area, areaForDay };
+  function areaForDay(bookings, day, hidden = new Set()) {
+    const hotelArea = area(bookingForDay(bookings, day, hidden));
+    if (hotelArea) return hotelArea;
+    const original = cleanArea(day?.city); if (original) return original;
+    const placeCities = [...new Set((day?.items || []).map(item => cleanArea(item[5]?.city)).filter(Boolean))];
+    return placeCities.length === 1 ? placeCities[0] : '';
+  }
+  globalThis.OrbisStays = { prepare, synchronize, covers, nextDate, validDate, area, areaForDay, bookingForDay };
 })();
 
 if (typeof document !== 'undefined') (() => {
   const S = window.OrbisStays;
   const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
   const visible = () => { S.prepare(hotels, days); return S.synchronize(hotels, days, hiddenHotelBookings); };
-  const find = day => visible().find(hotel => hotel[4].id === day?.stayBookingId);
+  const find = day => S.bookingForDay(visible(), day);
   let editing = null;
   const dialog = document.createElement('dialog'); dialog.id = 'stay-edit-dialog';
   dialog.innerHTML = `<form id="stay-edit-form"><button class="close-modal" type="button" data-stay-close aria-label="Close">×</button><p class="eyebrow">STAYS & BOOKINGS · 住宿与预订</p><h2>Change your stay</h2><label>Hotel name · 酒店名称<input name="name" required></label><div class="stay-dates"><label>Check-in date · 入住日期<input name="checkinDate" type="date" required></label><label>Time<input name="checkinTime" type="time" value="15:00"></label><label>Check-out date · 退房日期<input name="checkoutDate" type="date" required></label><label>Time<input name="checkoutTime" type="time" value="11:00"></label></div><label>City / confirmation · 城市与预订信息<input name="details"></label><label>Booking link · 预订链接<input name="link" type="url"></label><p class="stay-link-note">Updates every night from check-in through the night before check-out. · 自动同步入住日至退房前一晚的所有行程页。</p><button type="submit" class="primary-btn">Save stay · 保存住宿</button><button type="button" class="cancel-add" data-stay-close>Cancel</button></form>`;
@@ -119,7 +134,7 @@ if (typeof document !== 'undefined') (() => {
     const day = days[selected], booking = find(day), box = document.querySelector('.hotel-context');
     if (!box) return;
     const departing = visible().find(hotel => hotel[4]?.checkoutDate === day.iso);
-    const status = booking ? `${booking[4].checkinDate === day.iso ? 'Check in from' : 'Staying tonight'} · ${booking[4].checkinDate === day.iso ? booking[4].checkinTime : `Check out ${booking[4].checkoutDate} ${booking[4].checkoutTime}`}` : departing ? `Check out today · ${departing[4].checkoutTime}` : 'Add a dated booking to link this night';
+    const status = booking && !S.validDate(booking[4].checkinDate) ? '住宿日期待填写' : booking ? `${booking[4].checkinDate === day.iso ? 'Check in from' : 'Staying tonight'} · ${booking[4].checkinDate === day.iso ? booking[4].checkinTime : `Check out ${booking[4].checkoutDate} ${booking[4].checkoutTime}`}` : departing ? `Check out today · ${departing[4].checkoutTime}` : 'Add a dated booking to link this night';
     box.querySelector('b').textContent = booking ? booking[1] : day.hotel && day.hotel !== '—' ? day.hotel : 'No stay tonight';
     box.querySelector('small').textContent = status;
     const meta = document.querySelector('#day-meta span:last-child b'); if (meta) meta.textContent = status;

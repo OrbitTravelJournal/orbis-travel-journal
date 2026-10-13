@@ -47,9 +47,10 @@ if (typeof document !== 'undefined') (() => {
     const active = trip(); if (active) { try { localStorage.setItem(key(active), day.iso); } catch {} }
     document.querySelectorAll('#date-rail .date-tab').forEach((button, index) => {
       const d = days[index];
+      const dayArea = window.OrbisStays?.areaForDay(hotels, d, hiddenHotelBookings) || '区域待填写';
       const monthDay = d.iso ? `${Number(d.iso.slice(5,7))}月${Number(d.iso.slice(8))}日` : d.date;
-      button.innerHTML = `<small>Day ${index + 1}</small><strong>${safe(monthDay)}</strong><span>${safe(d.city)}</span>`;
-      button.setAttribute('aria-label', `Day ${index + 1} · ${d.iso || d.date} · ${d.city}`);
+      button.innerHTML = `<small>Day ${index + 1}</small><strong>${safe(monthDay)}</strong><span>${safe(dayArea)}</span>`;
+      button.setAttribute('aria-label', `Day ${index + 1} · ${d.iso || d.date} · ${dayArea}`);
       if (index === selected) button.setAttribute('aria-current', 'date'); else button.removeAttribute('aria-current');
     });
     const rail = document.querySelector('#date-rail'), activeTab = rail.querySelector('.active');
@@ -61,7 +62,7 @@ if (typeof document !== 'undefined') (() => {
       if (tabBounds.left < left) rail.scrollLeft += tabBounds.left - left;
       else if (tabBounds.right > right) rail.scrollLeft += tabBounds.right - right;
     }
-    const area = window.OrbisStays?.areaForDay(hotels, day, hiddenHotelBookings) || day.city;
+    const area = window.OrbisStays?.areaForDay(hotels, day, hiddenHotelBookings) || '区域待填写';
     const activities = day.items.filter(item => ['Activity','Meal'].includes(item[1])).slice(0,3).map(item => item[2]);
     summary.innerHTML = `<div><small>当天区域</small><b>${safe(area)}</b></div><div><small>主要活动</small><p>${safe(activities.join(' · ') || day.theme || '活动未填写')}</p></div><div><small>当晚住宿</small><b>${safe(day.hotel && day.hotel !== '—' ? day.hotel : '暂无当晚住宿')}</b></div><div class="reader-day-actions"><button type="button" class="glass-button" id="reader-day-map">查看当天地图</button><button type="button" class="glass-button" id="reader-day-stays">查看住宿预订</button></div>`;
     summary.querySelector('#reader-day-map').onclick = () => showPage('map');
