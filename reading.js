@@ -92,7 +92,22 @@ if (typeof document !== 'undefined') (() => {
       topLine.append(cardActions); card.prepend(topLine);
       body.querySelector('.stop-edit-tab')?.remove();
       body.querySelector('.auto-enrich-stop')?.remove();
-      body.querySelector('.visited-stop')?.remove();
+      let visited = body.querySelector('.visited-stop');
+      if (!visited) {
+        visited = document.createElement('button');
+        visited.type = 'button'; visited.className = 'visited-stop';
+        visited.onclick = () => {
+          item[5] ??= {};
+          item[5].visited = !item[5].visited;
+          item[5].visitedAt = item[5].visited ? (item[5].visitedAt || new Date().toISOString()) : '';
+          persistTrip(); renderItinerary(); renderJournal();
+        };
+      }
+      visited.classList.toggle('is-visited', !!item[5]?.visited);
+      visited.setAttribute('aria-pressed', String(!!item[5]?.visited));
+      visited.setAttribute('aria-label', item[5]?.visited ? '取消打卡' : '打卡');
+      visited.title = item[5]?.visited ? '取消打卡' : '打卡';
+      cardActions.append(visited);
       const shortActions = {'.item-menu':'更多操作','.edit-link-btn':'修改链接'};
       Object.entries(shortActions).forEach(([selector,label]) => body.querySelectorAll(selector).forEach(button => { button.textContent = label; button.setAttribute('aria-label',label); }));
       const menu = body.querySelector('.item-menu'), editLink = body.querySelector('.edit-link-btn');

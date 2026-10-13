@@ -8,6 +8,7 @@
     bookmark:'<path d="M6 6a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v15l-6-4-6 4z"/>',
     bed:'<path d="M3 20V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12M3 16h18M3 11h18M8 8v3m8-3v3"/>',
     journal:'<rect x="5" y="3" width="15" height="18" rx="3"/><path d="M8 3v18m4-12h5m-5 4h4M3 7h4m-4 5h4m-4 5h4"/>',
+    checkbox:'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="m8 12 3 3 5-6"/>',
     check:'<path d="m5 12 4 4L19 6"/>',
     warning:'<path d="m10 4-8 14a1 1 0 0 0 1 2h18a1 1 0 0 0 1-2L14 4a2 2 0 0 0-4 0ZM12 9v5m0 3v.1"/>',
     close:'<path d="m6 6 12 12M18 6 6 18"/>',
@@ -33,7 +34,7 @@
   const pages = {trips:'home',itinerary:'calendar',map:'map',restaurants:'bookmark',stays:'bed',journal:'journal'};
   const colors = {
     home:'#77ce24',calendar:'#9762ff',map:'#00b8d4',bookmark:'#ff4b9b',bed:'#ff9345',journal:'#bc56ed',
-    check:'#00c886',warning:'#e6b800',close:'#ed6274',trash:'#fa5a48',copy:'#c49700',share:'#18beac',
+    checkbox:'#00b982',check:'#00c886',warning:'#e6b800',close:'#ed6274',trash:'#fa5a48',copy:'#c49700',share:'#18beac',
     edit:'#ab55ec',ticket:'#fa4e9c',compass:'#00b8bc',photo:'#4b83f6',search:'#7283ff',archive:'#df8c36',
     suitcase:'#80b719',logout:'#db648d',menu:'#8089c9',pin:'#ef7046',plus:'#13b982',save:'#438ef0',back:'#b666d7',user:'#b48a29',more:'#7e79ad'
   };
@@ -58,7 +59,7 @@
       const text = el.textContent.trim();
       const label = ((text.length > 2 ? text : el.getAttribute('aria-label')) || text || el.title || '').replace(/\s+/g,' ');
       const page = el.dataset.page || el.dataset.go || el.dataset.menuPage || el.dataset.fallbackPage;
-      const icon = pages[page] || (el.matches('.reader-more') ? 'more' : el.matches('[data-photo-upload],[data-place-photo],[data-hotel-upload]') ? 'photo' : el.matches('[data-photo-remove],[data-hotel-remove-photo]') ? 'trash' : el.matches('#workspace-profile') ? 'user' : el.matches('.save-stop,.trip-favorite') ? 'bookmark' : el.matches('.visited-stop') ? 'pin' : rules.find(([pattern]) => pattern.test(label))?.[1]) || 'more';
+      const icon = pages[page] || (el.matches('.reader-more') ? 'more' : el.matches('[data-photo-upload],[data-place-photo],[data-hotel-upload]') ? 'photo' : el.matches('[data-photo-remove],[data-hotel-remove-photo]') ? 'trash' : el.matches('#workspace-profile') ? 'user' : el.matches('.save-stop,.trip-favorite') ? 'bookmark' : el.matches('.visited-stop') ? 'checkbox' : rules.find(([pattern]) => pattern.test(label))?.[1]) || 'more';
       el.classList.add('emoji-control');
       el.style.setProperty('--icon-color',colors[icon]);
       let graphic = el.querySelector(':scope>.orbis-icon');

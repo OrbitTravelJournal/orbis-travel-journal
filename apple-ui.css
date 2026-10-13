@@ -254,3 +254,13 @@ html body.apple-ui.reader-mode .booking-add .stay-dates{grid-template-columns:mi
 html body.apple-ui.reader-mode .booking-add form>button{width:100%!important;min-height:48px!important;font:500 15px/1.5 var(--sans)!important;color:#333338!important;background:#ffffffb3!important;border:1px solid #ffffff!important;border-radius:16px!important}
 @media(max-width:900px){html body.apple-ui.reader-mode #booking-manager{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:580px){html body.apple-ui.reader-mode .booking-section{padding:20px!important}html body.apple-ui.reader-mode .booking-add .stay-dates{grid-template-columns:minmax(0,1fr)}}
+
+/* Tonight's stay overrides the older dark context theme. */
+html body.apple-ui.reader-mode #itinerary .context-panel .hotel-context{background:rgba(255,255,255,.57)!important;background-image:none!important;border:1px solid #ffffffdc!important;color:#1d1d1f!important;height:auto!important;min-height:0!important;padding:20px!important;display:flex;flex-wrap:wrap;align-items:center;gap:12px;backdrop-filter:blur(24px) saturate(130%)!important;-webkit-backdrop-filter:blur(24px) saturate(130%)!important}
+html body.apple-ui.reader-mode #itinerary .context-panel .hotel-context :is(.eyebrow,b,small){flex-basis:100%;margin:0!important;color:#515156!important;min-height:0!important}
+html body.apple-ui.reader-mode #itinerary .context-panel .hotel-context b{color:#1d1d1f!important;font-size:20px!important}
+html body.apple-ui.reader-mode #itinerary .context-panel .hotel-context button{margin:0!important;background:#ffffffa6!important;border:1px solid #ffffffdc!important}
+html body.apple-ui.reader-mode #timeline .reader-card-actions .visited-stop{display:inline-flex!important;position:static!important;opacity:1!important;--icon-color:#00b982}
+html body.apple-ui.reader-mode #timeline .reader-card-actions .visited-stop:not(.is-visited) .orbis-icon path{display:none}
+html body.apple-ui.reader-mode #timeline .reader-card-actions .visited-stop.is-visited{background:#d9f8eb!important;border-color:#8ae4c4!important}
+@media(max-width:580px){html body.apple-ui.reader-mode #timeline .reader-card-topline{flex-wrap:wrap;gap:10px}html body.apple-ui.reader-mode #timeline .reader-card-actions{margin-left:auto;flex-wrap:wrap}}
