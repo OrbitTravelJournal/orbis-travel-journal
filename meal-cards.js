@@ -7,7 +7,7 @@
   const normalize=v=>String(v||'').trim().toLowerCase();
   function choices(day,mealSlot){
     const city=normalize(area(day));
-    return (savedPlaces||[]).filter(p=>window.OrbisSavedLibrary?.category(p)==='Meal').map(p=>({...p,note:p.notes||p.description||'',source:'收藏',duration:p.duration||'—'})).sort((a,b)=>Number(normalize(b.city)===city)-Number(normalize(a.city)===city));
+    return (savedPlaces||[]).filter(p=>window.OrbisSavedLibrary?.visible(p)&&window.OrbisSavedLibrary?.category(p)==='Meal').map(p=>({...p,note:p.notes||p.description||'',source:'收藏',duration:p.duration||'—'})).sort((a,b)=>Number(normalize(b.city)===city)-Number(normalize(a.city)===city));
   }
 
   function chooser(day,mealSlot,item){
