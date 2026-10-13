@@ -485,3 +485,7 @@ html body.apple-ui.reader-mode #restaurants .library-stars .library-star.is-lit{
 html body.apple-ui.reader-mode #restaurants .library-star.is-lit svg{fill:#ffc94b;stroke:#d99a15}
 html body.apple-ui.reader-mode #restaurants .library-star:focus-visible{outline:2px solid #d99a15;outline-offset:1px}
 html body.apple-ui.reader-mode #restaurants .library-star:active svg{transform:scale(.9)}
+
+@media(max-width:920px){
+ html body.apple-ui.reader-mode .topbar #top-location{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:calc(100% - 240px);margin:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+}
