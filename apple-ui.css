@@ -427,3 +427,5 @@ html body.apple-ui.reader-mode #restaurants .library-card-actions{gap:8px}
 html body.apple-ui.reader-mode #restaurants .library-trash{margin:20px 0;padding:16px;border-radius:18px;background:#ffffff80;color:#515156}
 html body.apple-ui.reader-mode #restaurants .library-trash>div{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
 html body.apple-ui.reader-mode #restaurants .library-icon,html body.apple-ui.reader-mode #open-search.library-icon{box-sizing:border-box!important;max-width:44px!important;flex:0 0 44px!important}
+html body.apple-ui.reader-mode #restaurants :is(.library-category,.library-head,.library-trash) .library-icon{width:44px!important;height:44px!important;min-width:44px!important;max-width:44px!important;min-height:44px!important;padding:10px!important;border-radius:50%!important;box-sizing:border-box!important;flex:0 0 44px!important;color:var(--library-accent)!important;background:#ffffffb8!important}
+html body.apple-ui.reader-mode #restaurants .library-icon svg{color:var(--library-accent)!important}
