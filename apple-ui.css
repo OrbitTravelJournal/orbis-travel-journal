@@ -290,3 +290,12 @@ html body.apple-ui.reader-mode #travel-info :is(label,p,summary){color:#515156!i
 html body.apple-ui.reader-mode #travel-info :is(h1,h2,summary b){color:#1d1d1f!important;opacity:1!important}
 html body.apple-ui.reader-mode #travel-info .travel-info-caption{margin:8px 0 24px!important;font-size:15px!important}
 html body.apple-ui.reader-mode #travel-info-status:empty{display:none}
+/* All app-owned action menus use the same light glass surface. */
+html body.apple-ui.reader-mode :is(.trip-card-menu,.mobile-menu-panel,.action-popover){background:rgba(249,251,255,.94)!important;background-image:none!important;color:#333338!important;border:1px solid #ffffffdc!important;border-radius:18px!important;box-shadow:0 12px 32px #52637d20!important;backdrop-filter:blur(28px) saturate(130%)!important;-webkit-backdrop-filter:blur(28px) saturate(130%)!important}
+html body.apple-ui.reader-mode .trip-card-menu{width:210px!important;max-width:calc(100vw - 48px);padding:8px!important}
+html body.apple-ui.reader-mode :is(.trip-card-menu,.mobile-menu-panel,.action-popover) :is(button,label,p){color:#515156!important;opacity:1!important}
+html body.apple-ui.reader-mode .trip-card-menu button.emoji-control{display:flex!important;align-items:center;justify-content:space-between!important;gap:12px!important;width:100%!important;min-height:46px!important;padding:10px 12px!important;font:500 14px/1.5 var(--sans)!important;border-radius:12px!important;background:transparent!important;box-shadow:none!important;border:0!important;text-align:left}
+html body.apple-ui.reader-mode .trip-card-menu button.emoji-control:hover{background:#ffffffb8!important}
+html body.apple-ui.reader-mode .trip-card-menu .trip-color-picker{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0!important;padding:10px 12px!important;font-size:14px!important;line-height:1.5}
+html body.apple-ui.reader-mode .trip-card-menu input[type=color]{width:40px!important;min-width:40px!important;height:32px!important;min-height:32px!important;margin:0!important;padding:3px!important;background:#ffffffb8!important}
+html body.apple-ui.reader-mode .workspace-trip-card:has(.trip-card-menu:not([hidden])) h2{max-width:100%!important}
