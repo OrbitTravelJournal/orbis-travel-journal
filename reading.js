@@ -158,7 +158,9 @@ if (typeof document !== 'undefined') (() => {
           const remove=panel.querySelector('[data-delete]');if(remove){remove.textContent='删除地点';remove.setAttribute('aria-label','删除地点');remove.dataset.actionIcon='trash';}
           [...panel.querySelectorAll('button')].forEach(button=>cardActions.append(button));panel.remove();
         }
-        if(editLink){editLink.setAttribute('aria-label','修改链接');editLink.dataset.actionIcon='edit';cardActions.append(editLink);}
+        editLink?.remove();
+        const duplicate=document.createElement('button');duplicate.type='button';duplicate.textContent='Duplicate';duplicate.setAttribute('aria-label','复制卡片 · Duplicate');duplicate.title='复制卡片 · Duplicate';duplicate.dataset.actionIcon='copy';duplicate.className='duplicate-stop';
+        duplicate.onclick=()=>{day.items.splice(index+1,0,structuredClone(item));persistTrip();renderItinerary();toast('卡片已复制');};cardActions.append(duplicate);
         menu.remove();actions?.remove();
       }
       row.draggable = true;
