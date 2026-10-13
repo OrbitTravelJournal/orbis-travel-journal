@@ -9,14 +9,16 @@
   const seedTrip={id:'japan-2026',name:'Japan for two',route:'Osaka · Kyoto · Amanohashidate · Kinosaki · Awaji',start:'2026-10-29',end:'2026-11-08',cover:'',status:'upcoming',travellers:2,days:oldDays(),hotels:oldHotels(),saved:[]};
   let workspace;
   try{workspace=JSON.parse(localStorage.getItem(KEY)||'null')}catch{workspace=null}
-  if(!workspace||!workspace.users||!workspace.trips){workspace={currentUserId:null,currentTripId:null,users:[seedUser],trips:[seedTrip]};}
+  if(!workspace||!workspace.users||!workspace.trips){workspace={currentUserId:null,currentTripId:null,users:[seedUser],trips:[]};}
   if(!workspace.users.length)workspace.users=[seedUser];
-  if(!workspace.trips.length)workspace.trips=[seedTrip];
+
+  workspace.trips.forEach(trip=>{if(!trip.ownerId)trip.ownerId=seedUser.id;});
   const currentUser=()=>workspace.users.find(u=>u.id===workspace.currentUserId);
-  const ownedTrips=()=>workspace.trips.filter(t=>t.ownerId===workspace.currentUserId||(!t.ownerId&&workspace.currentUserId===seedUser.id));
+  const isLegacyJapanTemplate=trip=>trip.id==='japan-2026'||trip.template==='japan-2026'||(/'s Japan journey$/.test(trip.name||'')&&trip.start==='2026-10-29');
+  const ownedTrips=()=>workspace.trips.filter(t=>t.ownerId===workspace.currentUserId&&(!isLegacyJapanTemplate(t)||t.importedFromShare||t.ownerId===workspace.japanOwnerId));
   function save(){try{localStorage.setItem(KEY,JSON.stringify(workspace))}catch{}}
   function id(prefix){return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`}
-  function syncLegacyToTrip(){let trip=workspace.trips.find(t=>t.id===workspace.currentTripId);if(!trip)return;trip.days=oldDays();trip.hotels=oldHotels();trip.updatedAt=Date.now();save()}
+  function syncLegacyToTrip(){let trip=workspace.trips.find(t=>t.id===workspace.currentTripId);if(!trip||trip.ownerId!==workspace.currentUserId)return;trip.days=oldDays();trip.hotels=oldHotels();trip.updatedAt=Date.now();save()}
   // Keep the ambient visual field tied to the same photos travellers see in the
   // active day's Stop cards. The CSS layer handles the blur, gradient and drift;
   // this small bridge only supplies the current image URL.
@@ -34,7 +36,7 @@
     document.documentElement.style.setProperty('--workspace-photo',value);
     document.documentElement.style.setProperty('--ambient-gradient',gradient);
   }
-  function loadTrip(trip){if(!trip)return;if(typeof days!=='undefined')days.splice(0,days.length,...JSON.parse(JSON.stringify(trip.days||[])));if(typeof hotels!=='undefined')hotels.splice(0,hotels.length,...JSON.parse(JSON.stringify(trip.hotels||[])));if(typeof selected!=='undefined')selected=window.OrbisReader?.entryIndex(trip)??0;workspace.currentTripId=trip.id;save();window.loadTripScopedData?.(trip);if(typeof renderDays==='function')renderDays();if(typeof renderHotels==='function')renderHotels();if(typeof renderItinerary==='function')renderItinerary();if(typeof showPage==='function')showPage('itinerary');updateWorkspaceChrome();renderTrips()}
+  function loadTrip(trip){if(!trip||!ownedTrips().some(t=>t.id===trip.id))return;if(typeof days!=='undefined')days.splice(0,days.length,...JSON.parse(JSON.stringify(trip.days||[])));if(typeof hotels!=='undefined')hotels.splice(0,hotels.length,...JSON.parse(JSON.stringify(trip.hotels||[])));if(typeof selected!=='undefined')selected=window.OrbisReader?.entryIndex(trip)??0;workspace.currentTripId=trip.id;save();window.loadTripScopedData?.(trip);if(typeof renderDays==='function')renderDays();if(typeof renderHotels==='function')renderHotels();if(typeof renderItinerary==='function')renderItinerary();if(typeof showPage==='function')showPage('itinerary');updateWorkspaceChrome();renderTrips()}
   function dateLabel(value){if(!value)return 'Dates to shape';let d=new Date(`${value}T12:00:00`);return d.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})}
   function tripStatus(trip){return trip.status==='archive'||(trip.end&&trip.end<today)?'archive':'upcoming'}
   function tripDays(trip){return (trip.days||[]).length||1}
@@ -57,33 +59,48 @@
     document.addEventListener('click',event=>{if(event.target.closest?.('.trip-card-menu')||event.target.closest?.('[data-trip-menu]'))return;grid.querySelectorAll('.trip-card-menu').forEach(x=>x.hidden=true)}, {once:true});
   }
   function escapeHtml(value){return String(value||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-  function encodeShareTrip(trip){const json=JSON.stringify({...trip,id:undefined,ownerId:undefined,status:'upcoming',sharedAt:Date.now()});return btoa(unescape(encodeURIComponent(json))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
-  function decodeShareTrip(value){try{let normalized=String(value||'').replace(/-/g,'+').replace(/_/g,'/');while(normalized.length%4)normalized+='=';return JSON.parse(decodeURIComponent(escape(atob(normalized))))}catch{return null}}
-  function shareUrlFor(trip){let url=new URL(location.href);url.search='';url.hash='';url.searchParams.set('share',encodeShareTrip(trip));return url.href}
+  async function encodeShareTrip(trip){
+    const json=JSON.stringify({...trip,id:undefined,ownerId:undefined,travelInfo:undefined,status:'upcoming',sharedAt:Date.now()},(key,value)=>typeof value==='string'&&value.startsWith('data:image/')?undefined:value);
+    const bytes=new TextEncoder().encode(json);
+    if(typeof CompressionStream==='undefined')return btoa(unescape(encodeURIComponent(json))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    const compressed=new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer());
+    return 'v2.'+btoa(Array.from(compressed,b=>String.fromCharCode(b)).join('')).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  }
+  async function decodeSharedLink(value){
+    if(!value?.startsWith('v2.'))return decodeShareTrip(value);
+    try{let encoded=value.slice(3).replace(/-/g,'+').replace(/_/g,'/');while(encoded.length%4)encoded+='=';
+      const bytes=Uint8Array.from(atob(encoded),c=>c.charCodeAt(0));const json=await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+      return decodeShareTrip(btoa(unescape(encodeURIComponent(json))));
+    }catch{return null;}
+  }
+  function decodeShareTrip(value){try{let normalized=String(value||'').replace(/-/g,'+').replace(/_/g,'/');while(normalized.length%4)normalized+='=';const trip=JSON.parse(decodeURIComponent(escape(atob(normalized))));if(!trip||typeof trip.name!=='string'||!Array.isArray(trip.days)||!trip.days.length||trip.days.some(d=>!d||!Array.isArray(d.items)))return null;return trip}catch{return null}}
+  async function shareUrlFor(trip){let url=new URL(location.href);url.search='';url.hash='share='+await encodeShareTrip(trip);return url.href}
   let pendingSharedTrip=null;
-  function openShareDialog(trip){if(!trip)return;let link=shareUrlFor(trip),dialog=document.querySelector('#workspace-share-dialog'),input=document.querySelector('#workspace-share-link'),email=document.querySelector('#workspace-share-email');if(!dialog)return;input.value=link;email.href=`mailto:?subject=${encodeURIComponent(`Join my trip · ${trip.name}`)}&body=${encodeURIComponent(`I shared my trip “${trip.name}” with you. Open this link to preview it and add a copy to your own Orbis account:\n\n${link}`)}`;dialog.showModal()}
+  async function openShareDialog(trip){if(!trip||!ownedTrips().some(t=>t.id===trip.id))return;syncLegacyToTrip();let link=await shareUrlFor(trip),dialog=document.querySelector('#workspace-share-dialog'),input=document.querySelector('#workspace-share-link'),email=document.querySelector('#workspace-share-email');if(!dialog)return;input.value=link;email.href=`mailto:?subject=${encodeURIComponent(`Join my trip · ${trip.name}`)}&body=${encodeURIComponent(`I shared my trip “${trip.name}” with you. Open this link to preview it and add a copy to your own Orbis account:\n\n${link}`)}`;dialog.showModal()}
   function showSharedTrip(trip){if(!trip)return;pendingSharedTrip=trip;let dialog=document.querySelector('#workspace-import-dialog');if(!dialog)return;document.querySelector('#workspace-import-title').textContent=trip.name||'A shared journey';document.querySelector('#workspace-import-copy').textContent=`${trip.route||'A complete travel plan'} · ${dateLabel(trip.start)} — ${dateLabel(trip.end)}. Add a copy to your account; your existing trips stay unchanged.`;document.querySelector('#workspace-import-preview').innerHTML=`<b>${tripDays(trip)} days</b><span>${(trip.days||[]).reduce((sum,day)=>sum+(day.items||[]).length,0)} itinerary stops · ${(trip.hotels||[]).length} stays</span>`;dialog.showModal()}
-  function importSharedTrip(){if(!pendingSharedTrip||!workspace.currentUserId){openAuth();return}let copy=JSON.parse(JSON.stringify(pendingSharedTrip));copy.id=id('trip');copy.ownerId=workspace.currentUserId;copy.status='upcoming';copy.name=`${copy.name||'Shared journey'}${ownedTrips().some(t=>t.name===copy.name)?' (copy)':''}`;delete copy.sharedAt;workspace.trips.push(copy);workspace.currentTripId=copy.id;save();pendingSharedTrip=null;history.replaceState({},'',location.pathname);document.querySelector('#workspace-import-dialog')?.close();loadTrip(copy);toast?.('Trip added to your account')}
-  function updateWorkspaceChrome(){const user=currentUser(),trip=workspace.trips.find(t=>t.id===workspace.currentTripId)||ownedTrips()[0];if(user){document.documentElement.style.setProperty('--journey-color',tripColor(trip||{}));document.body.classList.add('workspace-glass');document.documentElement.style.setProperty('--workspace-cover',`linear-gradient(135deg,${tripColor(trip||{})}22 0%,#121512 72%)`);const name=document.querySelector('#workspace-user-name');if(name)name.textContent=user.name;const avatar=document.querySelector('#workspace-profile');if(avatar)avatar.textContent=(user.avatar||user.name||'T').slice(0,1).toUpperCase();const welcome=document.querySelector('#workspace-welcome-copy');if(welcome)welcome.textContent=`Welcome back, ${user.name.split(' ')[0]}. Your trips, places and memories stay together here.`;const cap=document.querySelector('#workspace-trip-caption');if(cap&&trip)cap.innerHTML=`${escapeHtml(trip.name)}<br>${dateLabel(trip.start)} — ${dateLabel(trip.end)}`;}}
+  function importSharedTrip(){if(!pendingSharedTrip||!workspace.currentUserId){openAuth();return}let copy=JSON.parse(JSON.stringify(pendingSharedTrip));copy.id=id('trip');copy.ownerId=workspace.currentUserId;copy.status='upcoming';copy.importedFromShare=true;copy.name=`${copy.name||'Shared journey'}${ownedTrips().some(t=>t.name===copy.name)?' (copy)':''}`;delete copy.sharedAt;workspace.trips.push(copy);workspace.currentTripId=copy.id;save();pendingSharedTrip=null;history.replaceState({},'',location.pathname);document.querySelector('#workspace-import-dialog')?.close();loadTrip(copy);toast?.('Trip added to your account')}
+  function updateWorkspaceChrome(){window.OrbisAccountUI?.sync();const user=currentUser(),trip=workspace.trips.find(t=>t.id===workspace.currentTripId)||ownedTrips()[0];if(user){document.documentElement.style.setProperty('--journey-color',tripColor(trip||{}));document.body.classList.add('workspace-glass');document.documentElement.style.setProperty('--workspace-cover',`linear-gradient(135deg,${tripColor(trip||{})}22 0%,#121512 72%)`);const name=document.querySelector('#workspace-user-name');if(name)name.textContent=user.name;const avatar=document.querySelector('#workspace-profile');if(avatar)avatar.textContent=(user.avatar||user.name||'T').slice(0,1).toUpperCase();const welcome=document.querySelector('#workspace-welcome-copy');if(welcome)welcome.textContent=`Welcome back, ${user.name.split(' ')[0]}. Your trips, places and memories stay together here.`;const cap=document.querySelector('#workspace-trip-caption');if(cap&&!trip)cap.textContent='';if(cap&&trip)cap.innerHTML=`${escapeHtml(trip.name)}<br>${dateLabel(trip.start)} — ${dateLabel(trip.end)}`;}}
   function openAuth(){const dialog=document.querySelector('#workspace-auth-dialog');if(dialog&&!dialog.open)dialog.showModal()}
-  function signIn(name,email,googleId,avatar){
+  const japanOwnerEmailHash='65eabc9a8c692702071fe2dce7e548faf4c1dedd34e8e0d1fa18af1f9bf33255';
+  async function ensureOwnerJapan(user){
+    if(!user?.email)return;
+    const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(user.email.trim().toLowerCase())));
+    if(Array.from(digest,b=>b.toString(16).padStart(2,'0')).join('')!==japanOwnerEmailHash)return;
+    workspace.japanOwnerId=user.id;save();
+    const isJapan=t=>t.id==='japan-2026'||t.template==='japan-2026'||/japan/i.test(t.name||'');
+    if(workspace.trips.some(t=>t.ownerId===user.id&&isJapan(t)))return;
+    const legacy=workspace.trips.find(t=>t.ownerId===seedUser.id&&isJapan(t));
+    if(legacy){legacy.ownerId=user.id;save();return;}
+    const original=JSON.parse(JSON.stringify(seedTrip));original.id=id('trip');original.ownerId=user.id;original.template='japan-2026';workspace.trips.push(original);save();
+  }
+  async function signIn(name,email,googleId,avatar){
     const cleanName=(name||'Traveller').trim(),cleanEmail=(email||`${cleanName.toLowerCase().replace(/\s+/g,'.')}@local.tabi`).trim().toLowerCase();
     let user=workspace.users.find(u=>(googleId&&u.googleId===googleId)||u.email===cleanEmail);
-    if(!user&&googleId){
-      // The first Google account claims the original Japan seed so Ivan's existing
-      // planning work is preserved. Every later Google account starts empty.
-      const seedRecord=workspace.users.find(u=>u.id===seedUser.id);
-      const hasGoogleUser=workspace.users.some(u=>u.googleId);
-      const hasSeedTrip=workspace.trips.some(t=>t.ownerId===seedUser.id||(!t.ownerId&&seedUser.id===workspace.currentUserId));
-      if(seedRecord&&!hasGoogleUser&&hasSeedTrip&&window.confirm('Save your existing Japan trip to this Google account?\n\nChoose Cancel for a fresh, empty workspace.'))user=seedRecord;
-    }
     if(!user){user={id:googleId||id('user'),googleId:googleId||'',name:cleanName,email:cleanEmail,avatar:avatar||cleanName.slice(0,1)};workspace.users.push(user)}
     else{user.name=cleanName||user.name;user.email=cleanEmail;user.googleId=googleId||user.googleId;user.avatar=avatar||user.avatar}
+    await ensureOwnerJapan(user);
     workspace.currentUserId=user.id;
-    let trip=workspace.trips.find(t=>t.ownerId===user.id);
-    // Google accounts do not receive a copied demo trip. They can create their
-    // first journey from the Trips page, keeping each account's archive private.
-    if(!trip&&!googleId){trip=JSON.parse(JSON.stringify(seedTrip));trip.id=id('trip');trip.ownerId=user.id;trip.name=`${cleanName.split(' ')[0]}'s Japan journey`;workspace.trips.push(trip)}
+    let trip=ownedTrips()[0];
     workspace.currentTripId=trip?.id||null;save();document.querySelector('#workspace-auth-dialog')?.close();
     if(trip)loadTrip(trip);else{window.loadTripScopedData?.(null);updateWorkspaceChrome();renderTrips();if(typeof showPage==='function')showPage('trips');toast?.(`Welcome, ${cleanName.split(' ')[0]}. Create your first trip when you are ready.`)}
     if(pendingSharedTrip)setTimeout(()=>showSharedTrip(pendingSharedTrip),120);
@@ -130,11 +147,11 @@
     button.disabled=true;button.textContent='Connecting to Google…';status.textContent='Loading Google sign-in…';
     loadGoogleIdentity().then(()=>{
       if(!active())return;
-      window.google.accounts.id.initialize({client_id:clientId,ux_mode:'popup',auto_select:false,callback:response=>{
+      window.google.accounts.id.initialize({client_id:clientId,ux_mode:'popup',auto_select:false,callback:async response=>{
         if(!active())return;
         const profile=decodeGoogleCredential(response?.credential||'');
         if(!profile?.email||!profile?.sub){finish('Google sign-in did not return an account. Please try again.');return}
-        try{signIn(profile.name,profile.email,profile.sub,profile.picture);finish('')}
+        try{await signIn(profile.name,profile.email,profile.sub,profile.picture);finish('')}
         catch{finish('Google sign-in could not finish. Please try again.')}
       }});
       // prompt() is One Tap, not the explicit button sign-in flow. Let the user
@@ -159,18 +176,21 @@
   function createTrip(event){event.preventDefault();const name=document.querySelector('#workspace-trip-name').value.trim(),start=document.querySelector('#workspace-trip-start').value,end=document.querySelector('#workspace-trip-end').value,route=document.querySelector('#workspace-trip-route').value.trim();if(!name||!start||!end)return;syncLegacyToTrip();const trip={id:id('trip'),ownerId:workspace.currentUserId,name,start,end,route,color:tripColors[workspace.trips.length%tripColors.length],status:'upcoming',travellers:2,days:[{iso:start,date:String(new Date(`${start}T12:00:00`).getDate()).padStart(2,'0'),dow:new Date(`${start}T12:00:00`).toLocaleDateString('en',{weekday:'short'}).toUpperCase(),city:(route.split('·')[0]||'New place').trim(),title:`${name} <i>at your own pace</i>`,theme:'A day to shape',hotel:'—',notice:'Add your first stop when you are ready.',items:[['10:00','Free time','A blank page','Add your first stop whenever you are ready.','—']]}],hotels:[],saved:[]};workspace.trips.push(trip);workspace.currentTripId=trip.id;save();document.querySelector('#workspace-trip-dialog').close();document.querySelector('#workspace-trip-form').reset();loadTrip(trip);toast?.('New trip created')}
   function deleteTrip(tripId){const trip=workspace.trips.find(t=>t.id===tripId);if(!trip||!confirm(`Delete “${trip.name}”?`))return;workspace.trips=workspace.trips.filter(t=>t.id!==tripId);const remaining=ownedTrips();if(workspace.currentTripId===tripId)workspace.currentTripId=remaining[0]?.id||null;save();renderTrips(document.querySelector('.trip-filter.active')?.dataset.tripFilter||'upcoming');if(workspace.currentTripId){loadTrip(remaining.find(t=>t.id===workspace.currentTripId))}else{window.loadTripScopedData?.(null);updateWorkspaceChrome();if(typeof showPage==='function')showPage('trips')}toast?.('Trip deleted — the list is updated.')}
   function toggleArchive(tripId){const trip=workspace.trips.find(t=>t.id===tripId);if(!trip)return;trip.status=tripStatus(trip)==='archive'?'upcoming':'archive';save();renderTrips(document.querySelector('.trip-filter.active')?.dataset.tripFilter||'upcoming')}
-  function signOut(){syncLegacyToTrip();workspace.currentUserId=null;workspace.currentTripId=null;save();openAuth()}
+  function signOut(){syncLegacyToTrip();workspace.currentUserId=null;workspace.currentTripId=null;save();window.loadTripScopedData?.(null);window.OrbisAccountUI?.sync();showPage('trips');openAuth()}
   window.TabiWorkspace={get state(){return workspace},openTripDialog,renderTrips,signIn,signOut,loadTrip,openAuth,persist:save};
   const originalPersist=window.persistTrip;window.persistTrip=function(){if(originalPersist)originalPersist();syncLegacyToTrip()};
   const originalRenderItinerary=window.renderItinerary;
   window.renderItinerary=function(){if(originalRenderItinerary)originalRenderItinerary();syncAmbientBackground()};
   const originalShow=window.showPage;window.showPage=function(page){if(page==='trips'){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='trips'));document.querySelectorAll('[data-page]').forEach(a=>a.classList.toggle('active',a.dataset.page==='trips'));document.querySelector('#top-location').textContent='YOUR TRIPS';renderTrips();window.scrollTo({top:0,behavior:'smooth'});return}if(originalShow)originalShow(page);updateWorkspaceChrome()};
   document.addEventListener('DOMContentLoaded',()=>{});
-  const sharedValue=new URLSearchParams(location.search).get('share');
-  if(sharedValue)pendingSharedTrip=decodeShareTrip(sharedValue);
+  function acceptSharedLink(){
+    const value=new URLSearchParams(location.hash.slice(1)).get('share')||new URLSearchParams(location.search).get('share');if(!value)return;
+    decodeSharedLink(value).then(trip=>{pendingSharedTrip=trip;if(trip&&workspace.currentUserId)showSharedTrip(trip);else if(!trip)toast?.('分享链接无效，请重新获取');});
+  }
+  acceptSharedLink();window.addEventListener('hashchange',acceptSharedLink);
   const storedUser=workspace.currentUserId&&currentUser();
   if(!storedUser){workspace.currentUserId=null;workspace.currentTripId=null;save();setTimeout(()=>window.loadTripScopedData?.(null),0)}
-  const activeTrip=workspace.trips.find(t=>t.id===workspace.currentTripId)||ownedTrips()[0];if(activeTrip)loadTrip(activeTrip);syncAmbientBackground();updateWorkspaceChrome();renderTrips();if(!storedUser)openAuth();else if(pendingSharedTrip)setTimeout(()=>showSharedTrip(pendingSharedTrip),180);
+  const activeTrip=ownedTrips().find(t=>t.id===workspace.currentTripId)||ownedTrips()[0];if(activeTrip)loadTrip(activeTrip);else {workspace.currentTripId=null;showPage('trips');setTimeout(()=>window.loadTripScopedData?.(null),0);}syncAmbientBackground();updateWorkspaceChrome();renderTrips();if(storedUser)ensureOwnerJapan(storedUser).then(()=>{if(workspace.currentUserId!==storedUser.id)return;const trip=ownedTrips().find(t=>t.id===workspace.currentTripId)||ownedTrips()[0];if(trip&&!workspace.currentTripId)loadTrip(trip);});if(!storedUser)openAuth();else if(pendingSharedTrip)setTimeout(()=>showSharedTrip(pendingSharedTrip),180);
   const assistant=document.querySelector('.ai-planner');
   if(assistant){
     assistant.classList.add('global-ai-dialog');

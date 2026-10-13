@@ -454,3 +454,9 @@ html body.apple-ui.reader-mode #timeline .reader-action-group>.library-icon{colo
 html body.apple-ui.reader-mode #timeline .reader-action-group>.library-icon svg{color:#7e79ad!important}
 html body.apple-ui.reader-mode #timeline .reader-action-group .reader-card-actions{grid-template-columns:repeat(3,44px)!important;width:174px!important}
 @media(max-width:580px){html body.apple-ui.reader-mode #restaurants .library-head{flex-direction:row!important;gap:12px!important}html body.apple-ui.reader-mode #restaurants h1{font-size:28px!important}html body.apple-ui.reader-mode #restaurants .library-head-actions{gap:6px;flex-direction:row;margin-top:6px}}
+html body.apple-ui.reader-mode .account-empty-panel{display:none}
+html body.apple-ui.reader-mode.account-empty main .page:not(#trips)>*:not(.account-empty-panel){display:none!important}
+html body.apple-ui.reader-mode.account-empty main .page>.account-empty-panel{display:block;padding:24px;border:1px solid #ffffffdc;border-radius:24px;background:#ffffff90}
+html body.apple-ui.reader-mode .account-empty-panel h1{font-size:28px;color:#1d1d1f}
+html body.apple-ui.reader-mode .account-empty-panel p{font-size:16px;line-height:1.6;color:#515156}
+html body.apple-ui.reader-mode.account-empty #open-search{display:none!important}
