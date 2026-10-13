@@ -81,7 +81,7 @@
     if (key === target.locationKey && target.coordinates) { extra.coordinates = target.coordinates; extra.locationKey = key; }
     else { delete extra.coordinates; delete extra.locationKey; }
     item.splice(0, 6, ...draft.slice(0, 5), extra);
-    persistTrip(); dialog.close(); renderItinerary(); renderMap(); toast('Place saved · route and recommendations updated');
+    persistTrip(); dialog.close(); renderItinerary(); renderMap(); toast('地点已保存');
   };
   function resolveLocations(day) {
     day.items.forEach(item => {
@@ -104,11 +104,6 @@
   }
   function refreshRecommendations(day) {
     const rows = S.plan(day);
-    document.querySelectorAll('#timeline .timeline-item').forEach((row, index) => {
-      const timing = rows[index], label = row.querySelector('.stop-recommendation');
-      if (label) label.textContent = timing.start == null ? 'Recommended time · confirm previous locations' : `Recommended · ${S.clock(timing.start)}–${S.clock(timing.end)}${timing.conflict ? ` · ${timing.conflict}` : ''}`;
-      if (label) label.classList.toggle('has-conflict', !!timing.conflict);
-    });
     document.querySelectorAll('#timeline .travel-segment').forEach((segment, index) => {
       const timing = rows[index + 1].travel;
       segment.innerHTML = `<a href="${safe(routeLink(day.items[index], day.items[index + 1], day, timing.mode))}" target="_blank" rel="noreferrer">${timing.minutes == null ? '路程待确认' : `约 ${timing.minutes} 分钟 · ${({walking:'步行',cycling:'骑行',driving:'驾车',transit:'公共交通',auto:'交通'})[timing.mode] || '交通'}`} · 查看路线 ↗</a>`;
@@ -122,7 +117,7 @@
     if (index < 0 || index >= day.items.length || to < 0 || to >= day.items.length || index === to) return;
     day.planStart ||= day.items[0]?.[0] || '09:00';
     day.items.splice(to, 0, day.items.splice(index, 1)[0]);
-    persistTrip(); renderItinerary(); toast('Stop moved · recommendations updated');
+    persistTrip(); renderItinerary(); toast('地点顺序已更新');
   }
   const baseRender = window.renderItinerary;
   function touchReorder(row, day, index) {
@@ -174,7 +169,6 @@
       const bar = document.createElement('div'); bar.className = 'stop-edit-tab';
       bar.innerHTML = `<button type="button" data-edit-stop aria-haspopup="dialog">地点信息 · Edit place</button>`;
       card.prepend(bar); bar.querySelector('[data-edit-stop]').onclick = () => openEditor(item, day);
-      const recommendation = document.createElement('p'); recommendation.className = 'stop-recommendation'; card.append(recommendation);
       // Replace the original drag handler, which did not persist the new order.
       row.ondragstart = event => { if (event.target.closest('button,a,input,textarea,select,summary,[contenteditable]')) { event.preventDefault(); return; } event.dataTransfer.setData('text/orbis-stop', String(index)); event.dataTransfer.effectAllowed = 'move'; row.classList.add('card-dragging'); };
       row.ondragend = () => { row.classList.remove('card-dragging'); document.querySelectorAll('.card-drop-target').forEach(element => element.classList.remove('card-drop-target')); };
@@ -193,19 +187,6 @@
         };
       });
     });
-    let controls = document.querySelector('#stop-schedule-controls');
-    if (!controls) {
-      controls = document.createElement('div'); controls.id = 'stop-schedule-controls';
-      document.querySelector('#timeline').before(controls);
-    }
-    controls.innerHTML = `<label>Day starts · 当天开始 <input type="time" id="stop-day-start" value="${safe(day.planStart || day.items[0]?.[0] || '09:00')}"></label><button type="button" id="apply-stop-schedule">Apply recommended times · 应用推荐时间</button><small>Estimates update automatically. Existing times change only when you apply.</small>`;
-    controls.querySelector('input').onchange = event => { day.planStart = event.target.value; persistTrip(); refreshRecommendations(day); };
-    controls.querySelector('button').onclick = () => {
-      const rows = S.plan(day);
-      if (rows.some(row => row.start == null || row.travel.minutes == null || row.end >= 1440 || row.conflict)) return;
-      day.items.forEach((item, index) => { if (!item[5]?.fixedTime) item[0] = S.clock(rows[index].start); });
-      persistTrip(); renderItinerary(); toast('Recommended times applied');
-    };
     refreshRecommendations(day); resolveLocations(day);
   };
   // Custom per-stop city/country/address must also be reflected by navigation links.

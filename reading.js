@@ -77,7 +77,7 @@ if (typeof document !== 'undefined') (() => {
       if (navigation) { navigation.textContent = '导航 · Google Maps ↗'; navigation.classList.add('reader-navigate'); primary.append(navigation); }
       const flags = R.labels(item), foot = card.querySelector('.item-foot');
       if (foot) { foot.innerHTML = [flags.priority,flags.booking].filter(value => !value.endsWith('未标注')).map(value => `<span>${safe(value)}</span>`).join(''); if (foot.childElementCount) primary.append(foot); else foot.remove(); }
-      for (const element of [card.querySelector('.stop-edit-tab'),card.querySelector('.item-actions'),card.querySelector('.place-photo'),links,card.querySelector('.place-drawer'),card.querySelector('.stop-recommendation')]) if (element) body.append(element);
+      for (const element of [card.querySelector('.stop-edit-tab'),card.querySelector('.item-actions'),card.querySelector('.place-photo'),links,card.querySelector('.place-drawer')]) if (element) body.append(element);
       const time = row.querySelector('.item-time'); if (time) card.prepend(time);
       card.append(preview, primary, details);
       const actions = body.querySelector('.item-actions');
@@ -139,15 +139,6 @@ if (typeof document !== 'undefined') (() => {
       row.draggable = true;
     });
     // Existing planning controls and supplemental notes remain available on demand.
-    const controls = document.querySelector('#stop-schedule-controls');
-    if (controls && !controls.closest('.reader-schedule')) {
-      const panel = document.createElement('details'); panel.className = 'reader-schedule'; panel.innerHTML = '<summary>时间安排工具</summary>'; document.querySelector('#timeline').after(panel); panel.append(controls);
-    }
-    const notice = document.querySelector('#daily-notice');
-    let notes = document.querySelector('#reader-day-notes');
-    if (!notes) { notes = document.createElement('details'); notes.id = 'reader-day-notes'; document.querySelector('#timeline').after(notes); }
-    notes.innerHTML = `<summary>当天完整提醒与主题</summary><p>${safe(day.theme || '')}</p><p>${safe(day.notice || '')}</p>${notice?.textContent && notice.textContent !== day.notice ? `<p>${safe(notice.textContent)}</p>` : ''}`;
-    renderHome();
   }
   const baseItinerary = window.renderItinerary;
   window.renderItinerary = function () {
