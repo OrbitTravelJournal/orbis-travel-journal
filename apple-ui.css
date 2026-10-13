@@ -489,3 +489,7 @@ html body.apple-ui.reader-mode #restaurants .library-star:active svg{transform:s
 @media(max-width:920px){
  html body.apple-ui.reader-mode .topbar #top-location{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:calc(100% - 240px);margin:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 }
+
+html body.apple-ui.reader-mode .top-actions #workspace-profile.has-google-avatar{padding:0!important;overflow:hidden;border-radius:50%!important;background:rgba(255,255,255,.6)!important}
+html body.apple-ui.reader-mode #workspace-profile.has-google-avatar img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%;pointer-events:none}
+@media(max-width:580px){html body.apple-ui.reader-mode .top-actions #workspace-profile{display:inline-flex!important}.top-actions{gap:10px}}

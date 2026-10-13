@@ -2,7 +2,7 @@
 
 Production endpoint: https://owpxeksiaywnacomkwog.supabase.co/functions/v1/orbis-sync
 
-The static frontend retains Google Identity Services. The Edge Function validates Google RS256 signatures, issuer, audience, expiry and verified email. Credentials are stored only in tab sessionStorage; local email profiles never authorize cloud requests. Reauthentication is required when the Google credential expires.
+The static frontend retains Google Identity Services. The Edge Function validates Google RS256 signatures, issuer, audience, expiry and verified email. Google credentials establish a revocable random server session. Only a SHA-256 digest is stored on the server. Browser sessions persist in localStorage, renew with use for 30 days and require fresh Google authentication after a maximum of 90 days. Local email profiles never authorize cloud requests. Explicit logout clears browser credentials and revokes the server session when online.
 
 `orbis_workspaces` stores one JSON snapshot per verified Google subject, including photos and personal flight data. Public and authenticated Data API roles have no table or RPC access. RLS has no client policies intentionally: all requests pass through the verifying Edge Function, whose service key stays in server environment variables. The advisor INFO about RLS with no policy reflects this deny-by-default design.
 

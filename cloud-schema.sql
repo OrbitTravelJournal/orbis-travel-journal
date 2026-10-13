@@ -26,3 +26,9 @@ end;
 $$;
 revoke all on function public.orbis_save_workspace(text,jsonb,bigint) from public, anon, authenticated;
 grant execute on function public.orbis_save_workspace(text,jsonb,bigint) to service_role;
+
+-- Revocable persistent sessions contain token digests, never raw browser credentials.
+create table public.orbis_sessions (token_hash text primary key, google_sub text not null, expires_at timestamptz not null, max_expires_at timestamptz not null);
+alter table public.orbis_sessions enable row level security;
+revoke all on public.orbis_sessions from public, anon, authenticated;
+grant select, insert, update, delete on public.orbis_sessions to service_role;

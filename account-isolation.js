@@ -2,7 +2,7 @@
 (() => {
   const active=()=>{const s=window.TabiWorkspace?.state;return s?.currentUserId&&s.trips.find(t=>t.id===s.currentTripId&&t.ownerId===s.currentUserId);};
   function sync(){
-    const empty=!active();document.body.classList.toggle('account-empty',empty);
+    window.TabiWorkspace?.renderAccountAvatar?.();const empty=!active();document.body.classList.toggle('account-empty',empty);
     for(const id of ['itinerary','map','stays','restaurants','journal','travel-info']){
       const page=document.getElementById(id);if(!page)continue;
       if(!page.querySelector('.account-empty-panel')){

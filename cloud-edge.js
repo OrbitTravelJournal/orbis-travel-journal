@@ -5,19 +5,35 @@ const origins=new Set(['https://orbittraveljournal.github.io','http://127.0.0.1:
 export async function handle(req){
   const origin=req.headers.get('Origin')||'';
   const headers={'Content-Type':'application/json','Cache-Control':'no-store','Vary':'Origin',...(origins.has(origin)?{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Headers':'authorization,content-type','Access-Control-Allow-Methods':'GET,POST,OPTIONS'}:{})};
-  const reply=(body,status=200)=>new Response(JSON.stringify(body),{status,headers});
+  let sessionExpiry;
+  const reply=(body,status=200)=>new Response(JSON.stringify({...body,...(status===200&&sessionExpiry?{sessionExpiresAt:sessionExpiry}:{})}),{status,headers});
   if(origin&&!origins.has(origin))return reply({error:'Origin not allowed'},403);
   if(req.method==='OPTIONS')return new Response(null,{status:204,headers});
   if(!['GET','POST'].includes(req.method))return reply({error:'Method not allowed'},405);
-  let identity;
-  try{
-    const token=(req.headers.get('Authorization')||'').replace(/^Bearer /,'');
-    const {payload}=await jwtVerify(token,keys,{audience,issuer:['https://accounts.google.com','accounts.google.com'],algorithms:['RS256'],requiredClaims:['sub','exp','iat','email']});
-    if(payload.email_verified!==true||typeof payload.sub!=='string')throw new Error('Invalid identity');
-    identity=payload;
-  }catch{return reply({error:'Please sign in with Google again'},401);}
   const base=Deno.env.get('SUPABASE_URL'),secret=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
   const dbHeaders={apikey:secret,Authorization:`Bearer ${secret}`,'Content-Type':'application/json'};
+  const token=(req.headers.get('Authorization')||'').replace(/^Bearer /,'');
+  const digest=async value=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)))].map(b=>b.toString(16).padStart(2,'0')).join('');
+  let identity,sessionHash=null,googleVerified=false;
+  try{
+    if(/^orbis_[0-9a-f]{64}$/.test(token)){
+      sessionHash=await digest(token);
+      const r=await fetch(`${base}/rest/v1/orbis_sessions?token_hash=eq.${sessionHash}&select=google_sub,expires_at,max_expires_at`,{headers:dbHeaders});
+      if(!r.ok)return reply({error:'Session service unavailable'},503);
+      const row=(await r.json())[0];
+      if(!row||Date.parse(row.expires_at)<=Date.now()||Date.parse(row.max_expires_at)<=Date.now())throw new Error('Expired session');
+      identity={sub:row.google_sub};sessionExpiry=row.expires_at;
+      if(Date.parse(row.expires_at)-Date.now()<14*86400000){
+        const expiry=new Date(Math.min(Date.now()+30*86400000,Date.parse(row.max_expires_at))).toISOString();
+        const renewed=await fetch(`${base}/rest/v1/orbis_sessions?token_hash=eq.${sessionHash}`,{method:'PATCH',headers:dbHeaders,body:JSON.stringify({expires_at:expiry})});
+        if(renewed.ok)sessionExpiry=expiry;
+      }
+    }else{
+      const {payload}=await jwtVerify(token,keys,{audience,issuer:['https://accounts.google.com','accounts.google.com'],algorithms:['RS256'],requiredClaims:['sub','exp','iat','email']});
+      if(payload.email_verified!==true||typeof payload.sub!=='string')throw new Error('Invalid identity');
+      identity=payload;googleVerified=true;
+    }
+  }catch{return reply({error:'Please sign in with Google again'},401);}
   try{
     if(req.method==='GET'){
       const r=await fetch(`${base}/rest/v1/orbis_workspaces?google_sub=eq.${encodeURIComponent(identity.sub)}&select=snapshot,version,updated_at`,{headers:dbHeaders});
@@ -28,6 +44,18 @@ export async function handle(req){
     if(Number(req.headers.get('Content-Length')||0)>12*1024*1024)return reply({error:'Snapshot is too large'},413);
     const raw=await req.text();if(new TextEncoder().encode(raw).length>12*1024*1024)return reply({error:'Snapshot is too large'},413);
     let data;try{data=JSON.parse(raw)}catch{return reply({error:'Invalid JSON'},400);}
+    if(data.action==='session'){
+      if(!googleVerified)return reply({error:'Google verification required'},403);
+      const value='orbis_'+[...crypto.getRandomValues(new Uint8Array(32))].map(b=>b.toString(16).padStart(2,'0')).join('');
+      const expiresAt=new Date(Date.now()+30*86400000).toISOString(),maxExpiresAt=new Date(Date.now()+90*86400000).toISOString();
+      const created=await fetch(`${base}/rest/v1/orbis_sessions`,{method:'POST',headers:dbHeaders,body:JSON.stringify({token_hash:await digest(value),google_sub:identity.sub,expires_at:expiresAt,max_expires_at:maxExpiresAt})});
+      if(!created.ok)throw new Error('Session creation failed');
+      return reply({sessionToken:value,account:identity.sub,expiresAt});
+    }
+    if(data.action==='logout'){
+      if(sessionHash){const r=await fetch(`${base}/rest/v1/orbis_sessions?token_hash=eq.${sessionHash}`,{method:'DELETE',headers:dbHeaders});if(!r.ok)throw new Error('Session revocation failed');}
+      return reply({ok:true});
+    }
     if(!Number.isSafeInteger(data.version)||data.version<0||!Array.isArray(data.snapshot)||data.snapshot.length>200||data.snapshot.some(t=>!t||typeof t.id!=='string'||typeof t.name!=='string'||!Array.isArray(t.days)||!Array.isArray(t.hotels)||t.days.some(d=>!d||!Array.isArray(d.items))))return reply({error:'Invalid workspace'},400);
     const r=await fetch(`${base}/rest/v1/rpc/orbis_save_workspace`,{method:'POST',headers:dbHeaders,body:JSON.stringify({p_sub:identity.sub,p_snapshot:data.snapshot,p_version:data.version})});
     if(!r.ok)throw new Error('Database unavailable');

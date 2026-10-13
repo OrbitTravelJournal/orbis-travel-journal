@@ -1,4 +1,4 @@
-/* Google credentials stay in this tab's session storage. All cloud access is verified server-side. */
+/* A revocable server-issued session persists across visits; Google credentials are only used to establish it. */
 (() => {
   const endpoint='https://owpxeksiaywnacomkwog.supabase.co/functions/v1/orbis-sync';
   const state=()=>window.TabiWorkspace.state;
@@ -12,7 +12,7 @@
     try{return await new Promise((resolve,reject)=>{const tx=db.transaction('copies',mode==='get'?'readonly':'readwrite'),store=tx.objectStore('copies'),r=mode==='get'?store.get(key):store.put(value,key);let result;r.onsuccess=()=>result=r.result;tx.oncomplete=()=>resolve(result??null);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error)})}finally{db.close()}
   }
   let session=null,ctx=null,timer,busy=false;
-  try{session=JSON.parse(sessionStorage.getItem('orbis-google-session')||'null')}catch{}
+  try{session=JSON.parse(localStorage.getItem('orbis-account-session')||sessionStorage.getItem('orbis-google-session')||'null')}catch{}
   const panel=document.createElement('section');panel.id='account-cloud-sync';
   panel.innerHTML='<h3>云端同步</h3><p id="cloud-sync-status" role="status" aria-live="polite">使用 Google 重新登录，连接此账号的云端资料。本地邮箱档案不具备云端身份验证。</p><div><button type="button" id="cloud-check">检查同步</button><button type="button" id="cloud-use-local" hidden>以本机资料开始同步</button><button type="button" id="cloud-use-remote" hidden>使用云端资料</button></div>';
   document.querySelector('#workspace-auth-form').append(panel);
@@ -27,7 +27,9 @@
     if(r.status===401)throw Object.assign(new Error('Google 验证已过期，请重新点上方 Google 登录。资料仍保留在本机。'),{code:401});
     if(r.status===409)throw Object.assign(new Error('另一台设备已更新，请选择要保留的版本。'),{code:409});
     if(!r.ok)throw new Error('云端暂不可用，修改仍保留在本机。稍后点「检查同步」重试。');
-    return r.json();
+    const data=await r.json();
+    if(data.sessionExpiresAt&&session?.token===c.token){session.exp=Date.parse(data.sessionExpiresAt)/1000;try{localStorage.setItem('orbis-account-session',JSON.stringify(session))}catch{}}
+    return data;
   }
   async function applyRemote(c){
     if(!current(c)||!Array.isArray(c.cloud?.snapshot))return;
@@ -86,6 +88,17 @@
   window.addEventListener('orbis-account-changed',()=>{ctx=null;clearTimeout(timer);local.hidden=true;remote.hidden=true;check();});
   window.addEventListener('focus',check);document.addEventListener('visibilitychange',()=>{if(!document.hidden)check();});
   setInterval(()=>{if(!document.hidden&&user()?.googleId)check();},30000);
-  window.OrbisCloud={connect:async token=>{try{const p=JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));session={token,sub:p.sub,exp:p.exp};sessionStorage.setItem('orbis-google-session',JSON.stringify(session));ctx=null;await check();}catch{say('云端连接未完成，请重新 Google 登录。');}},getPreviousCopy:async()=>{const sub=user()?.googleId;if(!sub)return null;try{return await recovery('get',sub)}catch{return null}}};
-  check();
+  window.OrbisCloud={connect:async token=>{
+    try{
+      const result=await request({token},'POST',{action:'session'});
+      if(user()?.googleId!==result.account)return;
+      session={token:result.sessionToken,sub:result.account,exp:Date.parse(result.expiresAt)/1000,persistent:true};
+      localStorage.setItem('orbis-account-session',JSON.stringify(session));sessionStorage.removeItem('orbis-google-session');ctx=null;
+      while(busy)await new Promise(resolve=>setTimeout(resolve,50));await check();
+    }catch{say('持续登录未建立，请重新 Google 登录。当前资料仍在本机。');}
+  },disconnect:()=>{
+    const previous=session;session=null;ctx=null;clearTimeout(timer);localStorage.removeItem('orbis-account-session');sessionStorage.removeItem('orbis-google-session');
+    if(previous?.persistent)request({token:previous.token},'POST',{action:'logout'}).catch(()=>{});
+  },getPreviousCopy:async()=>{const sub=user()?.googleId;if(!sub)return null;try{return await recovery('get',sub)}catch{return null}}};
+  if(valid()&&!session.persistent)window.OrbisCloud.connect(session.token);else check();
 })();
