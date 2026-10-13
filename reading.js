@@ -69,6 +69,7 @@ if (typeof document !== 'undefined') (() => {
     summary.querySelector('#reader-day-stays').onclick = () => { const button = document.querySelector('.hotel-context button'); if (button) button.click(); else showPage('stays'); };
     document.querySelectorAll('#timeline .timeline-item').forEach((row, index) => {
       const item = day.items[index], card = row.querySelector('.item-card'); if (!item || !card) return;
+      card.dataset.stopKind = String(item[1] || '').toLowerCase();
       const legacySkip = /^Skipped · preserved in trip history$/.test(String(item[3] || ''));
       const skipped = item[5]?.skipped ?? legacySkip;
       card.classList.toggle('is-skipped', !!skipped);
