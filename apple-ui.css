@@ -460,3 +460,10 @@ html body.apple-ui.reader-mode.account-empty main .page>.account-empty-panel{dis
 html body.apple-ui.reader-mode .account-empty-panel h1{font-size:28px;color:#1d1d1f}
 html body.apple-ui.reader-mode .account-empty-panel p{font-size:16px;line-height:1.6;color:#515156}
 html body.apple-ui.reader-mode.account-empty #open-search{display:none!important}
+html body.apple-ui.reader-mode #account-backup{margin-top:24px;padding-top:20px;border-top:1px solid #dce1e9}
+html body.apple-ui.reader-mode #account-backup h3{font-size:18px;margin:0 0 8px;color:#1d1d1f}
+html body.apple-ui.reader-mode #account-backup p{font-size:14px;line-height:1.6;color:#515156;margin:8px 0}
+html body.apple-ui.reader-mode #account-backup>div{display:flex;flex-wrap:wrap;gap:10px}
+html body.apple-ui.reader-mode #account-backup button{width:auto!important;min-height:44px!important;padding:10px 14px!important;font:500 15px/1.5 var(--sans)!important;border:1px solid #ffffffed!important;border-radius:14px!important;color:#515156!important;background:#ffffffc9!important}
+html body.apple-ui.reader-mode #account-backup-status:empty{display:none}
+html body.apple-ui.reader-mode #account-backup .account-backup-download{display:inline-block;color:#326a58;text-decoration:underline;font-size:15px;line-height:1.6;padding:10px 0}
