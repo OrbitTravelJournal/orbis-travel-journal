@@ -60,23 +60,20 @@
       const label = ((text.length > 2 ? text : el.getAttribute('aria-label')) || text || el.title || '').replace(/\s+/g,' ');
       const page = el.dataset.page || el.dataset.go || el.dataset.menuPage || el.dataset.fallbackPage;
       const icon = pages[page] || (el.matches('.reader-more') ? 'more' : el.matches('[data-photo-upload],[data-place-photo],[data-hotel-upload]') ? 'photo' : el.matches('[data-photo-remove],[data-hotel-remove-photo]') ? 'trash' : el.matches('#workspace-profile') ? 'user' : el.matches('.save-stop,.trip-favorite') ? 'bookmark' : el.matches('.visited-stop') ? 'checkbox' : rules.find(([pattern]) => pattern.test(label))?.[1]) || 'more';
-      el.classList.add('emoji-control');
-      el.style.setProperty('--icon-color',colors[icon]);
+      if (!el.classList.contains('emoji-control')) el.classList.add('emoji-control');
+      if (el.style.getPropertyValue('--icon-color') !== colors[icon]) el.style.setProperty('--icon-color',colors[icon]);
       let graphic = el.querySelector(':scope>.orbis-icon');
       if (!graphic) { graphic = document.createElement('span'); graphic.className = 'orbis-icon'; graphic.setAttribute('aria-hidden','true'); el.append(graphic); }
       if (graphic.dataset.icon !== icon) {
         graphic.dataset.icon = icon;
         graphic.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true">${icons[icon]}</svg>`;
       }
-      el.title = label;
-      el.setAttribute('aria-label', label);
+      if (el.title !== label) el.title = label;
+      if (el.getAttribute('aria-label') !== label) el.setAttribute('aria-label', label);
     });
   }
-  let queued = false;
-  new MutationObserver(() => {
-    if (queued) return;
-    queued = true;
-    requestAnimationFrame(() => { queued = false; decorate(); });
-  }).observe(document.body,{childList:true,subtree:true,characterData:true});
+  // Finish icons before the browser paints newly rendered controls.
+  window.decorateOrbisIcons = decorate;
+  new MutationObserver(decorate).observe(document.body,{childList:true,subtree:true,characterData:true});
   decorate();
 })();

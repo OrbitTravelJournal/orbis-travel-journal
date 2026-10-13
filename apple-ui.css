@@ -264,3 +264,7 @@ html body.apple-ui.reader-mode #timeline .reader-card-actions .visited-stop{disp
 html body.apple-ui.reader-mode #timeline .reader-card-actions .visited-stop:not(.is-visited) .orbis-icon path{display:none}
 html body.apple-ui.reader-mode #timeline .reader-card-actions .visited-stop.is-visited{background:#d9f8eb!important;border-color:#8ae4c4!important}
 @media(max-width:580px){html body.apple-ui.reader-mode #timeline .reader-card-topline{flex-wrap:wrap;gap:10px}html body.apple-ui.reader-mode #timeline .reader-card-actions{margin-left:auto;flex-wrap:wrap}}
+
+/* Rendering a card must not animate every icon; feedback belongs to the pressed control. */
+html body.apple-ui.reader-mode .emoji-control,html body.apple-ui.reader-mode .emoji-control .orbis-icon{animation:none!important;transition:none!important}
+html body.apple-ui.reader-mode .emoji-control:active>.orbis-icon{transform:scale(.9);opacity:.7}

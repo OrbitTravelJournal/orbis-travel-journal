@@ -143,7 +143,7 @@ if (typeof document !== 'undefined') (() => {
     renderHome();
   }
   const baseItinerary = window.renderItinerary;
-  window.renderItinerary = function () { baseItinerary(); readDay(); };
+  window.renderItinerary = function () { baseItinerary(); readDay(); window.decorateOrbisIcons?.(); };
   const baseHotels = window.renderHotels;
   window.renderHotels = function () {
     baseHotels();
