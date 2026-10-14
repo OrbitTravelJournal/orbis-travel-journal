@@ -609,3 +609,11 @@ html body.apple-ui.reader-mode #hotel-list .hotel-card>.hotel-card-photo{positio
 html body.apple-ui.reader-mode #hotel-list .hotel-actions .hotel-photo-upload{position:static!important;display:inline-grid!important;place-items:center!important;width:44px!important;min-width:44px!important;max-width:44px!important;height:44px!important;min-height:44px!important;padding:10px!important;margin:0!important;border:1px solid #ffffffed!important;border-radius:50%!important;background:#eff4ffbd!important;color:#4b83f6!important;overflow:visible!important;box-shadow:none!important}
 html body.apple-ui.reader-mode #hotel-list .hotel-photo-upload svg{width:22px;height:22px;color:#4b83f6!important}
 @media(max-width:580px){html body.apple-ui.reader-mode #hotel-list .hotel-card>.hotel-card-photo{height:170px!important;margin-bottom:14px!important}}
+
+html body.apple-ui.reader-mode #hotel-list .hotel-card-controls{display:flex;justify-content:flex-end;gap:8px;margin:0 0 12px}
+html body.apple-ui.reader-mode #hotel-list .hotel-card-controls .library-icon{display:grid;place-items:center;width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;padding:10px!important;border:1px solid #ffffffed!important;border-radius:50%!important;background:#ffffffbd!important;color:#8c82b3!important;cursor:grab}
+html body.apple-ui.reader-mode #hotel-list .hotel-card-controls svg{width:22px;height:22px}
+html body.apple-ui.reader-mode #hotel-list .hotel-card-controls .hotel-bookmark{color:#ff4aa2!important;cursor:pointer}
+html body.apple-ui.reader-mode #hotel-list .hotel-bookmark.is-saved svg{fill:#ffd7e9}
+html body.apple-ui.reader-mode #hotel-list .hotel-card.is-hotel-dragging{opacity:.65!important}
+html body.apple-ui.reader-mode #hotel-list .hotel-card.is-hotel-drop{outline:2px solid #ac83e3;outline-offset:4px}
