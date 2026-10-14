@@ -554,3 +554,52 @@ html body.apple-ui.reader-mode #restaurants .library-category:not(:has(.library-
  html body.apple-ui.reader-mode #restaurants .library-category h2{font-size:24px}
  html body.apple-ui.reader-mode #restaurants .library-grid>.library-card{flex-basis:80%;padding:16px}
 }
+
+/* Always reachable route organiser, separate from the central navigation. */
+html body.apple-ui.reader-mode #route-assistant-trigger{position:fixed;right:24px;bottom:24px;width:54px!important;height:54px!important;min-height:54px!important;display:grid;place-items:center;padding:14px;border:1px solid #ffffffed;border-radius:50%;background:linear-gradient(135deg,#edddffed,#d5f5f1ed);color:#8864b8;box-shadow:0 8px 26px #52637d26;backdrop-filter:blur(20px);z-index:69;cursor:pointer}
+#route-assistant-trigger svg{width:26px;height:26px}
+html body.apple-ui.reader-mode #route-assistant-dialog{box-sizing:border-box;width:min(540px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);padding:24px;border:1px solid #ffffffed;border-radius:28px;background:#f8fafff5;color:#1d1d1f;overflow-y:auto;overscroll-behavior:contain;box-shadow:0 16px 60px #52637d30}
+#route-assistant-dialog[open]{animation:orbis-tools-reveal .22s ease-out}
+#route-assistant-dialog::backdrop{background:#27324830;backdrop-filter:blur(8px)}
+#route-assistant-dialog .route-header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+#route-assistant-dialog .route-header p{font-size:11px;letter-spacing:.08em;color:#747780;margin:0 0 6px}
+#route-assistant-dialog h2{font-size:24px;margin:0}
+#route-assistant-dialog .route-copy,#route-status,#route-preview p{font-size:14px;line-height:1.6;color:#626575;overflow-wrap:anywhere}
+#route-assistant-dialog button{min-height:44px;padding:10px 14px;border:1px solid #ffffffed;border-radius:14px;background:#ffffffc9;color:#765aab;font:500 14px/1.5 var(--sans);cursor:pointer}
+#route-assistant-dialog button:disabled{opacity:.5;cursor:wait}
+#route-assistant-dialog .route-close{width:44px;flex:none;font-size:26px;color:#fa596d;padding:0}
+#route-assistant-dialog label{font-size:14px;color:#626575}
+#route-assistant-dialog select{box-sizing:border-box;max-width:100%;min-width:0;min-height:44px;padding:8px 10px;border:1px solid #dce1e9;border-radius:12px;background:#ffffffb8;color:#35353b;font:16px/1.4 var(--sans)}
+#route-day{display:block;width:100%;margin:8px 0 16px}
+#route-assistant-dialog .route-library{border:1px solid #ffffffed;border-radius:16px;padding:14px;margin:16px 0;background:#eae3f34d}
+#route-assistant-dialog summary{cursor:pointer;font-size:15px;line-height:1.6}
+#route-library-list{max-height:220px;overflow:auto;margin:12px 0}
+#route-assistant-dialog .route-library-choice{display:flex;align-items:center;gap:10px;padding:9px 0}
+#route-assistant-dialog .route-library-choice input{width:20px;height:20px;flex:none;accent-color:#9470cd}
+#route-assistant-dialog small{display:block;font-size:12px;color:#747780;line-height:1.5}
+#route-assistant-dialog .route-stop{padding:14px;border:1px solid #ffffffed;border-radius:16px;background:#ffffff80;margin:10px 0}
+#route-assistant-dialog .route-stop-top{display:flex;align-items:flex-start;gap:12px}
+#route-assistant-dialog .route-stop-top b{flex:1;min-width:0;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+#route-assistant-dialog .route-stop-top select{width:116px;flex:none;font-size:14px}
+#route-assistant-dialog .route-location{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;font-size:12px;color:#747780}
+#route-assistant-dialog .route-location button{width:44px;height:44px;padding:10px;display:grid;place-items:center}
+#route-assistant-dialog .route-location svg{width:22px;height:22px}
+#route-assistant-dialog [data-route-results] button{display:block;width:100%;text-align:left;margin:8px 0}
+#route-assistant-dialog [data-route-results] span{display:block;font-size:12px;margin-top:6px}
+#route-assistant-dialog #route-preview{border-radius:18px;background:#e6f3ed80;padding:0 14px}
+#route-preview:not(:empty){padding:14px!important}
+#route-preview h3{font-size:18px;margin:0 0 10px}
+#route-preview li{padding:8px 0;font-size:14px;overflow-wrap:anywhere}
+#route-preview a{display:inline-block;color:#567f73;padding:6px 0;font-size:13px}
+#route-assistant-dialog .route-footer{position:sticky;bottom:-24px;display:flex;gap:10px;flex-wrap:wrap;padding:14px 0 8px;background:#f8fafff5;backdrop-filter:blur(20px)}
+#route-assistant-dialog [hidden]{display:none!important}
+@media(max-width:580px){html body.apple-ui.reader-mode #route-assistant-trigger{right:16px;bottom:max(18px,env(safe-area-inset-bottom))}html body.apple-ui.reader-mode #route-assistant-dialog{padding:18px}#route-assistant-dialog .route-footer{bottom:-18px}}
+@media(prefers-reduced-motion:reduce){#route-assistant-dialog[open]{animation:none}}
+html body.apple-ui.reader-mode #route-assistant-dialog .route-stop-top{display:grid!important;grid-template-columns:minmax(0,1fr) 116px;align-items:start}
+html body.apple-ui.reader-mode #route-assistant-dialog .route-stop-top select{width:116px!important;min-width:116px!important;max-width:116px!important;margin:0!important;box-sizing:border-box!important}
+html body.apple-ui.reader-mode #route-assistant-dialog .route-library-choice input{width:20px!important;min-width:20px!important;max-width:20px!important;height:20px!important;min-height:20px!important;padding:0!important;margin:0!important}
+html body.apple-ui.reader-mode #route-assistant-dialog :is(.route-library-choice span,.route-stop-top b){min-width:0;overflow-wrap:anywhere}
+html body.apple-ui.reader-mode #route-assistant-dialog #route-library-list{overflow-x:hidden}
+html body.apple-ui.reader-mode #route-assistant-dialog button{color:#765aab!important}
+html body.apple-ui.reader-mode #route-assistant-dialog .route-close{color:#fa596d!important}
+html body.apple-ui.reader-mode #route-assistant-dialog .route-location button{color:#0badad!important}

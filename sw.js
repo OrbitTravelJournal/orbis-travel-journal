@@ -1,8 +1,10 @@
-const CACHE_NAME = 'tabi-app-shell-v49-luminous-glass';
+const CACHE_NAME = 'tabi-app-shell-v50-route-organiser';
 const APP_SHELL = [
   './',
   './index.html',
   './app.js',
+  './route-order.js?v=20261014-route-organiser',
+  './route-assistant.js?v=20261014-route-organiser',
   './schedule.js',
   './stop-editor.js',
   './stop-editor.css',
