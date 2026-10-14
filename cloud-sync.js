@@ -20,11 +20,12 @@
   function say(text){status.textContent=text;}
   function valid(){return session&&user()?.googleId===session.sub&&session.exp*1000>Date.now();}
   function current(c){return !!c&&ctx===c&&valid()&&user()?.id===c.owner;}
-  function saveMeta(c){try{localStorage.setItem('orbis-cloud-meta:'+c.sub,JSON.stringify({version:c.version,hash:c.hash}))}catch{}}
+  async function saveMeta(c){try{const version=c.version,cloudHash=c.hash,stored=JSON.parse(localStorage.getItem('tabi-workspace-v1')||'null');const saved=stored?.trips?.filter(t=>t.ownerId===c.owner).map(t=>{const copy={...t};delete copy.ownerId;delete copy.updatedAt;return copy;});const savedHash=saved?await hash(saved):null;if(!current(c)||version!==c.version)return;localStorage.setItem('orbis-cloud-meta:'+c.sub,JSON.stringify({version,hash:cloudHash,savedHash}));c.savedHash=savedHash;}catch{}}
   function choices(c,message){if(!current(c))return;c.ready=false;local.hidden=false;remote.hidden=!c.cloud?.snapshot;local.textContent=c.cloud?.version?'保留本机版本并上传':'以本机资料开始同步';say(message);window.TabiWorkspace.openAuth();}
   async function request(c,method='GET',body){
-    const r=await fetch(endpoint,{method,headers:{Authorization:'Bearer '+c.token,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(20000)});
+    const r=await fetch(endpoint,{method,headers:{Authorization:'Bearer '+c.token,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,clientVersion:2})}:{}),signal:AbortSignal.timeout(20000)});
     if(r.status===401)throw Object.assign(new Error('Google 验证已过期，请重新点上方 Google 登录。资料仍保留在本机。'),{code:401});
+    if(r.status===426)throw new Error('同步版本已更新，请先下载本机备份，再刷新网页。');
     if(r.status===409)throw Object.assign(new Error('另一台设备已更新，请选择要保留的版本。'),{code:409});
     if(!r.ok)throw new Error('云端暂不可用，修改仍保留在本机。稍后点「检查同步」重试。');
     const data=await r.json();
@@ -51,15 +52,17 @@
     say('已同步 · '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
   }
   async function check(){
+    await window.TabiWorkspace.ready;
     if(!valid()){ctx=null;local.hidden=true;remote.hidden=true;say('请使用上方 Google 登录以连接云端；仅填写邮箱不会启用同步。');return;}
     if(busy)return;busy=true;
     let c=ctx;
-    if(!c||c.sub!==session.sub||c.owner!==user().id){c={sub:session.sub,owner:user().id,token:session.token,version:0,hash:null,ready:false};ctx=c;try{const meta=JSON.parse(localStorage.getItem('orbis-cloud-meta:'+c.sub)||'null');if(meta){c.version=meta.version;c.hash=meta.hash}}catch{}}
+    if(!c||c.sub!==session.sub||c.owner!==user().id){c={sub:session.sub,owner:user().id,token:session.token,version:0,hash:null,ready:false};ctx=c;try{const meta=JSON.parse(localStorage.getItem('orbis-cloud-meta:'+c.sub)||'null');if(meta){c.version=meta.version;c.hash=meta.hash;c.savedHash=meta.savedHash}}catch{}}
     c.token=session.token;
     try{
       const cloud=await request(c);if(!current(c))return;c.cloud=cloud;
       const localHash=await hash(snapshot()),cloudHash=cloud.snapshot?await hash(cloud.snapshot):null;if(!current(c))return;
       if(cloud.snapshot&&localHash===cloudHash){c.version=cloud.version;c.hash=cloudHash;c.ready=true;saveMeta(c);local.hidden=true;remote.hidden=true;say('已同步 · 云端与本机资料一致');return;}
+      if(cloud.snapshot&&c.savedHash&&localHash===c.savedHash&&localHash!==c.hash){await applyRemote(c);return;}
       if(c.hash&&cloud.version===c.version){c.ready=true;if(localHash!==c.hash)setTimeout(upload,0);else say('已同步');return;}
       if(cloud.snapshot&&(snapshot().length===0||(c.hash&&localHash===c.hash))){await applyRemote(c);return;}
       choices(c,cloud.snapshot?'发现云端资料。请先下载本机备份，再选择使用云端，或明确保留本机版本上传。手机有最新版时，请先在手机上传。':'云端尚无资料。请在保存最新版的手机上点「以本机资料开始同步」；电脑暂时不要上传旧版。');
@@ -68,6 +71,7 @@
   }
   async function upload(){
     const c=ctx;if(!c||!current(c)||!c.ready||busy)return;
+    try{await window.TabiWorkspace.flush?.()}catch{say('本机保存未完成，正在尝试保存到云端。')}
     const data=snapshot(),fingerprint=await hash(data);if(!current(c)||busy||fingerprint===c.hash)return;
     busy=true;say('正在同步…');
     try{

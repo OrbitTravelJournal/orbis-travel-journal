@@ -56,6 +56,7 @@ export async function handle(req){
       if(sessionHash){const r=await fetch(`${base}/rest/v1/orbis_sessions?token_hash=eq.${sessionHash}`,{method:'DELETE',headers:dbHeaders});if(!r.ok)throw new Error('Session revocation failed');}
       return reply({ok:true});
     }
+    if(data.clientVersion!==2)return reply({error:'Please update the app before syncing'},426);
     if(!Number.isSafeInteger(data.version)||data.version<0||!Array.isArray(data.snapshot)||data.snapshot.length>200||data.snapshot.some(t=>!t||typeof t.id!=='string'||typeof t.name!=='string'||!Array.isArray(t.days)||!Array.isArray(t.hotels)||t.days.some(d=>!d||!Array.isArray(d.items))))return reply({error:'Invalid workspace'},400);
     const r=await fetch(`${base}/rest/v1/rpc/orbis_save_workspace`,{method:'POST',headers:dbHeaders,body:JSON.stringify({p_sub:identity.sub,p_snapshot:data.snapshot,p_version:data.version})});
     if(!r.ok)throw new Error('Database unavailable');

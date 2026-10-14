@@ -16,7 +16,39 @@
   const currentUser=()=>workspace.users.find(u=>u.id===workspace.currentUserId);
   const isLegacyJapanTemplate=trip=>trip.id==='japan-2026'||trip.template==='japan-2026'||(/'s Japan journey$/.test(trip.name||'')&&trip.start==='2026-10-29');
   const ownedTrips=()=>workspace.trips.filter(t=>t.ownerId===workspace.currentUserId&&(!isLegacyJapanTemplate(t)||t.importedFromShare||t.ownerId===workspace.japanOwnerId));
-  function save(){let saved=true;try{localStorage.setItem(KEY,JSON.stringify(workspace))}catch{saved=false}window.dispatchEvent(new Event('orbis-workspace-saved'));return saved}
+  let durableDb=null,durablePending=null,durableWriting=null,restoring=true;
+  const originalSavedAt=Number(workspace.lastSavedAt)||0;
+  function writeDurable(){
+    if(!durableDb||restoring||durableWriting||!durablePending)return;
+    const copy=durablePending;durablePending=null;
+    durableWriting=new Promise((resolve,reject)=>{const tx=durableDb.transaction('workspace','readwrite');tx.objectStore('workspace').put(copy,'current');tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error)});
+    durableWriting.then(()=>{durableWriting=null;writeDurable()},()=>{durableWriting=null;durableDb=null;window.toast?.('本机持久保存未完成，请下载备份并检查同步');});
+  }
+  const ready=new Promise(resolve=>{
+    let request;try{request=indexedDB.open('orbis-workspace-data',1)}catch{restoring=false;resolve();return;}request.onupgradeneeded=()=>request.result.createObjectStore('workspace');
+    request.onerror=()=>{restoring=false;resolve()};
+    request.onsuccess=()=>{
+      durableDb=request.result;durableDb.onversionchange=()=>durableDb.close();
+      const tx=durableDb.transaction('workspace','readonly'),read=tx.objectStore('workspace').get('current');
+      read.onsuccess=()=>{
+        const cached=read.result;
+        if(cached&&Array.isArray(cached.users)&&Array.isArray(cached.trips)&&Number(cached.lastSavedAt)>originalSavedAt){
+          workspace=cached;const trip=ownedTrips().find(t=>t.id===workspace.currentTripId)||ownedTrips()[0];
+          if(trip)loadTrip(trip);else{workspace.currentTripId=null;window.loadTripScopedData?.(null);updateWorkspaceChrome();renderTrips();}
+          window.dispatchEvent(new Event('orbis-account-changed'));
+        }
+        restoring=false;durablePending=JSON.parse(JSON.stringify(workspace));writeDurable();resolve();
+      };
+      read.onerror=()=>{restoring=false;resolve()};
+    };
+  });
+  async function flush(){await ready;writeDurable();while(durableWriting){await durableWriting;writeDurable()}}
+  function save(){
+    workspace.lastSavedAt=Math.max(Date.now(),Number(workspace.lastSavedAt||0)+1);
+    let saved=true;try{localStorage.setItem(KEY,JSON.stringify(workspace))}catch{saved=false}
+    if(!restoring&&durableDb){durablePending=JSON.parse(JSON.stringify(workspace));writeDurable()}
+    window.dispatchEvent(new CustomEvent('orbis-workspace-saved',{detail:{persisted:saved}}));return saved||!!durableDb;
+  }
   function id(prefix){return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`}
   function syncLegacyToTrip(){let trip=workspace.trips.find(t=>t.id===workspace.currentTripId);if(!trip||trip.ownerId!==workspace.currentUserId)return;trip.days=oldDays();trip.hotels=oldHotels();trip.updatedAt=Date.now();save()}
   // Keep the ambient visual field tied to the same photos travellers see in the
@@ -36,7 +68,7 @@
     document.documentElement.style.setProperty('--workspace-photo',value);
     document.documentElement.style.setProperty('--ambient-gradient',gradient);
   }
-  function loadTrip(trip){if(!trip||!ownedTrips().some(t=>t.id===trip.id))return;if(typeof days!=='undefined')days.splice(0,days.length,...JSON.parse(JSON.stringify(trip.days||[])));if(typeof hotels!=='undefined')hotels.splice(0,hotels.length,...JSON.parse(JSON.stringify(trip.hotels||[])));if(typeof selected!=='undefined')selected=window.OrbisReader?.entryIndex(trip)??0;workspace.currentTripId=trip.id;save();window.loadTripScopedData?.(trip);if(typeof renderDays==='function')renderDays();if(typeof renderHotels==='function')renderHotels();if(typeof renderItinerary==='function')renderItinerary();if(typeof showPage==='function')showPage('itinerary');updateWorkspaceChrome();renderTrips()}
+  function loadTrip(trip){if(!trip||!ownedTrips().some(t=>t.id===trip.id))return;if(typeof days!=='undefined')days.splice(0,days.length,...JSON.parse(JSON.stringify(trip.days||[])));if(typeof hotels!=='undefined')hotels.splice(0,hotels.length,...JSON.parse(JSON.stringify(trip.hotels||[])));if(typeof selected!=='undefined')selected=window.OrbisReader?.entryIndex(trip)??0;workspace.currentTripId=trip.id;if(currentUser())currentUser().lastTripId=trip.id;save();window.loadTripScopedData?.(trip);if(typeof renderDays==='function')renderDays();if(typeof renderHotels==='function')renderHotels();if(typeof renderItinerary==='function')renderItinerary();if(typeof showPage==='function')showPage('itinerary');updateWorkspaceChrome();renderTrips()}
   function dateLabel(value){if(!value)return 'Dates to shape';let d=new Date(`${value}T12:00:00`);return d.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})}
   function tripStatus(trip){return trip.status==='archive'||(trip.end&&trip.end<today)?'archive':'upcoming'}
   function tripDays(trip){return (trip.days||[]).length||1}
@@ -103,13 +135,14 @@
     const original=JSON.parse(JSON.stringify(seedTrip));original.id=id('trip');original.ownerId=user.id;original.template='japan-2026';workspace.trips.push(original);save();
   }
   async function signIn(name,email,googleId,avatar){
+    await ready;const previousTripId=workspace.currentTripId;window.persistTrip?.();
     const cleanName=(name||'Traveller').trim(),cleanEmail=(email||`${cleanName.toLowerCase().replace(/\s+/g,'.')}@local.tabi`).trim().toLowerCase();
     let user=workspace.users.find(u=>(googleId&&u.googleId===googleId)||u.email===cleanEmail);
     if(!user){user={id:googleId||id('user'),googleId:googleId||'',name:cleanName,email:cleanEmail,avatar:avatar||cleanName.slice(0,1)};workspace.users.push(user)}
     else{user.name=cleanName||user.name;user.email=cleanEmail;user.googleId=googleId||user.googleId;user.avatar=avatar||user.avatar}
     await ensureOwnerJapan(user);
     workspace.currentUserId=user.id;
-    let trip=ownedTrips()[0];
+    let trip=ownedTrips().find(t=>t.id===previousTripId)||ownedTrips().find(t=>t.id===user.lastTripId)||ownedTrips()[0];
     workspace.currentTripId=trip?.id||null;save();document.querySelector('#workspace-auth-dialog')?.close();
     if(trip)loadTrip(trip);else{window.loadTripScopedData?.(null);updateWorkspaceChrome();renderTrips();if(typeof showPage==='function')showPage('trips');toast?.(`Welcome, ${cleanName.split(' ')[0]}. Create your first trip when you are ready.`)}
     window.dispatchEvent(new Event('orbis-account-changed'));
@@ -187,7 +220,7 @@
   function deleteTrip(tripId){const trip=workspace.trips.find(t=>t.id===tripId);if(!trip||!confirm(`Delete “${trip.name}”?`))return;workspace.trips=workspace.trips.filter(t=>t.id!==tripId);const remaining=ownedTrips();if(workspace.currentTripId===tripId)workspace.currentTripId=remaining[0]?.id||null;save();renderTrips(document.querySelector('.trip-filter.active')?.dataset.tripFilter||'upcoming');if(workspace.currentTripId){loadTrip(remaining.find(t=>t.id===workspace.currentTripId))}else{window.loadTripScopedData?.(null);updateWorkspaceChrome();if(typeof showPage==='function')showPage('trips')}toast?.('Trip deleted — the list is updated.')}
   function toggleArchive(tripId){const trip=workspace.trips.find(t=>t.id===tripId);if(!trip)return;trip.status=tripStatus(trip)==='archive'?'upcoming':'archive';save();renderTrips(document.querySelector('.trip-filter.active')?.dataset.tripFilter||'upcoming')}
   function signOut(){window.OrbisCloud?.disconnect();syncLegacyToTrip();workspace.currentUserId=null;workspace.currentTripId=null;save();window.dispatchEvent(new Event('orbis-account-changed'));window.loadTripScopedData?.(null);window.OrbisAccountUI?.sync();renderAccountAvatar();showPage('trips');openAuth()}
-  window.TabiWorkspace={get state(){return workspace},openTripDialog,renderTrips,signIn,signOut,loadTrip,openAuth,renderAccountAvatar,persist:save};
+  window.TabiWorkspace={get state(){return workspace},openTripDialog,renderTrips,signIn,signOut,loadTrip,openAuth,renderAccountAvatar,persist:save,ready,flush};
   const originalPersist=window.persistTrip;window.persistTrip=function(){if(originalPersist)originalPersist();syncLegacyToTrip()};
   const originalRenderItinerary=window.renderItinerary;
   window.renderItinerary=function(){if(originalRenderItinerary)originalRenderItinerary();syncAmbientBackground()};
@@ -221,7 +254,7 @@
   }
   document.querySelector('#dashboard')?.remove();
   document.querySelector('.days-panel')?.remove();document.querySelector('.language-switch')?.remove();
-  document.querySelector('#workspace-new-trip')?.addEventListener('click',openTripDialog);document.querySelector('#workspace-new-trip-inline')?.addEventListener('click',openTripDialog);document.querySelector('#workspace-trip-form')?.addEventListener('submit',createTrip);document.querySelector('#workspace-trip-close')?.addEventListener('click',()=>document.querySelector('#workspace-trip-dialog').close());document.querySelector('#workspace-trip-cancel')?.addEventListener('click',()=>document.querySelector('#workspace-trip-dialog').close());document.querySelector('#workspace-edit-trip-form')?.addEventListener('submit',saveEditedTrip);document.querySelector('#edit-trip-close')?.addEventListener('click',()=>document.querySelector('#workspace-edit-trip-dialog').close());document.querySelector('#edit-trip-cancel')?.addEventListener('click',()=>document.querySelector('#workspace-edit-trip-dialog').close());document.querySelector('#workspace-sign-out')?.addEventListener('click',signOut);document.querySelector('#workspace-profile')?.addEventListener('click',openAuth);
+  document.querySelector('#workspace-new-trip')?.addEventListener('click',openTripDialog);document.querySelector('#workspace-new-trip-inline')?.addEventListener('click',openTripDialog);document.querySelector('#workspace-trip-form')?.addEventListener('submit',createTrip);document.querySelector('#workspace-trip-close')?.addEventListener('click',()=>document.querySelector('#workspace-trip-dialog').close());document.querySelector('#workspace-trip-cancel')?.addEventListener('click',()=>document.querySelector('#workspace-trip-dialog').close());document.querySelector('#workspace-edit-trip-form')?.addEventListener('submit',saveEditedTrip);document.querySelector('#edit-trip-close')?.addEventListener('click',()=>document.querySelector('#workspace-edit-trip-dialog').close());document.querySelector('#edit-trip-cancel')?.addEventListener('click',()=>document.querySelector('#workspace-edit-trip-dialog').close());document.querySelector('#workspace-sign-out')?.addEventListener('click',signOut);document.querySelector('#workspace-profile')?.addEventListener('click',openAuth);document.querySelector('#workspace-auth-close')?.addEventListener('click',()=>document.querySelector('#workspace-auth-dialog').close());
   document.querySelector('#workspace-share-copy')?.addEventListener('click',async()=>{let input=document.querySelector('#workspace-share-link');try{await navigator.clipboard.writeText(input.value);toast?.('Share link copied')}catch{input.select();document.execCommand('copy');toast?.('Share link copied')}});
   document.querySelector('#workspace-share-close')?.addEventListener('click',()=>document.querySelector('#workspace-share-dialog')?.close());document.querySelector('#workspace-share-cancel')?.addEventListener('click',()=>document.querySelector('#workspace-share-dialog')?.close());
   document.querySelector('#workspace-import-form')?.addEventListener('submit',event=>{event.preventDefault();importSharedTrip()});document.querySelector('#workspace-import-close')?.addEventListener('click',()=>{pendingSharedTrip=null;document.querySelector('#workspace-import-dialog')?.close()});document.querySelector('#workspace-import-cancel')?.addEventListener('click',()=>{pendingSharedTrip=null;document.querySelector('#workspace-import-dialog')?.close()});

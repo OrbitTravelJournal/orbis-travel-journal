@@ -145,7 +145,7 @@
         }catch(error){lastError=error;if(!['QuotaExceededError','NS_ERROR_DOM_QUOTA_REACHED'].includes(error?.name))throw error;}
       }
       if(!saved)throw lastError||photoError('QuotaExceededError','存储空间不足');
-      renderSavedPlaces();renderItinerary();toast('图片已保存');
+      await window.TabiWorkspace?.flush?.();renderSavedPlaces();renderItinerary();toast('图片已保存');
     }catch(error){
       if(previous===undefined)delete p.photo;else p.photo=previous;
       if(trip)trip.saved=tripSaved;
