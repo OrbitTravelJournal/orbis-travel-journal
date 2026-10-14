@@ -32,7 +32,7 @@
       const missing=[...form.querySelectorAll('[required]')].find(input=>!input.value.trim());if(missing){status.textContent='请填写'+(missing.closest('label')?.firstChild.textContent||'必填资料');missing.focus();return;}
       if(!form.checkValidity()){form.reportValidity();status.textContent='请检查日期、时间或必填资料。';return;}
       button.disabled=true;
-      try{await submit(new FormData(form))}catch(error){status.textContent=error.message||'保存未完成，请重试。';status.scrollIntoView({block:'nearest'});}finally{button.disabled=false;}
+      try{await submit(new FormData(form))}catch(error){status.textContent=error.message||'保存未完成，请重试。';if(error.resolveDuplicate){const action=document.createElement('button');action.type='button';action.textContent='将这些修改保存到已有卡片';action.onclick=()=>{error.resolveDuplicate();form.requestSubmit();};status.append(document.createElement('br'),action);}status.scrollIntoView({block:'nearest'});}finally{button.disabled=false;}
     };dialog.showModal();
     updateLibraryViewport();
   }
@@ -43,16 +43,21 @@
     try{const parsed=new URL(/^https?:\/\//i.test(candidate)?candidate:'https://'+candidate);if(!['http:','https:'].includes(parsed.protocol)||!parsed.hostname.includes('.'))throw new Error();return parsed.href;}catch{throw new Error(label+'无法识别，请粘贴网址，例如 www.example.com；也可以留空。')}
   }
   function edit(place=null,type='Activity'){
-    const p=place||{},kind=place?category(p):type,owner=window.TabiWorkspace.state.currentUserId,tripId=window.TabiWorkspace.state.currentTripId;let lookupData=null;
+    const p=place||{},kind=place?category(p):type,owner=window.TabiWorkspace.state.currentUserId,tripId=window.TabiWorkspace.state.currentTripId;let lookupData=null,mergingDuplicate=false;
     openForm(place?'修改收藏地点':'添加收藏地点',`<div class="library-name-row">${field('地点名称','name',p.name,'text',true)}<button type="button" id="library-lookup" aria-label="按名称查找地点资料">查资料</button></div><p id="library-lookup-status" role="status"></p><div id="library-lookup-results"></div><label>类别<select name="libraryCategory">${Object.entries(categories()).map(([key,label])=>`<option value="${key}" ${key===kind?'selected':''}>${label}</option>`).join('')}</select></label><div class="library-field-row">${field('城市','city',p.city)}${field('区域 / 地标','region',p.region)}</div>${field('国家 / 地区','country',p.country)}${field('地址','address',p.address)}${field('Google Maps 链接（可选）','map',p.map,'url')}${field('网站链接（可选）','website',p.website,'url')}<label>备注<textarea name="notes">${safe(p.notes||p.description||'')}</textarea></label>`,async data=>{
       if(window.TabiWorkspace.state.currentUserId!==owner||window.TabiWorkspace.state.currentTripId!==tripId)throw new Error('账号或行程已切换，请重新打开地点表单。');
-      const target=place?savedPlaces.find(x=>x.key===place.key):null;if(place&&!target)throw new Error('这个收藏地点已变化，请重新打开。');
+      const target=place?(savedPlaces.includes(place)?place:savedPlaces.find(x=>x.key===place.key&&x.savedAt===place.savedAt)):null;if(place&&!target)throw new Error('这个收藏地点已变化，请重新打开。');
       const values=Object.fromEntries([...data].map(([k,v])=>[k,String(v).trim()]));if(!values.name)return;
+      if(mergingDuplicate&&target)for(const field of ['region','country','address','map','website','notes'])if(!values[field])values[field]=String(target[field]||(field==='notes'?target.description:'')||'');
       values.map=normalLink(values.map,'Google Maps 链接');values.website=normalLink(values.website,'网站链接');
       if(lookupData){values.lookupSource=lookupData.lookupSource;values.zh=lookupData.zh;if(!target?.photo&&lookupData.photo){values.photo=lookupData.photo;values.photoSource=lookupData.photoSource;values.photoCredit=lookupData.photoCredit;}}
       values.type=spec(values.libraryCategory).baseType;
       const key=savedKey(values.name,values.city);
-      if(savedPlaces.some(x=>x!==target&&x.key===key))throw new Error('这个地点已在收藏中，请修改已有卡片。');
+      const duplicate=savedPlaces.find(x=>visible(x)&&x!==target&&x.key===key&&(!target||key!==target.key));
+      if(duplicate){
+        const error=new Error('已有同名、同城市的卡片。你可以把当前填写的资料保存到那张卡片，原有图片和评分会保留。');
+        error.resolveDuplicate=()=>{place=duplicate;mergingDuplicate=true;};throw error;
+      }
       if(target)Object.assign(target,values,{key});else savedPlaces.unshift({...values,key,savedAt:Date.now()});
       if(persistSavedPlaces()===false)throw new Error('本机保存未完成，请先备份当前资料，暂不要刷新。');
       await window.TabiWorkspace.flush?.();renderSavedPlaces();
