@@ -603,3 +603,9 @@ html body.apple-ui.reader-mode #route-assistant-dialog #route-library-list{overf
 html body.apple-ui.reader-mode #route-assistant-dialog button{color:#765aab!important}
 html body.apple-ui.reader-mode #route-assistant-dialog .route-close{color:#fa596d!important}
 html body.apple-ui.reader-mode #route-assistant-dialog .route-location button{color:#0badad!important}
+
+/* Hotel photographs belong visibly inside their booking bubble. */
+html body.apple-ui.reader-mode #hotel-list .hotel-card>.hotel-card-photo{position:static!important;inset:auto!important;display:block!important;width:100%!important;height:190px!important;max-height:none!important;object-fit:cover!important;opacity:1!important;filter:none!important;transform:none!important;border-radius:18px!important;margin:0 0 18px!important;pointer-events:none}
+html body.apple-ui.reader-mode #hotel-list .hotel-actions .hotel-photo-upload{position:static!important;display:inline-grid!important;place-items:center!important;width:44px!important;min-width:44px!important;max-width:44px!important;height:44px!important;min-height:44px!important;padding:10px!important;margin:0!important;border:1px solid #ffffffed!important;border-radius:50%!important;background:#eff4ffbd!important;color:#4b83f6!important;overflow:visible!important;box-shadow:none!important}
+html body.apple-ui.reader-mode #hotel-list .hotel-photo-upload svg{width:22px;height:22px;color:#4b83f6!important}
+@media(max-width:580px){html body.apple-ui.reader-mode #hotel-list .hotel-card>.hotel-card-photo{height:170px!important;margin-bottom:14px!important}}

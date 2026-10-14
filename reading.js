@@ -192,7 +192,15 @@ if (typeof document !== 'undefined') (() => {
       }; actions.append(copyButton);
       if (info.confirmationNumber) { const code = document.createElement('p'); code.textContent = `确认号码：${info.confirmationNumber}`; copy.append(code); }
       const details = document.createElement('details'); details.className = 'reader-hotel-details'; details.innerHTML = '<summary>照片及其他操作</summary>';
-      for (const element of [card.querySelector('.hotel-photo-upload'),card.querySelector('[data-hotel-fill]'),card.querySelector('[data-hotel-remove-photo]'),button]) if (element) details.append(element);
+      const upload = card.querySelector('.hotel-photo-upload');
+      if (upload) {
+        upload.type = 'button'; upload.classList.add('library-icon');
+        const label = hotelMedia[hotel[1]]?.photo ? '更换酒店照片' : '添加酒店照片';
+        upload.setAttribute('aria-label', label); upload.title = label;
+        upload.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h4l2-3h4l2 3h4v12H3V7z"/><circle cx="12" cy="13" r="3"/></svg>';
+        actions.append(upload);
+      }
+      for (const element of [card.querySelector('[data-hotel-fill]'),card.querySelector('[data-hotel-remove-photo]'),button]) if (element) details.append(element);
       card.append(details);
     });
   };
