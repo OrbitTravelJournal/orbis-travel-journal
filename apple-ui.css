@@ -496,3 +496,24 @@ html body.apple-ui.reader-mode #workspace-profile.has-google-avatar img{display:
 
 html body.apple-ui.reader-mode #workspace-auth-close{position:absolute;right:14px;top:14px;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:1px solid #ffffffdf;border-radius:50%;background:#ffffffb0;color:#fa596d;font-size:28px;line-height:1;z-index:2}
 html body.apple-ui.reader-mode #workspace-auth-form>h2{padding-right:44px}
+
+html body.apple-ui.reader-mode #saved-library-dialog{max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain}
+html body.apple-ui.reader-mode #saved-library-dialog .library-form-actions{position:sticky;bottom:0;padding:12px 0 4px;background:rgba(246,248,252,.95);backdrop-filter:blur(15px);z-index:2}
+html body.apple-ui.reader-mode #saved-library-dialog .library-name-row{display:flex;align-items:center;gap:10px}
+html body.apple-ui.reader-mode #saved-library-dialog .library-name-row label{flex:1;min-width:0}
+html body.apple-ui.reader-mode #saved-library-dialog .library-form-status{font-size:14px;line-height:1.5;color:#b54640}
+html body.apple-ui.reader-mode #saved-library-dialog :is(.library-form-status,#library-lookup-status):empty{display:none}
+html body.apple-ui.reader-mode #saved-library-dialog #library-lookup-status{font-size:14px;line-height:1.5}
+html body.apple-ui.reader-mode #saved-library-dialog .library-lookup-choice{display:flex;gap:12px;padding:14px;border:1px solid #ffffffed;border-radius:16px;background:#ffffffa6;margin:10px 0}
+html body.apple-ui.reader-mode #saved-library-dialog .library-lookup-choice>img{width:80px;height:80px;object-fit:cover;border-radius:12px;flex:none}
+html body.apple-ui.reader-mode #saved-library-dialog .library-lookup-choice>div{min-width:0;flex:1}
+html body.apple-ui.reader-mode #saved-library-dialog .library-lookup-choice :is(p,a){display:block;font-size:13px;line-height:1.5;margin:4px 0;color:#535960;overflow-wrap:anywhere}
+html body.apple-ui.reader-mode #saved-library-dialog .library-lookup-preview{width:100%;max-height:180px;object-fit:cover;border-radius:14px}
+html body.apple-ui.reader-mode #restaurants .library-card .library-photo-credit{font-size:11px;color:#626b75!important;background:none!important;border:0!important;padding:0!important;min-height:0!important;overflow-wrap:anywhere}
+
+html body.apple-ui.reader-mode .place-photo-credit{display:block;color:#626b75!important;font-size:11px;line-height:1.5;margin:4px 0;overflow-wrap:anywhere}
+
+@media(max-width:700px){html body.apple-ui.reader-mode #saved-library-dialog{top:var(--library-top,12px)!important;bottom:auto!important;margin-block:0!important}}
+
+html body.apple-ui.reader-mode #saved-library-dialog .library-name-row{align-items:flex-end}
+html body.apple-ui.reader-mode #saved-library-dialog #library-lookup{margin-bottom:14px;flex:none}

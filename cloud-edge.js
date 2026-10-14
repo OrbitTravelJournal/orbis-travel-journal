@@ -1,3 +1,4 @@
+import { lookupPlaces } from './place-lookup.js';
 import { createRemoteJWKSet, jwtVerify } from 'npm:jose@6.1.0';
 const keys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
 const audience='410563003589-0gt2acjlughfar1kgsril4dlumgq4ikr.apps.googleusercontent.com';
@@ -51,6 +52,10 @@ export async function handle(req){
       const created=await fetch(`${base}/rest/v1/orbis_sessions`,{method:'POST',headers:dbHeaders,body:JSON.stringify({token_hash:await digest(value),google_sub:identity.sub,expires_at:expiresAt,max_expires_at:maxExpiresAt})});
       if(!created.ok)throw new Error('Session creation failed');
       return reply({sessionToken:value,account:identity.sub,expiresAt});
+    }
+    if(data.action==='lookup'){
+      if(typeof data.query!=='string'||!data.query.trim()||data.query.length>160)return reply({error:'Invalid place name'},400);
+      try{return reply({places:await lookupPlaces(data.query.trim())})}catch{return reply({error:'Place source unavailable'},502)}
     }
     if(data.action==='logout'){
       if(sessionHash){const r=await fetch(`${base}/rest/v1/orbis_sessions?token_hash=eq.${sessionHash}`,{method:'DELETE',headers:dbHeaders});if(!r.ok)throw new Error('Session revocation failed');}

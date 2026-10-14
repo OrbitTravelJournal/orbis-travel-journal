@@ -21,29 +21,66 @@
   const page=document.querySelector('#restaurants');
   page.innerHTML='<div class="library-head"><div><p class="eyebrow">SAVED PLACES · 收藏地点</p><h1>你的地点卡片库</h1><p>按类别、城市和区域整理，随时加入当天行程。</p></div><div class="library-head-actions">'+icon('placeAdd','添加地点','id="library-add"')+icon('categoryAdd','添加新分类','id="library-add-category"')+'</div></div><div id="saved-place-list"></div>';
   const dialog=document.createElement('dialog');dialog.id='saved-library-dialog';document.body.append(dialog);
+  function updateLibraryViewport(){const view=window.visualViewport;if(!view)return;dialog.style.maxHeight=Math.max(120,view.height-24)+'px';dialog.style.setProperty('--library-top',(view.offsetTop+12)+'px');}
+  window.visualViewport?.addEventListener('resize',()=>{if(dialog.open)updateLibraryViewport()});window.visualViewport?.addEventListener('scroll',()=>{if(dialog.open)updateLibraryViewport()});
   function openForm(title,fields,submit){
-    dialog.innerHTML=`<form class="library-form"><div class="library-dialog-head"><h2>${safe(title)}</h2><button type="button" class="library-close" aria-label="关闭地点表单">×</button></div>${fields}<div class="library-form-actions"><button type="button" class="library-cancel">取消</button><button type="submit">保存</button></div></form>`;
+    dialog.innerHTML=`<form class="library-form" novalidate><div class="library-dialog-head"><h2>${safe(title)}</h2><button type="button" class="library-close" aria-label="关闭地点表单">×</button></div>${fields}<p class="library-form-status" role="status" aria-live="polite"></p><div class="library-form-actions"><button type="button" class="library-cancel">取消</button><button type="submit">保存</button></div></form>`;
     dialog.querySelector('.library-close').onclick=dialog.querySelector('.library-cancel').onclick=()=>dialog.close();
-    dialog.querySelector('form').onsubmit=e=>{e.preventDefault();submit(new FormData(e.target));};dialog.showModal();
+    const form=dialog.querySelector('form'),status=form.querySelector('.library-form-status'),button=form.querySelector('[type="submit"]');
+    form.onsubmit=async e=>{
+      e.preventDefault();status.textContent='';
+      const missing=[...form.querySelectorAll('[required]')].find(input=>!input.value.trim());if(missing){status.textContent='请填写'+(missing.closest('label')?.firstChild.textContent||'必填资料');missing.focus();return;}
+      if(!form.checkValidity()){form.reportValidity();status.textContent='请检查日期、时间或必填资料。';return;}
+      button.disabled=true;
+      try{await submit(new FormData(form))}catch(error){status.textContent=error.message||'保存未完成，请重试。';status.scrollIntoView({block:'nearest'});}finally{button.disabled=false;}
+    };dialog.showModal();
+    updateLibraryViewport();
   }
-  const field=(label,name,value='',type='text',required=false)=>`<label>${safe(label)}<input name="${name}" type="${type}" value="${safe(value)}" ${required?'required':''}></label>`;
+  const field=(label,name,value='',type='text',required=false)=>`<label>${safe(label)}<input name="${name}" type="${type==='url'?'text':type}" ${type==='url'?'inputmode="url" autocapitalize="off" spellcheck="false"':''} value="${safe(value)}" ${required?'required':''}></label>`;
+  function normalLink(value,label){
+    const raw=String(value||'').trim();if(!raw)return '';
+    const found=raw.match(/https?:\/\/[^\s<>]+/i),candidate=found?found[0]:raw;
+    try{const parsed=new URL(/^https?:\/\//i.test(candidate)?candidate:'https://'+candidate);if(!['http:','https:'].includes(parsed.protocol)||!parsed.hostname.includes('.'))throw new Error();return parsed.href;}catch{throw new Error(label+'无法识别，请粘贴网址，例如 www.example.com；也可以留空。')}
+  }
   function edit(place=null,type='Activity'){
-    const p=place||{},kind=place?category(p):type;
-    openForm(place?'修改收藏地点':'添加收藏地点',`${field('地点名称','name',p.name,'text',true)}<label>类别<select name="libraryCategory">${Object.entries(categories()).map(([key,label])=>`<option value="${key}" ${key===kind?'selected':''}>${label}</option>`).join('')}</select></label><div class="library-field-row">${field('城市','city',p.city)}${field('区域 / 地标分组','region',p.region)}</div>${field('国家 / 地区','country',p.country)}${field('地址','address',p.address)}${field('Google Maps 链接（可选）','map',p.map,'url')}${field('网站链接（可选）','website',p.website,'url')}<label>备注<textarea name="notes">${safe(p.notes||p.description||'')}</textarea></label>`,data=>{
+    const p=place||{},kind=place?category(p):type,owner=window.TabiWorkspace.state.currentUserId,tripId=window.TabiWorkspace.state.currentTripId;let lookupData=null;
+    openForm(place?'修改收藏地点':'添加收藏地点',`<div class="library-name-row">${field('地点名称','name',p.name,'text',true)}<button type="button" id="library-lookup" aria-label="按名称查找地点资料">查资料</button></div><p id="library-lookup-status" role="status"></p><div id="library-lookup-results"></div><label>类别<select name="libraryCategory">${Object.entries(categories()).map(([key,label])=>`<option value="${key}" ${key===kind?'selected':''}>${label}</option>`).join('')}</select></label><div class="library-field-row">${field('城市','city',p.city)}${field('区域 / 地标分组','region',p.region)}</div>${field('国家 / 地区','country',p.country)}${field('地址','address',p.address)}${field('Google Maps 链接（可选）','map',p.map,'url')}${field('网站链接（可选）','website',p.website,'url')}<label>备注<textarea name="notes">${safe(p.notes||p.description||'')}</textarea></label>`,async data=>{
+      if(window.TabiWorkspace.state.currentUserId!==owner||window.TabiWorkspace.state.currentTripId!==tripId)throw new Error('账号或行程已切换，请重新打开地点表单。');
+      const target=place?savedPlaces.find(x=>x.key===place.key):null;if(place&&!target)throw new Error('这个收藏地点已变化，请重新打开。');
       const values=Object.fromEntries([...data].map(([k,v])=>[k,String(v).trim()]));if(!values.name)return;
+      values.map=normalLink(values.map,'Google Maps 链接');values.website=normalLink(values.website,'网站链接');
+      if(lookupData){values.lookupSource=lookupData.lookupSource;values.zh=lookupData.zh;if(!target?.photo&&lookupData.photo){values.photo=lookupData.photo;values.photoSource=lookupData.photoSource;values.photoCredit=lookupData.photoCredit;}}
       values.type=spec(values.libraryCategory).baseType;
       const key=savedKey(values.name,values.city);
-      if(savedPlaces.some(x=>x!==place&&x.key===key)){toast('这个地点已经在收藏中');return;}
-      if(place){Object.assign(place,values,{key});persistSavedPlaces();renderSavedPlaces();}
-      else savePlace({...values,savedAt:Date.now()});
+      if(savedPlaces.some(x=>x!==target&&x.key===key))throw new Error('这个地点已在收藏中，请修改已有卡片。');
+      if(target)Object.assign(target,values,{key});else savedPlaces.unshift({...values,key,savedAt:Date.now()});
+      if(persistSavedPlaces()===false)throw new Error('本机保存未完成，请先备份当前资料，暂不要刷新。');
+      await window.TabiWorkspace.flush?.();renderSavedPlaces();
       dialog.close();renderItinerary();toast('地点已保存');
     });
+    const form=dialog.querySelector('form'),lookup=form.querySelector('#library-lookup'),status=form.querySelector('#library-lookup-status'),results=form.querySelector('#library-lookup-results');
+    lookup.onclick=async()=>{
+      const name=form.elements.name.value.trim();if(!name){status.textContent='先输入地点名称。';form.elements.name.focus();return;}
+      lookup.disabled=true;status.textContent='正在查公开资料与真实图片…';results.replaceChildren();
+      try{
+        const places=await window.OrbisCloud.lookup(name);if(!dialog.open||!form.isConnected||form.elements.name.value.trim()!==name)return;
+        status.textContent=places.length?'请核对地点，点「使用资料」填入空白字段。没有可靠来源的字段会留空。':'没有找到可靠资料，可以继续手动保存；部分餐厅和小店不在公开资料库中。';
+        results.innerHTML=places.map((candidate,index)=>`<article class="library-lookup-choice">${candidate.photo?`<img src="${safe(candidate.photo)}" alt="" loading="lazy">`:''}<div><b>${safe(candidate.name)}</b><p>${safe([candidate.country,candidate.region].filter(Boolean).join(' · '))}</p><p>${safe(candidate.notes)}</p><a href="${safe(candidate.lookupSource)}" target="_blank" rel="noreferrer">资料来源 ↗</a>${candidate.photoSource?`<a href="${safe(candidate.photoSource)}" target="_blank" rel="noreferrer">照片来源 · ${safe(candidate.photoCredit)}</a>`:''}<button type="button" data-lookup-use="${index}">使用资料</button></div></article>`).join('');
+        results.querySelectorAll('[data-lookup-use]').forEach(button=>button.onclick=()=>{
+          lookupData=places[Number(button.dataset.lookupUse)];for(const key of ['country','region','address','website','map'])if(!form.elements[key].value.trim()&&lookupData[key])form.elements[key].value=lookupData[key];
+          if(!form.elements.notes.value.trim())form.elements.notes.value=[lookupData.notes,'资料来源：'+lookupData.lookupSource].filter(Boolean).join('\n');
+          status.textContent='资料已填入。请检查后点保存；已有资料与图片会保留。';results.replaceChildren();
+          if(lookupData.photo&&!p.photo)results.innerHTML=`<img class="library-lookup-preview" src="${safe(lookupData.photo)}" alt="地点照片预览"><a href="${safe(lookupData.photoSource)}" target="_blank" rel="noreferrer">${safe(lookupData.photoCredit)} · 照片来源 ↗</a>`;
+        });
+      }catch(error){if(form.isConnected&&dialog.open)status.textContent=error.message||'资料查询暂不可用，可以继续手动保存。';}finally{lookup.disabled=false;}
+    };
+    form.elements.name.addEventListener('input',()=>{lookupData=null;results.replaceChildren();});
   }
   window.addSavedPlaceToDay=key=>{
     const p=savedPlaces.find(x=>x.key===key&&visible(x));if(!p)return;
     openForm('加入日程',`<p>${safe(p.name)}</p><label>选择日期<select name="day">${days.map((d,i)=>`<option value="${i}" ${i===selected?'selected':''}>Day ${i+1} · ${safe(d.iso||d.date)} · ${safe(d.city)}</option>`).join('')}</select></label>${field('计划时间','time','','time',true)}${spec(category(p)).baseType==='Meal'?'<label>用餐安排<select name="mealSlot"><option value="breakfast">早餐</option><option value="lunch">午餐</option><option value="dinner">晚餐</option><option value="other">用餐 / 茶歇</option></select></label>':''}`,data=>{
       const day=days[+data.get('day')],time=String(data.get('time')),kind=spec(category(p)).baseType;if(!day||!time)return;
-      const extra={place:p.name,city:p.city||'',country:p.country||'',region:p.region||'',address:p.address||'',map:p.map||'',website:p.website||'',photo:p.photo||'',savedPlaceKey:p.key,libraryCategory:category(p)};
+      const extra={place:p.name,city:p.city||'',country:p.country||'',region:p.region||'',address:p.address||'',map:p.map||'',website:p.website||'',photo:p.photo||'',savedPlaceKey:p.key,libraryCategory:category(p),photoSource:p.photoSource||'',photoCredit:p.photoCredit||'',lookupSource:p.lookupSource||''};
       if(kind==='Meal')extra.mealSlot=String(data.get('mealSlot'));if(p.coordinates)extra.coordinates=p.coordinates;
       const item=[time,kind==='Other'?'Activity':kind,p.name,p.notes||p.description||'','—',extra];
       const at=day.items.findIndex(x=>x[0]>time);day.items.splice(at<0?day.items.length:at,0,item);persistTrip();renderItinerary();dialog.close();toast('已加入所选日期');
@@ -54,7 +91,7 @@
     list.innerHTML=Object.entries(categories()).map(([kind,label])=>{
       const places=savedPlaces.filter(p=>visible(p)&&category(p)===kind);if(kind==='Other'&&!places.length)return '';
       const groups=new Map();for(const p of places){const group=[p.country,p.city,p.region].filter(Boolean).join(' · ')||'区域待填写';if(!groups.has(group))groups.set(group,[]);groups.get(group).push(p);}
-      return `<section class="library-category" data-library-kind="${safe(kind)}" style="--library-color:${safe(spec(kind).color)}"><header><h2>${safe(label)}<small>${places.length}</small></h2><div class="library-category-actions">${icon('palette','修改分类 '+label,`data-library-category-edit="${safe(kind)}"`)}${icon('plus','添加'+label,`data-library-new="${safe(kind)}"`)}</div></header>${[...groups].map(([group,items])=>`<section class="library-region"><h3>${safe(group)}</h3><div class="library-grid">${items.map(p=>`<article class="library-card">${/^https?:\/\/|^data:image\//i.test(p.photo||'')?`<img src="${safe(p.photo)}" alt="" loading="lazy">`:''}<h4>${safe(p.name)}</h4>${p.zh?`<p>${safe(p.zh)}</p>`:''}${p.address?`<p>${safe(p.address)}</p>`:''}${stars(p)}${p.notes||p.description?`<details><summary>备注</summary><p>${safe(p.notes||p.description)}</p></details>`:''}<div class="library-card-tools">${icon('more','展开地点操作','data-library-toggle aria-expanded="false"')}<div class="library-card-actions" hidden inert><a class="library-icon" style="--library-accent:#ef7046" href="${safe(url(p))}" target="_blank" rel="noreferrer" aria-label="导航" title="导航"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths.pin}</svg></a>${icon('photo',p.photo?'更换图片':'添加图片',`data-library-photo="${safe(p.key)}"`)}${icon('edit','修改地点',`data-library-edit="${safe(p.key)}"`)}${icon('calendar','加入日程',`data-saved-add="${safe(p.key)}"`)}${icon('trash','删除地点',`data-library-delete="${safe(p.key)}"`)}</div></div></article>`).join('')}</div></section>`).join('')||'<p class="library-empty">还没有地点，点击上方添加。</p>'}</section>`;
+      return `<section class="library-category" data-library-kind="${safe(kind)}" style="--library-color:${safe(spec(kind).color)}"><header><h2>${safe(label)}<small>${places.length}</small></h2><div class="library-category-actions">${icon('palette','修改分类 '+label,`data-library-category-edit="${safe(kind)}"`)}${icon('plus','添加'+label,`data-library-new="${safe(kind)}"`)}</div></header>${[...groups].map(([group,items])=>`<section class="library-region"><h3>${safe(group)}</h3><div class="library-grid">${items.map(p=>`<article class="library-card">${/^https?:\/\/|^data:image\//i.test(p.photo||'')?`<img src="${safe(p.photo)}" alt="" loading="lazy">`:''}${p.photo&&/^https:\/\//i.test(p.photoSource||'')?`<a class="library-photo-credit" href="${safe(p.photoSource)}" target="_blank" rel="noreferrer">${safe(p.photoCredit||'照片来源')} ↗</a>`:''}<h4>${safe(p.name)}</h4>${p.zh?`<p>${safe(p.zh)}</p>`:''}${p.address?`<p>${safe(p.address)}</p>`:''}${stars(p)}${p.notes||p.description?`<details><summary>备注</summary><p>${safe(p.notes||p.description)}</p></details>`:''}<div class="library-card-tools">${icon('more','展开地点操作','data-library-toggle aria-expanded="false"')}<div class="library-card-actions" hidden inert><a class="library-icon" style="--library-accent:#ef7046" href="${safe(url(p))}" target="_blank" rel="noreferrer" aria-label="导航" title="导航"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths.pin}</svg></a>${icon('photo',p.photo?'更换图片':'添加图片',`data-library-photo="${safe(p.key)}"`)}${icon('edit','修改地点',`data-library-edit="${safe(p.key)}"`)}${icon('calendar','加入日程',`data-saved-add="${safe(p.key)}"`)}${icon('trash','删除地点',`data-library-delete="${safe(p.key)}"`)}</div></div></article>`).join('')}</div></section>`).join('')||'<p class="library-empty">还没有地点，点击上方添加。</p>'}</section>`;
     }).join('');
     const deleted=savedPlaces.filter(p=>p.libraryDeletedAt);
     if(deleted.length)list.insertAdjacentHTML('beforeend',`<details class="library-trash"><summary>已删除 · ${deleted.length}</summary>${deleted.map(p=>`<div><span>${safe(p.name)}</span>${icon('back','恢复 '+p.name,`data-library-restore="${safe(p.key)}"`)}${icon('trash','彻底删除 '+p.name,`data-library-purge="${safe(p.key)}"`)}</div>`).join('')}</details>`);
@@ -96,6 +133,7 @@
     document.querySelectorAll('#timeline .timeline-item').forEach((row,index)=>{
       const item=day.items[index],card=row.querySelector('.item-card');if(!item||!card)return;
       const linked=savedPlaces.find(p=>(p.key===item[5]?.savedPlaceKey||p.key===savedKey(item[2],item[5]?.city||day.city))&&!p.libraryCategoryDefinition);
+      const media=item[5]||{},image=card.querySelector('.place-photo img');if(image&&/^https:\/\//i.test(media.photoSource||'')&&!card.querySelector('.place-photo-credit')){const credit=document.createElement('a');credit.className='place-photo-credit';credit.href=media.photoSource;credit.target='_blank';credit.rel='noreferrer';credit.textContent=(media.photoCredit||'照片来源')+' ↗';image.after(credit);}
       const id=linked?category(linked):(item[5]?.libraryCategory||item[1]);
       if(!specs()[id])return;
       const info=spec(id),color=/^#[\da-f]{6}$/i.test(info.color)?info.color:defaults.Activity.color;
@@ -145,7 +183,7 @@
         }catch(error){lastError=error;if(!['QuotaExceededError','NS_ERROR_DOM_QUOTA_REACHED'].includes(error?.name))throw error;}
       }
       if(!saved)throw lastError||photoError('QuotaExceededError','存储空间不足');
-      await window.TabiWorkspace?.flush?.();renderSavedPlaces();renderItinerary();toast('图片已保存');
+      delete p.photoSource;delete p.photoCredit;persistSavedPlaces();await window.TabiWorkspace?.flush?.();renderSavedPlaces();renderItinerary();toast('图片已保存');
     }catch(error){
       if(previous===undefined)delete p.photo;else p.photo=previous;
       if(trip)trip.saved=tripSaved;
