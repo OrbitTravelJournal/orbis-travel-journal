@@ -8,8 +8,8 @@
   const spec=id=>specs()[id]||defaults.Other;
   const category=p=>p.libraryCategory||(/meal|restaurant|餐饮|餐厅|food/i.test(p.type||'')?'Meal':/stay|hotel|酒店|住宿/i.test(p.type||'')?'Stay':/activity|landmark|attraction|景点|place/i.test(p.type||'')?'Activity':'Other');
   const url=p=>/^https?:\/\//i.test(p.map||'')?p.map:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([p.name,p.address,p.region,p.city,p.country].filter(Boolean).join(', '))}`;
-  const paths={placeAdd:'<path d="M14 9c0 4-5 10-5 10S4 13 4 9a5 5 0 0 1 10 0z"/><circle cx="9" cy="9" r="1.6"/><path d="M18 3v6m-3-3h6"/>',categoryAdd:'<path d="M3 8V5a1 1 0 0 1 1-1h5l3 4h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8z"/><path d="M12 11v6m-3-3h6"/>',more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',palette:'<circle cx="12" cy="12" r="9"/><circle cx="8" cy="8" r="1"/><circle cx="15" cy="7" r="1"/><circle cx="17" cy="13" r="1"/><path d="M4 15h5l3 6"/>',plus:'<path d="M12 5v14M5 12h14"/>',photo:'<path d="M4 7h4l2-3h4l2 3h4v12H3V7z"/><circle cx="12" cy="13" r="3"/>',edit:'<path d="m14 4 6 6M4 20l5-1L20 8a2 2 0 0 0-4-4L5 15zM4 20h16"/>',pin:'<path d="M18 9c0 5-6 12-6 12S6 14 6 9a6 6 0 0 1 12 0z"/><circle cx="12" cy="9" r="2"/>',calendar:'<rect x="4" y="5" width="16" height="15" rx="4"/><path d="M8 3v4m8-4v4M4 10h16m-3 5h-6m3-3v6"/>',trash:'<path d="M4 6h16M9 6V3h6v3M6 6l1 14h10l1-14M10 10v6m4-6v6"/>',back:'<path d="m8 4-5 5 5 5M3 9h11a6 6 0 0 1 0 12"/>'};
-  const colors={placeAdd:'#13b982',categoryAdd:'#ab55ec',more:'#7e79ad',palette:'#ab55ec',plus:'#13b982',photo:'#4b83f6',edit:'#ab55ec',pin:'#ef7046',calendar:'#9762ff',trash:'#fa5a48',back:'#18beac'};
+  const paths={previous:'<path d="m15 5-7 7 7 7"/>',next:'<path d="m9 5 7 7-7 7"/>',placeAdd:'<path d="M14 9c0 4-5 10-5 10S4 13 4 9a5 5 0 0 1 10 0z"/><circle cx="9" cy="9" r="1.6"/><path d="M18 3v6m-3-3h6"/>',categoryAdd:'<path d="M3 8V5a1 1 0 0 1 1-1h5l3 4h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8z"/><path d="M12 11v6m-3-3h6"/>',more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',palette:'<circle cx="12" cy="12" r="9"/><circle cx="8" cy="8" r="1"/><circle cx="15" cy="7" r="1"/><circle cx="17" cy="13" r="1"/><path d="M4 15h5l3 6"/>',plus:'<path d="M12 5v14M5 12h14"/>',photo:'<path d="M4 7h4l2-3h4l2 3h4v12H3V7z"/><circle cx="12" cy="13" r="3"/>',edit:'<path d="m14 4 6 6M4 20l5-1L20 8a2 2 0 0 0-4-4L5 15zM4 20h16"/>',pin:'<path d="M18 9c0 5-6 12-6 12S6 14 6 9a6 6 0 0 1 12 0z"/><circle cx="12" cy="9" r="2"/>',calendar:'<rect x="4" y="5" width="16" height="15" rx="4"/><path d="M8 3v4m8-4v4M4 10h16m-3 5h-6m3-3v6"/>',trash:'<path d="M4 6h16M9 6V3h6v3M6 6l1 14h10l1-14M10 10v6m4-6v6"/>',back:'<path d="m8 4-5 5 5 5M3 9h11a6 6 0 0 1 0 12"/>'};
+  const colors={previous:'#7e79ad',next:'#7e79ad',placeAdd:'#13b982',categoryAdd:'#ab55ec',more:'#7e79ad',palette:'#ab55ec',plus:'#13b982',photo:'#4b83f6',edit:'#ab55ec',pin:'#ef7046',calendar:'#9762ff',trash:'#fa5a48',back:'#18beac'};
   const icon=(kind,label,attrs='')=>`<button type="button" class="library-icon" style="--library-accent:${colors[kind]}" aria-label="${safe(label)}" title="${safe(label)}" ${attrs}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[kind]}</svg></button>`;
   const ratingOf=p=>Number.isInteger(Number(p.rating))&&Number(p.rating)>=1&&Number(p.rating)<=5?Number(p.rating):0;
   const stars=p=>`<div class="library-stars" role="group" aria-label="${safe(p.name)}的评分，满分5星">${[1,2,3,4,5].map(n=>`<button type="button" class="library-star ${n<=ratingOf(p)?'is-lit':''}" data-library-rate="${safe(p.key)}" data-stars="${n}" aria-label="评${n}星" aria-pressed="${n===ratingOf(p)}" title="${n}星，再次点击可取消评分"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.3.9-4.55 4.43 1.08 6.27L12 17.34l-5.63 2.96 1.08-6.27L2.9 9.6l6.3-.9z"/></svg></button>`).join('')}</div>`;
@@ -86,13 +86,50 @@
       const at=day.items.findIndex(x=>x[0]>time);day.items.splice(at<0?day.items.length:at,0,item);persistTrip();renderItinerary();dialog.close();toast('已加入所选日期');
     });
   };
+  let railCleanup=()=>{};
+  function bindLibraryRails(list,positions){
+    const cleanups=[];
+    list.querySelectorAll('.library-region').forEach(region=>{
+      const rail=region.querySelector('.library-grid'),cards=[...rail.children],previous=region.querySelector('[data-library-previous]'),next=region.querySelector('[data-library-next]'),counter=region.querySelector('.library-page-count');
+      let timer,frame,last=-1;
+      const offsets=()=>cards.map(card=>card.offsetLeft-2);
+      function update(animate=false){
+        const starts=offsets(),max=Math.max(0,rail.scrollWidth-rail.clientWidth),left=rail.scrollLeft;
+        const first=Math.max(0,starts.findIndex((start,i)=>start+cards[i].offsetWidth>left+8));
+        let end=first;while(end+1<cards.length&&starts[end+1]+cards[end+1].offsetWidth<=left+rail.clientWidth+8)end++;
+        counter.textContent=first===end?`${first+1} / ${cards.length}`:`${first+1}–${end+1} / ${cards.length}`;
+        previous.disabled=left<=2;next.disabled=left>=max-2;
+        if(animate&&first!==last&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+          cards[first].classList.remove('is-page-turn');void cards[first].offsetWidth;cards[first].classList.add('is-page-turn');
+        }
+        if(animate||last<0)last=first;
+      }
+      function move(direction){
+        const starts=offsets(),left=rail.scrollLeft;
+        const target=direction>0?starts.find(start=>start>left+8):starts.filter(start=>start<left-8).pop();
+        rail.scrollTo({left:target??(direction>0?rail.scrollWidth:0),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+      }
+      previous.onclick=()=>move(-1);next.onclick=()=>move(1);
+      rail.onkeydown=e=>{if(e.target!==rail||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();if(e.key==='Home'||e.key==='End')rail.scrollTo({left:e.key==='Home'?0:rail.scrollWidth,behavior:'auto'});else move(e.key==='ArrowRight'?1:-1);};
+      rail.onscroll=()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>update());clearTimeout(timer);timer=setTimeout(()=>update(true),130);};
+      cards.forEach(card=>card.onanimationend=()=>card.classList.remove('is-page-turn'));
+      const position=positions.get(region.dataset.libraryRail);
+      if(position){const card=cards.find(card=>card.dataset.libraryKey===position.key);rail.scrollLeft=card?card.offsetLeft-2:position.left;}
+      const observer=new ResizeObserver(()=>update());observer.observe(rail);update();
+      cleanups.push(()=>{observer.disconnect();clearTimeout(timer);cancelAnimationFrame(frame);});
+    });
+    railCleanup=()=>cleanups.forEach(clean=>clean());
+  }
   window.renderSavedPlaces=()=>{
     const list=document.querySelector('#saved-place-list');if(!list)return;
+    const positions=new Map([...list.querySelectorAll('.library-region')].map(region=>{const rail=region.querySelector('.library-grid');const card=[...rail.children].find(card=>card.offsetLeft-2+card.offsetWidth>rail.scrollLeft+8);return [region.dataset.libraryRail,{key:card?.dataset.libraryKey,left:rail.scrollLeft}];}));
+    railCleanup();
     list.innerHTML=Object.entries(categories()).map(([kind,label])=>{
       const places=savedPlaces.filter(p=>visible(p)&&category(p)===kind);if(kind==='Other'&&!places.length)return '';
       const groups=new Map();for(const p of places){const group=[p.country,p.city,p.region].filter(Boolean).join(' · ')||'区域待填写';if(!groups.has(group))groups.set(group,[]);groups.get(group).push(p);}
-      return `<section class="library-category" data-library-kind="${safe(kind)}" style="--library-color:${safe(spec(kind).color)}"><header><h2>${safe(label)}<small>${places.length}</small></h2><div class="library-category-actions">${icon('palette','修改分类 '+label,`data-library-category-edit="${safe(kind)}"`)}${icon('plus','添加'+label,`data-library-new="${safe(kind)}"`)}</div></header>${[...groups].map(([group,items])=>`<section class="library-region"><h3>${safe(group)}</h3><div class="library-grid">${items.map(p=>`<article class="library-card">${/^https?:\/\/|^data:image\//i.test(p.photo||'')?`<img src="${safe(p.photo)}" alt="" loading="lazy">`:''}${p.photo&&/^https:\/\//i.test(p.photoSource||'')?`<a class="library-photo-credit" href="${safe(p.photoSource)}" target="_blank" rel="noreferrer">${safe(p.photoCredit||'照片来源')} ↗</a>`:''}<h4>${safe(p.name)}</h4>${p.zh?`<p>${safe(p.zh)}</p>`:''}${p.address?`<p>${safe(p.address)}</p>`:''}${stars(p)}${p.notes||p.description?`<details><summary>备注</summary><p>${safe(p.notes||p.description)}</p></details>`:''}<div class="library-card-tools">${icon('more','展开地点操作','data-library-toggle aria-expanded="false"')}<div class="library-card-actions" hidden inert><a class="library-icon" style="--library-accent:#ef7046" href="${safe(url(p))}" target="_blank" rel="noreferrer" aria-label="导航" title="导航"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths.pin}</svg></a>${icon('photo',p.photo?'更换图片':'添加图片',`data-library-photo="${safe(p.key)}"`)}${icon('edit','修改地点',`data-library-edit="${safe(p.key)}"`)}${icon('calendar','加入日程',`data-saved-add="${safe(p.key)}"`)}${icon('trash','删除地点',`data-library-delete="${safe(p.key)}"`)}</div></div></article>`).join('')}</div></section>`).join('')||'<p class="library-empty">还没有地点，点击上方添加。</p>'}</section>`;
+      return `<section class="library-category" data-library-kind="${safe(kind)}" style="--library-color:${safe(spec(kind).color)}"><header><h2>${safe(label)}<small>${places.length}</small></h2><div class="library-category-actions">${icon('palette','修改分类 '+label,`data-library-category-edit="${safe(kind)}"`)}${icon('plus','添加'+label,`data-library-new="${safe(kind)}"`)}</div></header>${[...groups].map(([group,items])=>`<section class="library-region" data-library-rail="${safe(JSON.stringify([kind,group]))}"><div class="library-region-head"><h3>${safe(group)}</h3><div class="library-paging">${icon('previous','上一张地点卡片','data-library-previous')}<span class="library-page-count" aria-label="卡片位置"></span>${icon('next','下一张地点卡片','data-library-next')}</div></div><div class="library-grid" tabindex="0" role="region" aria-label="${safe(label+' · '+group)}，左右翻阅地点卡片">${items.map(p=>`<article class="library-card" data-library-key="${safe(p.key)}">${/^https?:\/\/|^data:image\//i.test(p.photo||'')?`<img src="${safe(p.photo)}" alt="" loading="lazy">`:''}${p.photo&&/^https:\/\//i.test(p.photoSource||'')?`<a class="library-photo-credit" href="${safe(p.photoSource)}" target="_blank" rel="noreferrer">${safe(p.photoCredit||'照片来源')} ↗</a>`:''}<h4>${safe(p.name)}</h4>${p.zh?`<p>${safe(p.zh)}</p>`:''}${p.address?`<p>${safe(p.address)}</p>`:''}${stars(p)}${p.notes||p.description?`<details><summary>备注</summary><p>${safe(p.notes||p.description)}</p></details>`:''}<div class="library-card-tools">${icon('more','展开地点操作','data-library-toggle aria-expanded="false"')}<div class="library-card-actions" hidden inert><a class="library-icon" style="--library-accent:#ef7046" href="${safe(url(p))}" target="_blank" rel="noreferrer" aria-label="导航" title="导航"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths.pin}</svg></a>${icon('photo',p.photo?'更换图片':'添加图片',`data-library-photo="${safe(p.key)}"`)}${icon('edit','修改地点',`data-library-edit="${safe(p.key)}"`)}${icon('calendar','加入日程',`data-saved-add="${safe(p.key)}"`)}${icon('trash','删除地点',`data-library-delete="${safe(p.key)}"`)}</div></div></article>`).join('')}</div></section>`).join('')||'<p class="library-empty">还没有地点，点击上方添加。</p>'}</section>`;
     }).join('');
+    bindLibraryRails(list,positions);
     const deleted=savedPlaces.filter(p=>p.libraryDeletedAt);
     if(deleted.length)list.insertAdjacentHTML('beforeend',`<details class="library-trash"><summary>已删除 · ${deleted.length}</summary>${deleted.map(p=>`<div><span>${safe(p.name)}</span>${icon('back','恢复 '+p.name,`data-library-restore="${safe(p.key)}"`)}${icon('trash','彻底删除 '+p.name,`data-library-purge="${safe(p.key)}"`)}</div>`).join('')}</details>`);
     list.querySelectorAll('[data-library-rate]').forEach(b=>b.onclick=()=>{

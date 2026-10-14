@@ -517,3 +517,23 @@ html body.apple-ui.reader-mode .place-photo-credit{display:block;color:#626b75!i
 
 html body.apple-ui.reader-mode #saved-library-dialog .library-name-row{align-items:flex-end}
 html body.apple-ui.reader-mode #saved-library-dialog #library-lookup{margin-bottom:14px;flex:none}
+
+/* Each region is a horizontal card shelf; paging never changes stored records. */
+html body.apple-ui.reader-mode #restaurants .library-category{min-width:0}
+html body.apple-ui.reader-mode #restaurants .library-region-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+html body.apple-ui.reader-mode #restaurants .library-region-head h3{margin:0;min-width:0;overflow-wrap:anywhere}
+html body.apple-ui.reader-mode #restaurants .library-paging{display:flex;align-items:center;gap:6px;flex:none}
+html body.apple-ui.reader-mode #restaurants .library-page-count{font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap;min-width:46px;text-align:center;color:#6e6e73!important}
+html body.apple-ui.reader-mode #restaurants .library-paging button:disabled{opacity:.3;cursor:default}
+html body.apple-ui.reader-mode #restaurants .library-grid{position:relative;display:flex;gap:16px;align-items:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#b6afc455 transparent;padding:4px 2px 14px;perspective:1100px}
+html body.apple-ui.reader-mode #restaurants .library-grid:focus-visible{outline:2px solid var(--library-color);outline-offset:4px;border-radius:16px}
+html body.apple-ui.reader-mode #restaurants .library-grid>.library-card{flex:0 0 clamp(240px,29%,300px);box-sizing:border-box;scroll-snap-align:start;transform-origin:left center}
+html body.apple-ui.reader-mode #restaurants .library-card.is-page-turn{animation:orbis-library-page .38s ease-out}
+@keyframes orbis-library-page{from{transform:rotateY(-5deg) translateX(5px);opacity:.86}to{transform:rotateY(0) translateX(0);opacity:1}}
+@media(max-width:580px){
+ html body.apple-ui.reader-mode #restaurants .library-category{padding:16px}
+ html body.apple-ui.reader-mode #restaurants .library-region-head{align-items:flex-start;flex-wrap:wrap;gap:8px}
+ html body.apple-ui.reader-mode #restaurants .library-paging{margin-left:auto}
+ html body.apple-ui.reader-mode #restaurants .library-grid>.library-card{flex-basis:88%;min-width:0}
+}
+@media(prefers-reduced-motion:reduce){html body.apple-ui.reader-mode #restaurants .library-card.is-page-turn{animation:none!important}}
