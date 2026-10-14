@@ -626,3 +626,5 @@ html body.apple-ui.reader-mode #hotel-list .hotel-card>.hotel-card-photo{opacity
 
 html body.apple-ui.reader-mode #hotel-list .hotel-card-controls .hotel-photo-upload{position:static!important;color:#4b83f6!important;background:#eff4ffbd!important;overflow:visible!important;cursor:pointer}
 html body.apple-ui.reader-mode #hotel-list .hotel-card-controls .hotel-photo-clear{color:#ea7863!important;cursor:pointer}
+
+html body.apple-ui.reader-mode #hotel-list .hotel-card>.hotel-card-photo{-webkit-mask:none!important;mask:none!important;-webkit-mask-image:none!important;mask-image:none!important}
