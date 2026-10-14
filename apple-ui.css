@@ -617,3 +617,12 @@ html body.apple-ui.reader-mode #hotel-list .hotel-card-controls .hotel-bookmark{
 html body.apple-ui.reader-mode #hotel-list .hotel-bookmark.is-saved svg{fill:#ffd7e9}
 html body.apple-ui.reader-mode #hotel-list .hotel-card.is-hotel-dragging{opacity:.65!important}
 html body.apple-ui.reader-mode #hotel-list .hotel-card.is-hotel-drop{outline:2px solid #ac83e3;outline-offset:4px}
+
+html body.apple-ui.reader-mode #hotel-list .hotel-card-controls .hotel-delete{color:#fa5a48!important;background:#fff1f1bd!important;cursor:pointer}
+/* Hotel bubbles use a plain surface; uploaded photographs keep their original colours. */
+html body.apple-ui.reader-mode #hotel-list .hotel-card{background:#fafbfc!important;background-image:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html body.apple-ui.reader-mode #hotel-list .hotel-card:before,html body.apple-ui.reader-mode #hotel-list .hotel-card:after{display:none!important;background:none!important}
+html body.apple-ui.reader-mode #hotel-list .hotel-card>.hotel-card-photo{opacity:1!important;filter:none!important;mix-blend-mode:normal!important}
+
+html body.apple-ui.reader-mode #hotel-list .hotel-card-controls .hotel-photo-upload{position:static!important;color:#4b83f6!important;background:#eff4ffbd!important;overflow:visible!important;cursor:pointer}
+html body.apple-ui.reader-mode #hotel-list .hotel-card-controls .hotel-photo-clear{color:#ea7863!important;cursor:pointer}

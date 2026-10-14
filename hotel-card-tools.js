@@ -49,7 +49,12 @@
       const key=savedKey(hotel[1],OrbisStays.area(hotel)||''),saved=savedPlaces.some(p=>p.key===key&&OrbisSavedLibrary.visible(p));
       save.setAttribute('aria-pressed',String(saved));save.classList.toggle('is-saved',saved);if(saved){save.title='酒店已收藏';save.setAttribute('aria-label','酒店已收藏');}
       save.onclick=()=>collect(hotel,save).catch(()=>toast('收藏保存未完成，请稍后重试'));
-      top.append(handle,save);card.prepend(top);drag(handle,card,hotel);
+      remove.type='button';remove.classList.add('library-icon','hotel-delete');remove.setAttribute('aria-label','删除酒店预订');remove.title='删除酒店预订';remove.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M9 6V3h6v3M6 6l1 14h10l1-14M10 10v6m4-6v6"/></svg>';
+      top.append(handle,save);
+      const upload=card.querySelector('.hotel-photo-upload'),removePhoto=card.querySelector('[data-hotel-remove-photo]');
+      if(upload)top.append(upload);
+      if(removePhoto){removePhoto.classList.add('library-icon','hotel-photo-clear');removePhoto.type='button';removePhoto.setAttribute('aria-label','删除酒店照片');removePhoto.title='删除酒店照片';removePhoto.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 6-6 4 4m3-7 4 4m0-4-4 4"/></svg>';top.append(removePhoto);}
+      top.append(remove);card.prepend(top);drag(handle,card,hotel);
     });
   };renderHotels();
 })();
