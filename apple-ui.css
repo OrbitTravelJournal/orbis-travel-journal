@@ -628,3 +628,15 @@ html body.apple-ui.reader-mode #hotel-list .hotel-card-controls .hotel-photo-upl
 html body.apple-ui.reader-mode #hotel-list .hotel-card-controls .hotel-photo-clear{color:#ea7863!important;cursor:pointer}
 
 html body.apple-ui.reader-mode #hotel-list .hotel-card>.hotel-card-photo{-webkit-mask:none!important;mask:none!important;-webkit-mask-image:none!important;mask-image:none!important}
+
+/* Category drawers keep a large library compact; cards remain unchanged. */
+html body.apple-ui.reader-mode #restaurants .library-category>header>h2{flex:1;min-width:0}
+html body.apple-ui.reader-mode #restaurants .library-category .library-category-toggle{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;width:100%!important;min-width:0!important;min-height:44px!important;padding:0!important;border:0!important;border-radius:8px!important;background:transparent!important;color:#1d1d1f!important;box-shadow:none!important;font:inherit!important;text-align:left!important;cursor:pointer}
+html body.apple-ui.reader-mode #restaurants .library-category .library-category-toggle>span{overflow-wrap:anywhere}
+html body.apple-ui.reader-mode #restaurants .library-category .library-category-toggle>svg{width:20px;height:20px;flex:none;margin-left:auto;color:#8b83a3;transition:transform .2s ease}
+html body.apple-ui.reader-mode #restaurants .library-category .library-category-toggle[aria-expanded=true]>svg{transform:rotate(180deg)}
+html body.apple-ui.reader-mode #restaurants .library-category-body[hidden]{display:none!important}
+html body.apple-ui.reader-mode #restaurants .library-category:has(.library-category-body[hidden])>header{padding-bottom:0;border-bottom:0;margin-bottom:0}
+html body.apple-ui.reader-mode #restaurants .library-category-body:not([hidden]){animation:orbis-tools-reveal .2s ease-out}
+html body.apple-ui.reader-mode #restaurants .library-category .library-category-toggle:focus-visible{outline:2px solid var(--library-color);outline-offset:4px}
+@media(prefers-reduced-motion:reduce){html body.apple-ui.reader-mode #restaurants .library-category-body{animation:none!important}html body.apple-ui.reader-mode #restaurants .library-category .library-category-toggle>svg{transition:none}}
