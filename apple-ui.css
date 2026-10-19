@@ -640,3 +640,8 @@ html body.apple-ui.reader-mode #restaurants .library-category:has(.library-categ
 html body.apple-ui.reader-mode #restaurants .library-category-body:not([hidden]){animation:orbis-tools-reveal .2s ease-out}
 html body.apple-ui.reader-mode #restaurants .library-category .library-category-toggle:focus-visible{outline:2px solid var(--library-color);outline-offset:4px}
 @media(prefers-reduced-motion:reduce){html body.apple-ui.reader-mode #restaurants .library-category-body{animation:none!important}html body.apple-ui.reader-mode #restaurants .library-category .library-category-toggle>svg{transition:none}}
+
+/* Restaurant alternatives show the same photographs as their saved cards. */
+html body.apple-ui.reader-mode #itinerary .meal-options .meal-choice>.meal-choice-photo{position:static!important;inset:auto!important;display:block!important;flex:none;width:100%!important;height:130px!important;max-height:none!important;margin:0!important;object-fit:cover!important;border-radius:12px!important;opacity:1!important;filter:none!important;transform:none!important;mask:none!important;-webkit-mask:none!important;mix-blend-mode:normal!important}
+html body.apple-ui.reader-mode #itinerary .meal-options .meal-choice>.meal-photo-credit{display:block!important;min-height:0!important;border:0!important;background:none!important;padding:0!important;color:#79756f!important;font:400 11px/1.4 var(--sans)!important;text-align:left!important;overflow-wrap:anywhere}
+html body.apple-ui.reader-mode .meal-choice[hidden]{display:none!important}
