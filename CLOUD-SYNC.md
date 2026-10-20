@@ -1,5 +1,36 @@
 # Orbis account sync
 
+## Large photo workspace repair (2026-10-20)
+
+Normal polling sends `knownVersion` once the browser has a trusted cloud fingerprint.
+When that version still matches, the server selects only version metadata and
+returns `unchanged`, avoiding repeated downloads of the entire photo workspace.
+Changed versions and existing clients continue to receive complete snapshots.
+Restored stale browser caches still take the recovery path and are never uploaded
+as fresh edits. Snapshot transfers allow 120 seconds and display clear timeout
+and 12 MiB limit messages without removing local photographs.
+
+Server writes send the validated request to a server-only raw-body RPC adapter.
+The adapter parses the photo JSON once, then calls the existing atomic save
+function with its expected-version check. This avoids repeated large JSON
+extraction in PostgREST; direct table JSON writes also timed out in live testing.
+Browser table grants and RLS are unchanged. Only `service_role` may execute the
+adapter; it uses SECURITY INVOKER and an empty search path.
+
+Apply `cloud-save-raw.sql`, deploy `cloud-edge.js` as `orbis-sync`, then publish
+the frontend. Existing clients remain compatible. After publishing, refresh the
+latest device and check sync, then check the receiving device. Keep downloaded
+backups until photographs are visible on both devices.
+
+Validation: `node --test tests/cloud-sync.test.cjs` covers large transfers,
+metadata polls, authentication, simultaneous writes, initial-write conflicts,
+stale-cache recovery, errors and size limits with mocked HTTP. Live HTTPS
+verification uses a temporary synthetic account and randomly generated photo
+payload to check initial write, a roughly 11 MiB upload and byte-identical
+download, a later edit, changed-version download, lightweight polling and stale
+write rejection. Test sessions and workspace data must be removed afterward.
+Real owner-device verification still requires refreshing both devices.
+
 Production endpoint: https://owpxeksiaywnacomkwog.supabase.co/functions/v1/orbis-sync
 
 The static frontend retains Google Identity Services. The Edge Function validates Google RS256 signatures, issuer, audience, expiry and verified email. Google credentials establish a revocable random server session. Only a SHA-256 digest is stored on the server. Browser sessions persist in localStorage, renew with use for 30 days and require fresh Google authentication after a maximum of 90 days. Local email profiles never authorize cloud requests. Explicit logout clears browser credentials and revokes the server session when online.
@@ -29,3 +60,4 @@ their DOM. Trash can be restored; permanent deletion requires a second explicit
 confirmation and is only accepted for trashed files. The underlying upload,
 open, account/trip isolation and cleanup paths were verified against live Storage
 with temporary test identities, which were revoked afterward.
+

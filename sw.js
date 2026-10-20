@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tabi-app-shell-v51-booking-files';
+const CACHE_NAME = 'tabi-app-shell-v52-photo-sync';
 const APP_SHELL = [
   './',
   './index.html',
@@ -50,3 +50,4 @@ self.addEventListener('fetch', event => {
     return response;
   }).catch(() => caches.match(event.request).then(cached => cached || caches.match('./index.html'))));
 });
+

@@ -38,6 +38,13 @@ export async function handle(req){
   }catch{return reply({error:'Please sign in with Google again'},401);}
   try{
     if(req.method==='GET'){
+      const known=new URL(req.url).searchParams.get('knownVersion');
+      if(known&&/^[1-9][0-9]*$/.test(known)){
+        const meta=await fetch(`${base}/rest/v1/orbis_workspaces?google_sub=eq.${encodeURIComponent(identity.sub)}&select=version,updated_at`,{headers:dbHeaders,signal:AbortSignal.timeout(15000)});
+        if(!meta.ok)throw new Error('Database unavailable');
+        const row=(await meta.json())[0];
+        if(row&&String(row.version)===known)return reply({account:identity.sub,unchanged:true,version:row.version,updatedAt:row.updated_at});
+      }
       const r=await fetch(`${base}/rest/v1/orbis_workspaces?google_sub=eq.${encodeURIComponent(identity.sub)}&select=snapshot,version,updated_at`,{headers:dbHeaders});
       if(!r.ok)throw new Error('Database unavailable');
       const rows=await r.json(),row=rows[0];
@@ -67,9 +74,12 @@ export async function handle(req){
     }
     if(data.clientVersion!==2)return reply({error:'Please update the app before syncing'},426);
     if(!Number.isSafeInteger(data.version)||data.version<0||!Array.isArray(data.snapshot)||data.snapshot.length>200||data.snapshot.some(t=>!t||typeof t.id!=='string'||typeof t.name!=='string'||!Array.isArray(t.days)||!Array.isArray(t.hotels)||t.days.some(d=>!d||!Array.isArray(d.items))))return reply({error:'Invalid workspace'},400);
-    const r=await fetch(`${base}/rest/v1/rpc/orbis_save_workspace`,{method:'POST',headers:dbHeaders,body:JSON.stringify({p_sub:identity.sub,p_snapshot:data.snapshot,p_version:data.version})});
+    // Raw bytes avoid repeated large JSON extraction in PostgREST. The server-only
+    // adapter parses once and calls the existing atomic, version-checked save.
+    const r=await fetch(`${base}/rest/v1/rpc/orbis_save_workspace_raw`,{method:'POST',headers:{...dbHeaders,'Content-Type':'application/octet-stream'},body:JSON.stringify({p_sub:identity.sub,p_snapshot:data.snapshot,p_version:data.version}),signal:AbortSignal.timeout(45000)});
     if(!r.ok)throw new Error('Database unavailable');
     const saved=await r.json();return saved?reply(saved):reply({error:'Another device changed this workspace'},409);
   }catch{return reply({error:'Cloud unavailable; keep your local copy'},503);}
 }
 Deno.serve(handle);
+
