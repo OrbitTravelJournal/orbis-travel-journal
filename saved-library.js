@@ -14,7 +14,15 @@
   const ratingOf=p=>Number.isInteger(Number(p.rating))&&Number(p.rating)>=1&&Number(p.rating)<=5?Number(p.rating):0;
   const stars=p=>`<div class="library-stars" role="group" aria-label="${safe(p.name)}的评分，满分5星">${[1,2,3,4,5].map(n=>`<button type="button" class="library-star ${n<=ratingOf(p)?'is-lit':''}" data-library-rate="${safe(p.key)}" data-stars="${n}" aria-label="评${n}星" aria-pressed="${n===ratingOf(p)}" title="${n}星，再次点击可取消评分"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.3.9-4.55 4.43 1.08 6.27L12 17.34l-5.63 2.96 1.08-6.27L2.9 9.6l6.3-.9z"/></svg></button>`).join('')}</div>`;
   const visible=p=>!p.libraryDeletedAt&&!p.libraryCategoryDefinition;
-  window.OrbisSavedLibrary={category,visible,baseType:p=>spec(category(p)).baseType,decorateItinerary};
+  function itineraryCategory(item,day){
+    const type=String(item[1]||''),extra=item[5]||{};
+    const linked=savedPlaces.find(p=>visible(p)&&(p.key===extra.savedPlaceKey||p.key===savedKey(item[2],extra.city||day.city)));
+    // A saved category may decorate a stop only while its behaviour matches
+    // the stop's explicit type; old meal metadata must never relabel transport.
+    const candidates=[linked?category(linked):null,extra.libraryCategory,type];
+    return candidates.find(id=>id&&specs()[id]?.baseType===type)||null;
+  }
+  window.OrbisSavedLibrary={category,visible,itineraryCategory,baseType:p=>spec(category(p)).baseType,decorateItinerary};
   window.isSavedPlace=(name,city)=>savedPlaces.some(p=>p.key===savedKey(name,city)&&visible(p));
   const saveBase=window.savePlace;
   window.savePlace=place=>{const old=savedPlaces.find(p=>p.key===savedKey(place.name,place.city)&&p.libraryDeletedAt);if(old){delete old.libraryDeletedAt;Object.assign(old,place);persistSavedPlaces();renderSavedPlaces();}else saveBase(place);};
@@ -187,10 +195,13 @@
     const day=days[selected];if(!day)return;
     document.querySelectorAll('#timeline .timeline-item').forEach((row,index)=>{
       const item=day.items[index],card=row.querySelector('.item-card');if(!item||!card)return;
-      const linked=savedPlaces.find(p=>(p.key===item[5]?.savedPlaceKey||p.key===savedKey(item[2],item[5]?.city||day.city))&&!p.libraryCategoryDefinition);
       const media=item[5]||{},image=card.querySelector('.place-photo img');if(image&&/^https:\/\//i.test(media.photoSource||'')&&!card.querySelector('.place-photo-credit')){const credit=document.createElement('a');credit.className='place-photo-credit';credit.href=media.photoSource;credit.target='_blank';credit.rel='noreferrer';credit.textContent=(media.photoCredit||'照片来源')+' ↗';image.after(credit);}
-      const id=linked?category(linked):(item[5]?.libraryCategory||item[1]);
-      if(!specs()[id])return;
+      const id=itineraryCategory(item,day);
+      if(!id){
+        delete card.dataset.libraryCategory;card.style.removeProperty('--category-rgb');card.style.removeProperty('--category-ink');card.dataset.stopKind=String(item[1]||'').toLowerCase();
+        const tag=card.querySelector('.item-type');if(tag)tag.textContent=({Transport:'交通',Activity:'景点',Meal:'餐饮',Stay:'酒店','Free time':'自由安排'})[item[1]]||String(item[1]||'');
+        return;
+      }
       const info=spec(id),color=/^#[\da-f]{6}$/i.test(info.color)?info.color:defaults.Activity.color;
       const rgb=[1,3,5].map(i=>parseInt(color.slice(i,i+2),16)).join(' ');card.style.setProperty('--category-rgb',rgb);card.style.setProperty('--category-ink','#41414a');
       card.dataset.libraryCategory=id;card.dataset.stopKind=String(info.baseType).toLowerCase();const tag=card.querySelector('.item-type');if(tag)tag.textContent=info.label+(info.baseType==='Meal'&&item[5]?.mealSlot?' · '+({breakfast:'早餐',lunch:'午餐',dinner:'晚餐',other:'茶歇'}[item[5].mealSlot]||''): '');

@@ -78,6 +78,7 @@
     event.preventDefault();
     if (!target || !target.day.items.includes(target.item)) return;
     const { item, day } = target, draft = formItem(), key = S.locationKey(draft, day), extra = { ...(item[5] || {}), ...draft[5], website: field('website').value.trim(), photo: field('photo').value.trim(), rating: field('rating').value, opens: field('opens').value, closes: field('closes').value, fixedTime: field('fixed').checked, travelMode: field('mode').value };
+    if (draft[1] !== item[1]) { delete extra.libraryCategory; delete extra.savedPlaceKey; delete extra.mealSlot; delete extra.mealOriginal; }
     if (key === target.locationKey && target.coordinates) { extra.coordinates = target.coordinates; extra.locationKey = key; }
     else { delete extra.coordinates; delete extra.locationKey; }
     item.splice(0, 6, ...draft.slice(0, 5), extra);
