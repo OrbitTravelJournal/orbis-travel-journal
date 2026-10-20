@@ -10,25 +10,26 @@ Restored stale browser caches still take the recovery path and are never uploade
 as fresh edits. Snapshot transfers allow 120 seconds and display clear timeout
 and 12 MiB limit messages without removing local photographs.
 
-Server writes now use a single conditional table PATCH filtered by verified
-Google subject and expected version. Initial writes use conflict-ignore INSERT.
-Both return only version metadata; an empty result becomes HTTP 409. This avoids
-passing large photo JSONB through the RPC argument extraction path while retaining
-atomic conflict protection. Browser table grants and RLS are unchanged; the legacy
-RPC remains available for rollback.
+Server writes send the validated request to a server-only raw-body RPC adapter.
+The adapter parses the photo JSON once, then calls the existing atomic save
+function with its expected-version check. This avoids repeated large JSON
+extraction in PostgREST; direct table JSON writes also timed out in live testing.
+Browser table grants and RLS are unchanged. Only `service_role` may execute the
+adapter; it uses SECURITY INVOKER and an empty search path.
 
-Deploy `cloud-edge.js` as `orbis-sync` before publishing the frontend. The edge
-function is compatible with existing clients; older servers simply ignore the
-new query parameter. After publishing, refresh the latest device, check sync,
-resolve any version choice on that device, then check the receiving device.
-Keep downloaded backups until photographs are visible on both devices.
+Apply `cloud-save-raw.sql`, deploy `cloud-edge.js` as `orbis-sync`, then publish
+the frontend. Existing clients remain compatible. After publishing, refresh the
+latest device and check sync, then check the receiving device. Keep downloaded
+backups until photographs are visible on both devices.
 
 Validation: `node --test tests/cloud-sync.test.cjs` covers large transfers,
 metadata polls, authentication, simultaneous writes, initial-write conflicts,
-stale-cache recovery, errors and size limits with mocked HTTP. A live database
-transaction using a temporary table verified an 11 MiB synthetic photograph,
-version increment and stale-write refusal, then rolled back. These checks do not
-replace a real Google-authorized desktop-to-phone transfer after deployment.
+stale-cache recovery, errors and size limits with mocked HTTP. Live HTTPS
+verification uses a temporary synthetic account and randomly generated photo
+payload to check initial write, a roughly 11 MiB upload and byte-identical
+download, a later edit, changed-version download, lightweight polling and stale
+write rejection. Test sessions and workspace data must be removed afterward.
+Real owner-device verification still requires refreshing both devices.
 
 Production endpoint: https://owpxeksiaywnacomkwog.supabase.co/functions/v1/orbis-sync
 

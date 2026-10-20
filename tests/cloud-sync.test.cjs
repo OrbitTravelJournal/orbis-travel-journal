@@ -18,6 +18,13 @@ function backend(initial){
     async fetch(url,options={}){
       calls.push({url,options});const u=new URL(url),q=u.searchParams;
       if(u.pathname.endsWith('/orbis_sessions'))return json([{google_sub:'owner',expires_at:'2099-01-01',max_expires_at:'2099-02-01'}]);
+      if(u.pathname.endsWith('/rpc/orbis_save_workspace_raw')){
+        assert.equal(options.headers['Content-Type'],'application/octet-stream');
+        const data=JSON.parse(options.body);assert.equal(data.p_sub,'owner');
+        if(data.p_version===0?!!row:!row||row.version!==data.p_version)return json(null);
+        row={google_sub:data.p_sub,snapshot:data.p_snapshot,version:data.p_version+1,updated_at:'now'};
+        return json({version:row.version,updatedAt:row.updated_at});
+      }
       assert.equal(u.pathname,'/rest/v1/orbis_workspaces');
       if(options.method==='POST'){
         assert.equal(q.get('on_conflict'),'google_sub');assert.match(options.headers.Prefer,/ignore-duplicates/);
@@ -55,7 +62,7 @@ test('metadata endpoint requires a verified session',async()=>{
   const b=backend();const r=await b.request('GET',undefined,'?knownVersion=275','forged');
   assert.equal(r.status,401);assert.equal(b.calls.length,0);
 });
-test('11MB snapshot saves intact through conditional table write',async()=>{
+test('11MB snapshot saves intact through the raw-body adapter',async()=>{
   const b=backend({google_sub:'owner',version:275});const image='x'.repeat(11*1024*1024);
   const r=await b.request('POST',{clientVersion:2,version:275,snapshot:[trip(image)]});
   assert.equal(r.status,200);assert.equal((await r.json()).version,276);assert.equal(b.row().snapshot[0].hotelMedia.Kyoto.photo,image);

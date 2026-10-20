@@ -74,14 +74,11 @@ export async function handle(req){
     }
     if(data.clientVersion!==2)return reply({error:'Please update the app before syncing'},426);
     if(!Number.isSafeInteger(data.version)||data.version<0||!Array.isArray(data.snapshot)||data.snapshot.length>200||data.snapshot.some(t=>!t||typeof t.id!=='string'||typeof t.name!=='string'||!Array.isArray(t.days)||!Array.isArray(t.hotels)||t.days.some(d=>!d||!Array.isArray(d.items))))return reply({error:'Invalid workspace'},400);
-    // A conditional table write keeps the version check atomic, without routing
-    // a multi-megabyte JSONB value through PostgREST's RPC argument extraction.
-    const first=data.version===0;
-    const target=first?'on_conflict=google_sub':`google_sub=eq.${encodeURIComponent(identity.sub)}&version=eq.${data.version}`;
-    const values={snapshot:data.snapshot,version:data.version+1,updated_at:new Date().toISOString(),...(first?{google_sub:identity.sub}:{})};
-    const r=await fetch(`${base}/rest/v1/orbis_workspaces?${target}&select=version,updated_at`,{method:first?'POST':'PATCH',headers:{...dbHeaders,Prefer:'return=representation'+(first?',resolution=ignore-duplicates':'')},body:JSON.stringify(values),signal:AbortSignal.timeout(45000)});
+    // Raw bytes avoid repeated large JSON extraction in PostgREST. The server-only
+    // adapter parses once and calls the existing atomic, version-checked save.
+    const r=await fetch(`${base}/rest/v1/rpc/orbis_save_workspace_raw`,{method:'POST',headers:{...dbHeaders,'Content-Type':'application/octet-stream'},body:JSON.stringify({p_sub:identity.sub,p_snapshot:data.snapshot,p_version:data.version}),signal:AbortSignal.timeout(45000)});
     if(!r.ok)throw new Error('Database unavailable');
-    const saved=(await r.json())[0];return saved?reply({version:saved.version,updatedAt:saved.updated_at}):reply({error:'Another device changed this workspace'},409);
+    const saved=await r.json();return saved?reply(saved):reply({error:'Another device changed this workspace'},409);
   }catch{return reply({error:'Cloud unavailable; keep your local copy'},503);}
 }
 Deno.serve(handle);
