@@ -63,7 +63,7 @@ if (typeof document !== 'undefined') (() => {
       else if (tabBounds.right > right) rail.scrollLeft += tabBounds.right - right;
     }
     const area = window.OrbisStays?.areaForDay(hotels, day, hiddenHotelBookings) || '区域待填写';
-    const activities = day.items.filter(item => ['Activity','Meal'].includes(item[1])).slice(0,3).map(item => item[2]);
+    const activities = day.items.filter(item => ['Activity','Meal','Shop'].includes(item[1])).slice(0,3).map(item => item[2]);
     summary.innerHTML = `<div><small>当天区域</small><b>${safe(area)}</b></div><div><small>主要活动</small><p>${safe(activities.join(' · ') || day.theme || '活动未填写')}</p></div><div><small>当晚住宿</small><b>${safe(day.hotel && day.hotel !== '—' ? day.hotel : '暂无当晚住宿')}</b></div><div class="reader-day-actions"><button type="button" class="glass-button" id="reader-day-map">查看当天地图</button><button type="button" class="glass-button" id="reader-day-stays">查看住宿预订</button></div>`;
     summary.querySelector('#reader-day-map').onclick = () => showPage('map');
     summary.querySelector('#reader-day-stays').onclick = () => { const button = document.querySelector('.hotel-context button'); if (button) button.click(); else showPage('stays'); };

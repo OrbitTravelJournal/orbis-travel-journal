@@ -1,12 +1,12 @@
 /* Manual place library: preserve existing records and use explicit map links. */
 (() => {
   const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const defaults={Activity:{label:'景点',color:'#a175e7',baseType:'Activity'},Stay:{label:'酒店',color:'#60b69d',baseType:'Stay'},Meal:{label:'餐饮',color:'#ff9e4a',baseType:'Meal'},Other:{label:'其他地点',color:'#91a6bc',baseType:'Activity'}};
+  const defaults={Activity:{label:'景点',color:'#a175e7',baseType:'Activity'},Stay:{label:'酒店',color:'#60b69d',baseType:'Stay'},Meal:{label:'餐饮',color:'#ff9e4a',baseType:'Meal'},Shop:{label:'商铺',color:'#e5ad56',baseType:'Shop'},Other:{label:'其他地点',color:'#91a6bc',baseType:'Activity'}};
   const definitions=()=>Object.fromEntries(savedPlaces.filter(p=>p.libraryCategoryDefinition).map(p=>[p.categoryId,{label:p.name,color:p.color,baseType:p.baseType||'Activity'}]));
-  const specs=()=>({...defaults,...definitions()});
+  const specs=()=>{const custom=definitions(),all={...defaults,...custom};if(Object.entries(custom).some(([id,value])=>id!=='Shop'&&value.label==='商铺'))delete all.Shop;return all;};
   const categories=()=>Object.fromEntries(Object.entries(specs()).map(([id,spec])=>[id,spec.label]));
   const spec=id=>specs()[id]||defaults.Other;
-  const category=p=>p.libraryCategory||(/meal|restaurant|餐饮|餐厅|food/i.test(p.type||'')?'Meal':/stay|hotel|酒店|住宿/i.test(p.type||'')?'Stay':/activity|landmark|attraction|景点|place/i.test(p.type||'')?'Activity':'Other');
+  const category=p=>p.libraryCategory||(/shop|store|shopping|商铺|商店|购物/i.test(p.type||'')?'Shop':/meal|restaurant|餐饮|餐厅|food/i.test(p.type||'')?'Meal':/stay|hotel|酒店|住宿/i.test(p.type||'')?'Stay':/activity|landmark|attraction|景点|place/i.test(p.type||'')?'Activity':'Other');
   const url=p=>/^https?:\/\//i.test(p.map||'')?p.map:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([p.name,p.address,p.region,p.city,p.country].filter(Boolean).join(', '))}`;
   const paths={previous:'<path d="m15 5-7 7 7 7"/>',next:'<path d="m9 5 7 7-7 7"/>',placeAdd:'<path d="M14 9c0 4-5 10-5 10S4 13 4 9a5 5 0 0 1 10 0z"/><circle cx="9" cy="9" r="1.6"/><path d="M18 3v6m-3-3h6"/>',categoryAdd:'<path d="M3 8V5a1 1 0 0 1 1-1h5l3 4h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8z"/><path d="M12 11v6m-3-3h6"/>',more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',palette:'<circle cx="12" cy="12" r="9"/><circle cx="8" cy="8" r="1"/><circle cx="15" cy="7" r="1"/><circle cx="17" cy="13" r="1"/><path d="M4 15h5l3 6"/>',plus:'<path d="M12 5v14M5 12h14"/>',photo:'<path d="M4 7h4l2-3h4l2 3h4v12H3V7z"/><circle cx="12" cy="13" r="3"/>',edit:'<path d="m14 4 6 6M4 20l5-1L20 8a2 2 0 0 0-4-4L5 15zM4 20h16"/>',pin:'<path d="M18 9c0 5-6 12-6 12S6 14 6 9a6 6 0 0 1 12 0z"/><circle cx="12" cy="9" r="2"/>',calendar:'<rect x="4" y="5" width="16" height="15" rx="4"/><path d="M8 3v4m8-4v4M4 10h16m-3 5h-6m3-3v6"/>',trash:'<path d="M4 6h16M9 6V3h6v3M6 6l1 14h10l1-14M10 10v6m4-6v6"/>',back:'<path d="m8 4-5 5 5 5M3 9h11a6 6 0 0 1 0 12"/>'};
   const colors={previous:'#7e79ad',next:'#7e79ad',placeAdd:'#13b982',categoryAdd:'#ab55ec',more:'#7e79ad',palette:'#ab55ec',plus:'#13b982',photo:'#4b83f6',edit:'#ab55ec',pin:'#ef7046',calendar:'#9762ff',trash:'#fa5a48',back:'#18beac'};
@@ -19,10 +19,10 @@
     const linked=savedPlaces.find(p=>visible(p)&&(p.key===extra.savedPlaceKey||p.key===savedKey(item[2],extra.city||day.city)));
     // A saved category may decorate a stop only while its behaviour matches
     // the stop's explicit type; old meal metadata must never relabel transport.
-    const candidates=[linked?category(linked):null,extra.libraryCategory,type];
+    const candidates=[extra.libraryCategory,linked?category(linked):null,type];
     return candidates.find(id=>id&&specs()[id]?.baseType===type)||null;
   }
-  window.OrbisSavedLibrary={category,visible,itineraryCategory,baseType:p=>spec(category(p)).baseType,decorateItinerary};
+  window.OrbisSavedLibrary={category,visible,itineraryCategory,specs,baseType:p=>spec(category(p)).baseType,decorateItinerary};
   window.isSavedPlace=(name,city)=>savedPlaces.some(p=>p.key===savedKey(name,city)&&visible(p));
   const saveBase=window.savePlace;
   window.savePlace=place=>{const old=savedPlaces.find(p=>p.key===savedKey(place.name,place.city)&&p.libraryDeletedAt);if(old){delete old.libraryDeletedAt;Object.assign(old,place);persistSavedPlaces();renderSavedPlaces();}else saveBase(place);};
@@ -183,7 +183,7 @@
   };
   function editCategory(id=null){
     const current=id?spec(id):{label:'',color:'#a175e7',baseType:'Activity'};
-    openForm(id?'修改分类':'添加分类',`${field('分类名称','label',current.label,'text',true)}${field('分类颜色','color',current.color,'color')}<label>用于行程<select name="baseType"><option value="Activity" ${current.baseType==='Activity'?'selected':''}>普通地点</option><option value="Meal" ${current.baseType==='Meal'?'selected':''}>餐饮（早餐 / 午餐 / 晚餐）</option><option value="Stay" ${current.baseType==='Stay'?'selected':''}>住宿</option></select></label>`,data=>{
+    openForm(id?'修改分类':'添加分类',`${field('分类名称','label',current.label,'text',true)}${field('分类颜色','color',current.color,'color')}<label>用于行程<select name="baseType"><option value="Activity" ${current.baseType==='Activity'?'selected':''}>普通地点</option><option value="Shop" ${current.baseType==='Shop'?'selected':''}>商铺</option><option value="Meal" ${current.baseType==='Meal'?'selected':''}>餐饮（早餐 / 午餐 / 晚餐）</option><option value="Stay" ${current.baseType==='Stay'?'selected':''}>住宿</option></select></label>`,data=>{
       const label=String(data.get('label')).trim();if(!label)return;
       const categoryId=id||'custom-'+crypto.randomUUID();
       let definition=savedPlaces.find(p=>p.libraryCategoryDefinition&&p.categoryId===categoryId);
@@ -199,7 +199,7 @@
       const id=itineraryCategory(item,day);
       if(!id){
         delete card.dataset.libraryCategory;card.style.removeProperty('--category-rgb');card.style.removeProperty('--category-ink');card.dataset.stopKind=String(item[1]||'').toLowerCase();
-        const tag=card.querySelector('.item-type');if(tag)tag.textContent=({Transport:'交通',Activity:'景点',Meal:'餐饮',Stay:'酒店','Free time':'自由安排'})[item[1]]||String(item[1]||'');
+        const tag=card.querySelector('.item-type');if(tag)tag.textContent=({Transport:'交通',Activity:'景点',Shop:'商铺',Meal:'餐饮',Stay:'酒店','Free time':'自由安排'})[item[1]]||String(item[1]||'');
         return;
       }
       const info=spec(id),color=/^#[\da-f]{6}$/i.test(info.color)?info.color:defaults.Activity.color;

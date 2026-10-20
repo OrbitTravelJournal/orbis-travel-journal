@@ -8,7 +8,7 @@
   dialog.id = 'stop-editor-dialog';
   dialog.innerHTML = `<form id="stop-editor-form"><button type="button" class="close-modal" data-editor-close aria-label="Close">×</button><p class="eyebrow">PLACE INFORMATION · 地点信息</p><h2>Edit this stop</h2><div class="stop-editor-grid">
     <label>Place name · 地点名称<input name="title" required></label>
-    <label>Category · 类别<select name="type">${['Activity', 'Meal', 'Transport', 'Stay', 'Free time'].map(type => `<option>${type}</option>`).join('')}</select></label>
+    <label>Category · 类别<select name="type">${['Activity', 'Meal', 'Transport', 'Stay', 'Shop', 'Free time'].map(type => `<option>${type}</option>`).join('')}</select></label>
     <label>Map search name<input name="place" placeholder="Exact venue or landmark"></label>
     <label>Address · 地址<input name="address"></label>
     <label>City · 城市<input name="city"></label><label>Country · 国家<input name="country"></label>
@@ -27,12 +27,17 @@
   dialog.querySelectorAll('[data-editor-close]').forEach(button => button.onclick = () => dialog.close());
   dialog.addEventListener('close', () => { searchGeneration++; target = null; });
   function formItem() {
-    return [field('time').value, field('type').value, field('title').value.trim(), field('notes').value.trim(), `${field('duration').value}m`, { place: field('place').value.trim(), address: field('address').value.trim(), city: field('city').value.trim(), country: field('country').value.trim(), map: field('map').value.trim() }];
+    const choice=field('type').value, type=window.OrbisSavedLibrary?.specs()[choice]?.baseType||choice;
+    return [field('time').value, type, field('title').value.trim(), field('notes').value.trim(), `${field('duration').value}m`, { place: field('place').value.trim(), address: field('address').value.trim(), city: field('city').value.trim(), country: field('country').value.trim(), map: field('map').value.trim() }];
   }
   function openEditor(item, day) {
     const extra = item[5] || {};
     target = { item, day, coordinates: S.coords(item, day), locationKey: S.locationKey(item, day) };
-    const values = { title: item[2], type: item[1], place: extra.place || '', address: extra.address || '', city: extra.city || day.city, country: extra.country || day.country || inferredCountry(day), time: item[0], duration: S.duration(item), notes: item[3], mode: extra.travelMode || 'auto', opens: extra.opens || '', closes: extra.closes || '', map: extra.map || '', website: extra.website || '', photo: extra.photo || '', rating: extra.rating || '' };
+    const library=window.OrbisSavedLibrary, options=library?.specs()||{};
+    field('type').innerHTML=Object.entries(options).map(([id,info])=>`<option value="${safe(id)}">${safe(info.label)}</option>`).join('')+['Transport','Free time'].map(id=>`<option value="${id}">${id==='Transport'?'交通':'自由安排'}</option>`).join('');
+    const currentCategory=library?.itineraryCategory(item,day)||item[1];
+    target.category=currentCategory;
+    const values = { title: item[2], type: currentCategory, place: extra.place || '', address: extra.address || '', city: extra.city || day.city, country: extra.country || day.country || inferredCountry(day), time: item[0], duration: S.duration(item), notes: item[3], mode: extra.travelMode || 'auto', opens: extra.opens || '', closes: extra.closes || '', map: extra.map || '', website: extra.website || '', photo: extra.photo || '', rating: extra.rating || '' };
     Object.entries(values).forEach(([name, value]) => { field(name).value = value ?? ''; });
     field('fixed').checked = !!extra.fixedTime;
     dialog.querySelector('#stop-location-results').replaceChildren();
@@ -78,7 +83,9 @@
     event.preventDefault();
     if (!target || !target.day.items.includes(target.item)) return;
     const { item, day } = target, draft = formItem(), key = S.locationKey(draft, day), extra = { ...(item[5] || {}), ...draft[5], website: field('website').value.trim(), photo: field('photo').value.trim(), rating: field('rating').value, opens: field('opens').value, closes: field('closes').value, fixedTime: field('fixed').checked, travelMode: field('mode').value };
-    if (draft[1] !== item[1]) { delete extra.libraryCategory; delete extra.savedPlaceKey; delete extra.mealSlot; delete extra.mealOriginal; }
+    const categoryId=field('type').value;
+    if (draft[1] !== item[1] || categoryId !== target.category) { delete extra.libraryCategory; delete extra.savedPlaceKey; delete extra.mealSlot; delete extra.mealOriginal; }
+    if(window.OrbisSavedLibrary?.specs()[categoryId])extra.libraryCategory=categoryId;
     if (key === target.locationKey && target.coordinates) { extra.coordinates = target.coordinates; extra.locationKey = key; }
     else { delete extra.coordinates; delete extra.locationKey; }
     item.splice(0, 6, ...draft.slice(0, 5), extra);
