@@ -23,14 +23,20 @@
   async function saveMeta(c){try{const version=c.version,cloudHash=c.hash,stored=JSON.parse(localStorage.getItem('tabi-workspace-v1')||'null');const saved=stored?.trips?.filter(t=>t.ownerId===c.owner).map(t=>{const copy={...t};delete copy.ownerId;delete copy.updatedAt;return copy;});const savedHash=saved?await hash(saved):null;if(!current(c)||version!==c.version)return;localStorage.setItem('orbis-cloud-meta:'+c.sub,JSON.stringify({version,hash:cloudHash,savedHash}));c.savedHash=savedHash;}catch{}}
   function choices(c,message){if(!current(c))return;c.ready=false;local.hidden=false;remote.hidden=!c.cloud?.snapshot;local.textContent=c.cloud?.version?'保留本机版本并上传':'以本机资料开始同步';say(message);window.TabiWorkspace.openAuth();}
   async function request(c,method='GET',body){
-    const r=await fetch(endpoint,{method,headers:{Authorization:'Bearer '+c.token,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,clientVersion:2})}:{}),signal:AbortSignal.timeout(body?.action==='files-upload'?90000:20000)});
+    const url=method==='GET'&&c.hash&&c.version>0?endpoint+'?knownVersion='+encodeURIComponent(c.version):endpoint;
+    const transfer=method==='GET'||Array.isArray(body?.snapshot);
+    let r;
+    try{r=await fetch(url,{method,headers:{Authorization:'Bearer '+c.token,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,clientVersion:2})}:{}),signal:AbortSignal.timeout(transfer?120000:body?.action==='files-upload'?90000:20000)});}
+    catch(e){if(e.name==='TimeoutError'||e.name==='AbortError')throw new Error('云端同步超时，照片较多时可能需要更长时间。资料仍保留在本机，请保持页面打开，稍后点「检查同步」重试。');throw e;}
     if(r.status===401)throw Object.assign(new Error('Google 验证已过期，请重新点上方 Google 登录。资料仍保留在本机。'),{code:401});
     if(r.status===426)throw new Error('同步版本已更新，请先下载本机备份，再刷新网页。');
     if(r.status===409)throw Object.assign(new Error('另一台设备已更新，请选择要保留的版本。'),{code:409});
+    if(r.status===413)throw new Error('本机行程连同照片超过云端的12MB上限，尚未上传。请先下载本机备份，再整理较大的照片后重试。');
     if(body?.action?.startsWith('files-')&&!r.ok){let message;try{message=(await r.json()).error}catch{}throw new Error(message||'文件操作暂未完成，请稍后重试。');}
     if(body?.action==='lookup'&&!r.ok)throw new Error('公开资料暂不可用，可以继续手动填写，稍后再查。');
     if(!r.ok)throw new Error('云端暂不可用，修改仍保留在本机。稍后点「检查同步」重试。');
-    const data=await r.json();
+    let data;
+    try{data=await r.json();}catch(e){if(e.name==='TimeoutError'||e.name==='AbortError')throw new Error('云端照片下载超时，资料仍保留在本机。请保持页面打开，稍后点「检查同步」重试。');throw e;}
     if(data.sessionExpiresAt&&session?.token===c.token){session.exp=Date.parse(data.sessionExpiresAt)/1000;try{localStorage.setItem('orbis-account-session',JSON.stringify(session))}catch{}}
     return data;
   }
@@ -61,7 +67,19 @@
     if(!c||c.sub!==session.sub||c.owner!==user().id){c={sub:session.sub,owner:user().id,token:session.token,version:0,hash:null,ready:false};ctx=c;try{const meta=JSON.parse(localStorage.getItem('orbis-cloud-meta:'+c.sub)||'null');if(meta){c.version=meta.version;c.hash=meta.hash;c.savedHash=meta.savedHash}}catch{}}
     c.token=session.token;
     try{
-      const cloud=await request(c);if(!current(c))return;c.cloud=cloud;
+      let cloud=await request(c);if(!current(c))return;
+      if(cloud.unchanged===true&&cloud.version===c.version&&c.hash){
+        const localHash=await hash(snapshot());if(!current(c))return;
+        if(c.savedHash&&localHash===c.savedHash&&localHash!==c.hash){
+          // A restored old localStorage cache is not a new edit to upload.
+          cloud=await request({...c,hash:null});if(!current(c))return;
+        }else{
+          c.ready=true;local.hidden=true;remote.hidden=true;
+          if(localHash!==c.hash)setTimeout(upload,0);else say('已同步 · 云端与本机资料一致');
+          return;
+        }
+      }
+      c.cloud=cloud;
       const localHash=await hash(snapshot()),cloudHash=cloud.snapshot?await hash(cloud.snapshot):null;if(!current(c))return;
       if(cloud.snapshot&&localHash===cloudHash){c.version=cloud.version;c.hash=cloudHash;c.ready=true;saveMeta(c);local.hidden=true;remote.hidden=true;say('已同步 · 云端与本机资料一致');return;}
       if(cloud.snapshot&&c.savedHash&&localHash===c.savedHash&&localHash!==c.hash){await applyRemote(c);return;}
@@ -108,3 +126,4 @@
   },getPreviousCopy:async()=>{const sub=user()?.googleId;if(!sub)return null;try{return await recovery('get',sub)}catch{return null}}};
   if(valid()&&!session.persistent)window.OrbisCloud.connect(session.token);else check();
 })();
+
