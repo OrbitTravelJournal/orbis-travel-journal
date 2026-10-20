@@ -23,10 +23,11 @@
   async function saveMeta(c){try{const version=c.version,cloudHash=c.hash,stored=JSON.parse(localStorage.getItem('tabi-workspace-v1')||'null');const saved=stored?.trips?.filter(t=>t.ownerId===c.owner).map(t=>{const copy={...t};delete copy.ownerId;delete copy.updatedAt;return copy;});const savedHash=saved?await hash(saved):null;if(!current(c)||version!==c.version)return;localStorage.setItem('orbis-cloud-meta:'+c.sub,JSON.stringify({version,hash:cloudHash,savedHash}));c.savedHash=savedHash;}catch{}}
   function choices(c,message){if(!current(c))return;c.ready=false;local.hidden=false;remote.hidden=!c.cloud?.snapshot;local.textContent=c.cloud?.version?'保留本机版本并上传':'以本机资料开始同步';say(message);window.TabiWorkspace.openAuth();}
   async function request(c,method='GET',body){
-    const r=await fetch(endpoint,{method,headers:{Authorization:'Bearer '+c.token,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,clientVersion:2})}:{}),signal:AbortSignal.timeout(20000)});
+    const r=await fetch(endpoint,{method,headers:{Authorization:'Bearer '+c.token,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,clientVersion:2})}:{}),signal:AbortSignal.timeout(body?.action==='files-upload'?90000:20000)});
     if(r.status===401)throw Object.assign(new Error('Google 验证已过期，请重新点上方 Google 登录。资料仍保留在本机。'),{code:401});
     if(r.status===426)throw new Error('同步版本已更新，请先下载本机备份，再刷新网页。');
     if(r.status===409)throw Object.assign(new Error('另一台设备已更新，请选择要保留的版本。'),{code:409});
+    if(body?.action?.startsWith('files-')&&!r.ok){let message;try{message=(await r.json()).error}catch{}throw new Error(message||'文件操作暂未完成，请稍后重试。');}
     if(body?.action==='lookup'&&!r.ok)throw new Error('公开资料暂不可用，可以继续手动填写，稍后再查。');
     if(!r.ok)throw new Error('云端暂不可用，修改仍保留在本机。稍后点「检查同步」重试。');
     const data=await r.json();
@@ -101,7 +102,7 @@
       localStorage.setItem('orbis-account-session',JSON.stringify(session));sessionStorage.removeItem('orbis-google-session');ctx=null;
       while(busy)await new Promise(resolve=>setTimeout(resolve,50));await check();
     }catch{say('持续登录未建立，请重新 Google 登录。当前资料仍在本机。');}
-  },lookup:async query=>{await window.TabiWorkspace.ready;if(!valid())throw new Error('请先用 Google 登录，或继续手动填写。');return (await request({token:session.token},'POST',{action:'lookup',query})).places;},disconnect:()=>{
+  },files:async(action,payload={})=>{await window.TabiWorkspace.ready;if(!valid())throw new Error('请先用 Google 登录，再上传或打开预订文件。');const owner=state().currentUserId,token=session.token,result=await request({token},'POST',{...payload,action:'files-'+action});if(state().currentUserId!==owner||session?.token!==token)throw new Error('账号已切换，请重新打开文件栏目。');return result;},lookup:async query=>{await window.TabiWorkspace.ready;if(!valid())throw new Error('请先用 Google 登录，或继续手动填写。');return (await request({token:session.token},'POST',{action:'lookup',query})).places;},disconnect:()=>{
     const previous=session;session=null;ctx=null;clearTimeout(timer);localStorage.removeItem('orbis-account-session');sessionStorage.removeItem('orbis-google-session');
     if(previous?.persistent)request({token:previous.token},'POST',{action:'logout'}).catch(()=>{});
   },getPreviousCopy:async()=>{const sub=user()?.googleId;if(!sub)return null;try{return await recovery('get',sub)}catch{return null}}};

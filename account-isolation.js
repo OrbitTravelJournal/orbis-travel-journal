@@ -3,7 +3,7 @@
   const active=()=>{const s=window.TabiWorkspace?.state;return s?.currentUserId&&s.trips.find(t=>t.id===s.currentTripId&&t.ownerId===s.currentUserId);};
   function sync(){
     window.TabiWorkspace?.renderAccountAvatar?.();const empty=!active();document.body.classList.toggle('account-empty',empty);
-    for(const id of ['itinerary','map','stays','restaurants','journal','travel-info']){
+    for(const id of ['itinerary','map','stays','restaurants','journal','travel-info','booking-files']){
       const page=document.getElementById(id);if(!page)continue;
       if(!page.querySelector('.account-empty-panel')){
         const panel=document.createElement('section');panel.className='account-empty-panel';panel.innerHTML='<h1>还没有行程</h1><p>创建一趟旅行，或打开分享链接，将行程副本加入你的账号。</p><button type="button">创建行程</button>';panel.querySelector('button').onclick=()=>window.TabiWorkspace.openTripDialog();page.append(panel);

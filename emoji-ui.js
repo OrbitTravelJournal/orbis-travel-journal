@@ -2,6 +2,7 @@
 (() => {
   // Original 24px line icons: one stroke, rounded ends, no font dependency.
   const icons = {
+    document:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8m-8 4h5"/>',
     pause:'<path d="M8 5v14M16 5v14"/>',
     plane:'<path d="m21 3-6 18-3-9-9-3zM12 12l9-9"/>',
     home:'<path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/>',
@@ -34,7 +35,7 @@
     more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>'
   };
   const pages = {trips:'home',itinerary:'calendar',map:'map',restaurants:'bookmark',stays:'bed',journal:'journal','travel-info':'plane'};
-  const colors = {
+  const colors = {document:'#697fd0',
     pause:'#c49700',
     plane:'#18bdaa',home:'#77ce24',calendar:'#9762ff',map:'#00b8d4',bookmark:'#ff4b9b',bed:'#ff9345',journal:'#bc56ed',
     checkbox:'#00b982',check:'#00c886',warning:'#e6b800',close:'#ed6274',trash:'#fa5a48',copy:'#c49700',share:'#18beac',
@@ -58,11 +59,11 @@
   function decorate() {
     document.querySelectorAll('.shell button,.shell a[data-page],.shell a[data-go],.shell .hotel-actions a,.shell .reader-navigate,.shell .navigate-stop,.shell .primary-map-link,.shell details>summary,dialog:not(#workspace-auth-dialog) button,dialog:not(#workspace-auth-dialog) .secondary-btn').forEach(el => {
       // Date information and language selectors remain readable.
-      if (el.matches('#workspace-profile.has-google-avatar,.library-icon,.brand,.date-tab,[data-lang],summary,.mobile-nav-toggle,.mobile-nav-account') || el.closest('.language-switch,.reader-details-body,.reader-schedule,#reader-day-notes,.item-menu-panel,.booking-add form,#travel-info-form,.meal-options,.library-card,.library-category,#saved-library-dialog,#library-add,#account-backup,#account-cloud-sync') || (el.closest('dialog') && !el.matches('.close-modal'))) return;
+      if (el.matches('#workspace-profile.has-google-avatar,.library-icon,.brand,.date-tab,[data-lang],summary,.mobile-nav-toggle,.mobile-nav-account') || el.closest('.language-switch,.reader-details-body,.reader-schedule,#reader-day-notes,.item-menu-panel,.booking-add form,#travel-info-form,.meal-options,.library-card,.library-category,#saved-library-dialog,#booking-files,#library-add,#account-backup,#account-cloud-sync') || (el.closest('dialog') && !el.matches('.close-modal'))) return;
       const text = el.textContent.trim();
       const label = ((text.length > 2 ? text : el.getAttribute('aria-label')) || text || el.title || '').replace(/\s+/g,' ');
       const page = el.dataset.page || el.dataset.go || el.dataset.menuPage || el.dataset.fallbackPage;
-      const icon = el.dataset.actionIcon || pages[page] || (el.matches('.reader-more') ? 'more' : el.matches('[data-photo-upload],[data-place-photo],[data-hotel-upload]') ? 'photo' : el.matches('[data-photo-remove],[data-hotel-remove-photo]') ? 'trash' : el.matches('#workspace-profile') ? 'user' : el.matches('.save-stop,.trip-favorite') ? 'bookmark' : el.matches('.visited-stop') ? 'checkbox' : rules.find(([pattern]) => pattern.test(label))?.[1]) || 'more';
+      const icon = (page==='booking-files'?'document':null) || el.dataset.actionIcon || pages[page] || (el.matches('.reader-more') ? 'more' : el.matches('[data-photo-upload],[data-place-photo],[data-hotel-upload]') ? 'photo' : el.matches('[data-photo-remove],[data-hotel-remove-photo]') ? 'trash' : el.matches('#workspace-profile') ? 'user' : el.matches('.save-stop,.trip-favorite') ? 'bookmark' : el.matches('.visited-stop') ? 'checkbox' : rules.find(([pattern]) => pattern.test(label))?.[1]) || 'more';
       if (!el.classList.contains('emoji-control')) el.classList.add('emoji-control');
       if (el.style.getPropertyValue('--icon-color') !== colors[icon]) el.style.setProperty('--icon-color',colors[icon]);
       let graphic = el.querySelector(':scope>.orbis-icon');

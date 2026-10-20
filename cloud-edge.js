@@ -1,3 +1,4 @@
+import { handleBookingFiles } from './booking-file-service.js';
 import { lookupPlaces } from './place-lookup.js';
 import { createRemoteJWKSet, jwtVerify } from 'npm:jose@6.1.0';
 const keys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
@@ -52,6 +53,9 @@ export async function handle(req){
       const created=await fetch(`${base}/rest/v1/orbis_sessions`,{method:'POST',headers:dbHeaders,body:JSON.stringify({token_hash:await digest(value),google_sub:identity.sub,expires_at:expiresAt,max_expires_at:maxExpiresAt})});
       if(!created.ok)throw new Error('Session creation failed');
       return reply({sessionToken:value,account:identity.sub,expiresAt});
+    }
+    if(typeof data.action==='string'&&data.action.startsWith('files-')){
+      try{return reply(await handleBookingFiles(data,{base,headers:dbHeaders,sub:identity.sub}));}catch(error){return reply({error:error.status?error.message:'文件服务暂不可用，请稍后重试。'},error.status||503);}
     }
     if(data.action==='lookup'){
       if(typeof data.query!=='string'||!data.query.trim()||data.query.length>160)return reply({error:'Invalid place name'},400);

@@ -1,8 +1,9 @@
-const CACHE_NAME = 'tabi-app-shell-v50-route-organiser';
+const CACHE_NAME = 'tabi-app-shell-v51-booking-files';
 const APP_SHELL = [
   './',
   './index.html',
   './app.js',
+  './booking-files.js?v=20261020-booking-files',
   './route-order.js?v=20261014-route-organiser',
   './route-assistant.js?v=20261014-route-organiser',
   './schedule.js',
