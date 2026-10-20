@@ -9,7 +9,10 @@
   }
   async function download(previous=false){
     try{
-      const backup=makeBackup();if(previous===true){const owner=user()?.id,copy=await window.OrbisCloud?.getPreviousCopy();if(user()?.id!==owner)throw new Error('账号已变化，请重新下载');if(!copy?.length)throw new Error('当前账号没有同步前旧版');backup.trips=copy;backup.source='before-cloud-sync';}const url=URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'})),link=document.createElement('a');
+      const backup=makeBackup();if(previous===true){const owner=user()?.id,copy=await window.OrbisCloud?.getPreviousCopy();if(user()?.id!==owner)throw new Error('账号已变化，请重新下载');if(!copy?.length)throw new Error('当前账号没有同步前旧版');backup.trips=copy;backup.source='before-cloud-sync';}
+      status.textContent='正在打包照片与行程…';
+      if(window.OrbisPhotos)backup.trips=await window.OrbisPhotos.portable(backup.trips);
+      const url=URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'})),link=document.createElement('a');
       link.href=url;link.download=`Orbis-backup-${backup.exportedAt.slice(0,10)}.json`;link.textContent='下载 JSON 备份文件';link.className='account-backup-download';section.querySelector('.account-backup-download')?.remove();section.append(link);link.click();setTimeout(()=>URL.revokeObjectURL(url),300000);
       status.textContent=`已生成 ${backup.trips.length} 趟行程的备份。若未开始下载，请点击下方文件链接；它包含图片及个人资料。`;
     }catch(error){status.textContent=error.message;}
@@ -24,7 +27,7 @@
   section.querySelector('#account-import-backup').onclick=()=>{if(!user()){status.textContent='请先登录需要接收备份的账号';return;}input.value='';input.click();};
   input.onchange=async()=>{
     const file=input.files?.[0],current=user();if(!file||!current)return;
-    const s=state(),initialLength=s.trips.length,previousId=s.currentTripId;
+    const s=state(),previousId=s.currentTripId;let imported=[];
     try{
       if(file.size>40*1024*1024)throw new Error('备份文件过大，请分开导入');
       const backup=JSON.parse(await file.text());
@@ -33,10 +36,12 @@
       if(!backup.trips.length)throw new Error('备份文件没有行程');
       for(const trip of backup.trips){if(!trip||typeof trip.name!=='string'||!Array.isArray(trip.days)||!Array.isArray(trip.hotels)||trip.days.some(d=>!d||!Array.isArray(d.items)))throw new Error('备份中的行程格式不完整');}
       const copies=backup.trips.map(trip=>({...trip,id:'backup-'+crypto.randomUUID(),ownerId:current.id,name:trip.name+'（备份副本）',importedFromShare:true,restoredAt:new Date().toISOString()}));
-      s.trips.push(...copies);
-      if(window.TabiWorkspace.persist()===false){s.trips.splice(initialLength);throw new Error('本机空间不足，导入未完成。原资料和备份文件保留。');}
+      if(window.OrbisPhotos){status.textContent='正在恢复照片…';await window.OrbisPhotos.prepare(copies);}
+      if(user()?.id!==current.id)throw new Error('登录账号已变化，导入未完成。');
+      imported=copies;s.trips.push(...copies);
+      if(window.TabiWorkspace.persist()===false)throw new Error('本机空间不足，导入未完成。原资料和备份文件保留。');
       window.TabiWorkspace.renderTrips();status.textContent=`已导入 ${copies.length} 趟行程副本，原行程未覆盖。`;
-    }catch(error){if(s.trips.length>initialLength)s.trips.splice(initialLength);s.currentTripId=previousId;status.textContent=error.message;}
+    }catch(error){s.trips=s.trips.filter(t=>!imported.includes(t));if(user()?.id===current.id)s.currentTripId=previousId;status.textContent=error.message;}
     finally{input.value='';}
   };
 })();

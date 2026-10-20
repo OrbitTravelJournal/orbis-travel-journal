@@ -24,14 +24,15 @@
   function choices(c,message){if(!current(c))return;c.ready=false;local.hidden=false;remote.hidden=!c.cloud?.snapshot;local.textContent=c.cloud?.version?'保留本机版本并上传':'以本机资料开始同步';say(message);window.TabiWorkspace.openAuth();}
   async function request(c,method='GET',body){
     const url=method==='GET'&&c.hash&&c.version>0?endpoint+'?knownVersion='+encodeURIComponent(c.version):endpoint;
-    const transfer=method==='GET'||Array.isArray(body?.snapshot);
+    const transfer=method==='GET'||Array.isArray(body?.snapshot)||['photos-upload','photos-migrate'].includes(body?.action);
     let r;
     try{r=await fetch(url,{method,headers:{Authorization:'Bearer '+c.token,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,clientVersion:2})}:{}),signal:AbortSignal.timeout(transfer?120000:body?.action==='files-upload'?90000:20000)});}
     catch(e){if(e.name==='TimeoutError'||e.name==='AbortError')throw new Error('云端同步超时，照片较多时可能需要更长时间。资料仍保留在本机，请保持页面打开，稍后点「检查同步」重试。');throw e;}
     if(r.status===401)throw Object.assign(new Error('Google 验证已过期，请重新点上方 Google 登录。资料仍保留在本机。'),{code:401});
     if(r.status===426)throw new Error('同步版本已更新，请先下载本机备份，再刷新网页。');
     if(r.status===409)throw Object.assign(new Error('另一台设备已更新，请选择要保留的版本。'),{code:409});
-    if(r.status===413)throw new Error('本机行程连同照片超过云端的12MB上限，尚未上传。请先下载本机备份，再整理较大的照片后重试。');
+    if(body?.action?.startsWith('photos-')&&!r.ok){let message;try{message=(await r.json()).error}catch{}throw Object.assign(new Error(message||'照片暂未上传，原照片保留，请稍后重试。'),{name:'PhotoUploadError'});}
+    if(r.status===413)throw new Error('行程文字与链接超过12MB上限，尚未上传。请先下载本机备份，再分开保存行程。');
     if(body?.action?.startsWith('files-')&&!r.ok){let message;try{message=(await r.json()).error}catch{}throw new Error(message||'文件操作暂未完成，请稍后重试。');}
     if(body?.action==='lookup'&&!r.ok)throw new Error('公开资料暂不可用，可以继续手动填写，稍后再查。');
     if(!r.ok)throw new Error('云端暂不可用，修改仍保留在本机。稍后点「检查同步」重试。');
@@ -39,6 +40,18 @@
     try{data=await r.json();}catch(e){if(e.name==='TimeoutError'||e.name==='AbortError')throw new Error('云端照片下载超时，资料仍保留在本机。请保持页面打开，稍后点「检查同步」重试。');throw e;}
     if(data.sessionExpiresAt&&session?.token===c.token){session.exp=Date.parse(data.sessionExpiresAt)/1000;try{localStorage.setItem('orbis-account-session',JSON.stringify(session))}catch{}}
     return data;
+  }
+  async function preparePhotos(c){
+    if(!window.OrbisPhotos)return;
+    const before=snapshot(),beforeHash=await hash(before);
+    const result=await window.OrbisPhotos.prepare(before,(done,total)=>{if(current(c))say(`正在迁移照片 ${done}/${total}…`)});
+    if(!current(c)||!result.map.size)return;
+    // Keep a recovery copy before replacing local image bytes with durable links.
+    await recovery('put','photos:'+c.sub,snapshot());if(!current(c))return;
+    const normalizedHash=await hash(result.snapshot);if(!current(c))return;
+    window.OrbisPhotos.commit(result.map,c.owner);
+    if(c.hash===beforeHash)c.hash=normalizedHash;
+    if(c.savedHash===beforeHash)c.savedHash=normalizedHash;
   }
   async function applyRemote(c){
     if(!current(c)||!Array.isArray(c.cloud?.snapshot))return;
@@ -67,6 +80,12 @@
     if(!c||c.sub!==session.sub||c.owner!==user().id){c={sub:session.sub,owner:user().id,token:session.token,version:0,hash:null,ready:false};ctx=c;try{const meta=JSON.parse(localStorage.getItem('orbis-cloud-meta:'+c.sub)||'null');if(meta){c.version=meta.version;c.hash=meta.hash;c.savedHash=meta.savedHash}}catch{}}
     c.token=session.token;
     try{
+      await preparePhotos(c);if(!current(c))return;
+      if(window.OrbisPhotos&&!c.photosMigrated){
+        let migration;
+        do{migration=await request(c,'POST',{action:'photos-migrate'});if(!current(c))return;}while(migration.pending);
+        c.photosMigrated=true;
+      }
       let cloud=await request(c);if(!current(c))return;
       if(cloud.unchanged===true&&cloud.version===c.version&&c.hash){
         const localHash=await hash(snapshot());if(!current(c))return;
@@ -91,10 +110,11 @@
   }
   async function upload(){
     const c=ctx;if(!c||!current(c)||!c.ready||busy)return;
-    try{await window.TabiWorkspace.flush?.()}catch{say('本机保存未完成，正在尝试保存到云端。')}
-    const data=snapshot(),fingerprint=await hash(data);if(!current(c)||busy||fingerprint===c.hash)return;
     busy=true;say('正在同步…');
     try{
+      try{await window.TabiWorkspace.flush?.()}catch{say('本机保存未完成，正在尝试保存到云端。')}
+      await preparePhotos(c);if(!current(c))return;
+      const data=snapshot(),fingerprint=await hash(data);if(!current(c)||fingerprint===c.hash)return;
       const result=await request(c,'POST',{snapshot:data,version:c.version});if(!current(c))return;
       c.version=result.version;c.hash=fingerprint;saveMeta(c);say('已同步 · '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
       if(await hash(snapshot())!==c.hash)timer=setTimeout(upload,1500);
@@ -120,10 +140,11 @@
       localStorage.setItem('orbis-account-session',JSON.stringify(session));sessionStorage.removeItem('orbis-google-session');ctx=null;
       while(busy)await new Promise(resolve=>setTimeout(resolve,50));await check();
     }catch{say('持续登录未建立，请重新 Google 登录。当前资料仍在本机。');}
-  },files:async(action,payload={})=>{await window.TabiWorkspace.ready;if(!valid())throw new Error('请先用 Google 登录，再上传或打开预订文件。');const owner=state().currentUserId,token=session.token,result=await request({token},'POST',{...payload,action:'files-'+action});if(state().currentUserId!==owner||session?.token!==token)throw new Error('账号已切换，请重新打开文件栏目。');return result;},lookup:async query=>{await window.TabiWorkspace.ready;if(!valid())throw new Error('请先用 Google 登录，或继续手动填写。');return (await request({token:session.token},'POST',{action:'lookup',query})).places;},disconnect:()=>{
+  },photos:async(action,payload={})=>{await window.TabiWorkspace.ready;if(!valid())throw Object.assign(new Error('请先用 Google 登录，再上传或查看照片。'),{name:'PhotoUploadError'});const owner=state().currentUserId,token=session.token,result=await request({token},'POST',{...payload,action:'photos-'+action});if(state().currentUserId!==owner||session?.token!==token)throw new Error('账号已切换，原照片保留。');return result;},files:async(action,payload={})=>{await window.TabiWorkspace.ready;if(!valid())throw new Error('请先用 Google 登录，再上传或打开预订文件。');const owner=state().currentUserId,token=session.token,result=await request({token},'POST',{...payload,action:'files-'+action});if(state().currentUserId!==owner||session?.token!==token)throw new Error('账号已切换，请重新打开文件栏目。');return result;},lookup:async query=>{await window.TabiWorkspace.ready;if(!valid())throw new Error('请先用 Google 登录，或继续手动填写。');return (await request({token:session.token},'POST',{action:'lookup',query})).places;},disconnect:()=>{
     const previous=session;session=null;ctx=null;clearTimeout(timer);localStorage.removeItem('orbis-account-session');sessionStorage.removeItem('orbis-google-session');
     if(previous?.persistent)request({token:previous.token},'POST',{action:'logout'}).catch(()=>{});
   },getPreviousCopy:async()=>{const sub=user()?.googleId;if(!sub)return null;try{return await recovery('get',sub)}catch{return null}}};
+  window.dispatchEvent?.(new Event('orbis-photos-ready'));
   if(valid()&&!session.persistent)window.OrbisCloud.connect(session.token);else check();
 })();
 

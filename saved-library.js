@@ -235,27 +235,25 @@
   let photoBusy=false;
   photoInput.onchange=async()=>{
     const file=photoInput.files?.[0],p=photoTarget;if(!file||!p||photoBusy)return;
-    photoBusy=true;const previous=p.photo,state=window.TabiWorkspace?.state,tripId=state?.currentTripId,trip=state?.trips.find(t=>t.id===state.currentTripId&&t.ownerId===state.currentUserId),tripSaved=trip?.saved;
-    toast('正在处理图片…');
+    photoBusy=true;const previous=p.photo,context=window.OrbisPhotos.context();
+    toast('正在上传图片…');
     try{
-      const image=await readPhoto(file);let saved=false,lastError;
+      const image=await readPhoto(file);let preview;
       for(const [side,quality] of [[960,.72],[800,.65],[640,.58],[480,.5],[320,.45]]){
-        const photo=thumbnail(image,side,quality);if(photo.length>180000&&side>320)continue;
-        try{
-          if(window.TabiWorkspace?.state?.currentTripId!==tripId||!savedPlaces.includes(p))throw photoError('PhotoTargetError','当前地点已变化');
-          p.photo=photo;persistSavedPlaces();
-          if(trip){trip.saved=JSON.parse(JSON.stringify(savedPlaces));if(window.TabiWorkspace.persist()===false)throw photoError('QuotaExceededError','存储空间不足');}
-          saved=true;break;
-        }catch(error){lastError=error;if(!['QuotaExceededError','NS_ERROR_DOM_QUOTA_REACHED'].includes(error?.name))throw error;}
+        preview=thumbnail(image,side,quality);if(preview.length<=180000||side===320)break;
       }
-      if(!saved)throw lastError||photoError('QuotaExceededError','存储空间不足');
-      delete p.photoSource;delete p.photoCredit;persistSavedPlaces();await window.TabiWorkspace?.flush?.();renderSavedPlaces();renderItinerary();toast('图片已保存');
+      const photo=await window.OrbisPhotos.uploadData(preview);
+      if(window.OrbisPhotos.context()!==context||!savedPlaces.includes(p))throw photoError('PhotoTargetError','当前地点已变化');
+      p.photo=photo;
+      if(persistSavedPlaces()===false)throw photoError('QuotaExceededError','存储空间不足');
+      delete p.photoSource;delete p.photoCredit;persistSavedPlaces();await window.TabiWorkspace?.flush?.();
+      renderSavedPlaces();renderItinerary();toast('图片已保存');
     }catch(error){
-      if(previous===undefined)delete p.photo;else p.photo=previous;
-      if(trip)trip.saved=tripSaved;
-      try{persistSavedPlaces();window.TabiWorkspace?.persist();}catch{}
-      const message=error?.name==='PhotoFormatError'?'浏览器无法读取这张图片，请先转换成 JPG 或 PNG。':error?.name==='QuotaExceededError'||error?.name==='NS_ERROR_DOM_QUOTA_REACHED'?'浏览器存储空间不足，图片未保存。已有攻略和图片保留。':error?.name==='PhotoTargetError'?'地点已切换，请重新选择图片。':'图片读取失败，请重新选择 JPG 或 PNG。';
-      toast(message);
+      if(window.OrbisPhotos.context()===context&&savedPlaces.includes(p)){
+        if(previous===undefined)delete p.photo;else p.photo=previous;
+        try{persistSavedPlaces();}catch{}
+      }
+      toast(error?.name==='PhotoFormatError'?'浏览器无法读取这张图片，请先转换成 JPG 或 PNG。':error.message||'图片上传未完成，原图片保留。');
     }finally{photoInput.value='';photoBusy=false;}
   };
   document.querySelector('#library-add-category').onclick=()=>editCategory();

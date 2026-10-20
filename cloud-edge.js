@@ -1,5 +1,6 @@
 import { handleBookingFiles } from './booking-file-service.js';
 import { lookupPlaces } from './place-lookup.js';
+import { photoStore } from './photo-service.js';
 import { createRemoteJWKSet, jwtVerify } from 'npm:jose@6.1.0';
 const keys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
 const audience='410563003589-0gt2acjlughfar1kgsril4dlumgq4ikr.apps.googleusercontent.com';
@@ -61,6 +62,15 @@ export async function handle(req){
       if(!created.ok)throw new Error('Session creation failed');
       return reply({sessionToken:value,account:identity.sub,expiresAt});
     }
+    if(typeof data.action==='string'&&data.action.startsWith('photos-')){
+      try{
+        const photos=await photoStore({base,headers:dbHeaders,sub:identity.sub});
+        if(data.action==='photos-upload')return reply(await photos.upload(data.data));
+        if(data.action==='photos-sign')return reply(await photos.sign(data.urls));
+        if(data.action==='photos-migrate')return reply(await photos.migrate());
+        return reply({error:'未知照片操作。'},400);
+      }catch(error){return reply({error:error.status?error.message:'照片服务暂不可用，原照片保留。'},error.status||503);}
+    }
     if(typeof data.action==='string'&&data.action.startsWith('files-')){
       try{return reply(await handleBookingFiles(data,{base,headers:dbHeaders,sub:identity.sub}));}catch(error){return reply({error:error.status?error.message:'文件服务暂不可用，请稍后重试。'},error.status||503);}
     }
@@ -74,9 +84,14 @@ export async function handle(req){
     }
     if(data.clientVersion!==2)return reply({error:'Please update the app before syncing'},426);
     if(!Number.isSafeInteger(data.version)||data.version<0||!Array.isArray(data.snapshot)||data.snapshot.length>200||data.snapshot.some(t=>!t||typeof t.id!=='string'||typeof t.name!=='string'||!Array.isArray(t.days)||!Array.isArray(t.hotels)||t.days.some(d=>!d||!Array.isArray(d.items))))return reply({error:'Invalid workspace'},400);
+    // Older clients may still send embedded images. Normalize them as well, so
+    // a stale open tab cannot reintroduce photo bytes into cloud workspaces.
+    let linked;
+    try{linked=(await (await photoStore({base,headers:dbHeaders,sub:identity.sub})).externalize(data.snapshot)).snapshot;}
+    catch(error){return reply({error:error.status?error.message:'照片上传未完成，原资料保留。'},error.status||503);}
     // Raw bytes avoid repeated large JSON extraction in PostgREST. The server-only
     // adapter parses once and calls the existing atomic, version-checked save.
-    const r=await fetch(`${base}/rest/v1/rpc/orbis_save_workspace_raw`,{method:'POST',headers:{...dbHeaders,'Content-Type':'application/octet-stream'},body:JSON.stringify({p_sub:identity.sub,p_snapshot:data.snapshot,p_version:data.version}),signal:AbortSignal.timeout(45000)});
+    const r=await fetch(`${base}/rest/v1/rpc/orbis_save_workspace_raw`,{method:'POST',headers:{...dbHeaders,'Content-Type':'application/octet-stream'},body:JSON.stringify({p_sub:identity.sub,p_snapshot:linked,p_version:data.version}),signal:AbortSignal.timeout(45000)});
     if(!r.ok)throw new Error('Database unavailable');
     const saved=await r.json();return saved?reply(saved):reply({error:'Another device changed this workspace'},409);
   }catch{return reply({error:'Cloud unavailable; keep your local copy'},503);}

@@ -1,8 +1,13 @@
-const CACHE_NAME = 'tabi-app-shell-v52-photo-sync';
+const CACHE_NAME = 'tabi-app-shell-v53-photo-links';
 const APP_SHELL = [
   './',
   './index.html',
-  './app.js',
+  './app.js?v=20261020-photo-links',
+  './photo-links.js?v=20261020-photo-links',
+  './cloud-sync.js?v=20261020-photo-links',
+  './workspace.js?v=20261020-photo-links',
+  './saved-library.js?v=20261020-photo-links',
+  './account-backup.js?v=20261020-photo-links',
   './booking-files.js?v=20261020-booking-files',
   './route-order.js?v=20261014-route-organiser',
   './route-assistant.js?v=20261014-route-organiser',
@@ -41,7 +46,7 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
+  if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) return;
   event.respondWith(fetch(event.request).then(response => {
     if (response.ok && new URL(event.request.url).origin === self.location.origin) {
       const copy = response.clone();

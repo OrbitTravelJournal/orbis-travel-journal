@@ -92,7 +92,7 @@
   }
   function escapeHtml(value){return String(value||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
   async function encodeShareTrip(trip){
-    const json=JSON.stringify({...trip,id:undefined,ownerId:undefined,travelInfo:undefined,status:'upcoming',sharedAt:Date.now()},(key,value)=>typeof value==='string'&&value.startsWith('data:image/')?undefined:value);
+    const json=JSON.stringify({...trip,id:undefined,ownerId:undefined,travelInfo:undefined,status:'upcoming',sharedAt:Date.now()},(key,value)=>typeof value==='string'&&(value.startsWith('data:image/')||window.OrbisPhotos?.isPrivate(value))?undefined:value);
     const bytes=new TextEncoder().encode(json);
     if(typeof CompressionStream==='undefined')return btoa(unescape(encodeURIComponent(json))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
     const compressed=new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer());

@@ -1,5 +1,43 @@
 # Orbis account sync
 
+## Private photo links
+
+`photo-service.js` stores uploads in the private `orbis-trip-photos` bucket.
+Every image is addressed by SHA-256 of its bytes under a SHA-256 account folder;
+repeated uses of one image share one object. The workspace stores permanent
+private object URLs. `photo-links.js` resolves them to one-hour signed URLs for
+images and ambient backgrounds in memory only. Signed URLs never enter saved
+trips, cloud fingerprints, share links or localStorage. Account changes clear
+the URL cache. External HTTPS image links remain links and are not downloaded.
+
+New hotel, itinerary, saved-place and journal uploads finish before a link is
+saved. Each photo may be up to 8 MiB; their combined size is no longer part of
+the 12 MiB workspace request limit. Local-only profiles need Google sign-in to
+upload private photos. Failed uploads retain the previous image. Uploaded
+objects are retained when a card is removed so older backups can still recover
+them; storage consumption remains subject to the project's existing plan.
+
+On a verified device's next sync, existing embedded images are uploaded and
+replaced with links in both account state and active legacy view arrays. An
+IndexedDB recovery copy is written first. Cloud migration retains each original
+snapshot in private `orbis-workspace-backups` storage before changing a version,
+and applies batches using the existing version-conditional RPC. Concurrent edits
+are never overwritten. Older clients' uploads are also normalized server-side.
+
+Downloaded JSON backups remain self-contained: the export operation retrieves
+private image bytes into the download without changing the saved workspace.
+Importing them uploads image bytes before committing copied trips. Private
+photo URLs are omitted from public trip-sharing links, matching the previous
+behavior for embedded images. No new public Storage policy or table grant is
+introduced.
+
+Deploy `photo-storage.sql`, then the Edge Function including `photo-service.js`,
+then the frontend assets. The new frontend needs a refresh on each device. Tests
+cover migration, duplicates, privacy, failures, account changes, edits in flight,
+and the existing synchronization behavior. Live tests verify original image
+bytes, signed/unsigned access, consecutive automatic edits between two clients,
+portable backups and desktop/mobile rendering with a synthetic account.
+
 ## Large photo workspace repair (2026-10-20)
 
 Normal polling sends `knownVersion` once the browser has a trusted cloud fingerprint.
