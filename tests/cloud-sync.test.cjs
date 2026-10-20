@@ -12,7 +12,7 @@ const json=(v,status=200)=>new Response(JSON.stringify(v),{status});
 function backend(initial){
   let row=initial?structuredClone(initial):null;
   const calls=[];
-  const context={Request,Response,URL,TextEncoder,crypto:webcrypto,AbortSignal,
+  const context={Request,Response,URL,TextEncoder,TextDecoder,Uint8Array,atob,btoa,crypto:webcrypto,AbortSignal,
     Deno:{env:{get:key=>key==='SUPABASE_URL'?'https://db.example':'server-secret'},serve(){}},
     createRemoteJWKSet:()=>({}),jwtVerify:async()=>{throw Error('invalid')},
     async fetch(url,options={}){
@@ -42,7 +42,7 @@ function backend(initial){
       return json(q.get('select')==='version,updated_at'?[{version:row.version,updated_at:row.updated_at}]:[row]);
     }};
   const src=fs.readFileSync(path.join(root,'cloud-edge.js'),'utf8').replace(/^import .*;\n/gm,'').replace('export async function handle','async function handle');
-  vm.createContext(context);vm.runInContext(src,context);
+  vm.createContext(context);vm.runInContext(fs.readFileSync(path.join(root,'photo-service.js'),'utf8').replace('export async function photoStore','async function photoStore'),context);vm.runInContext(src,context);
   const request=(method='GET',data,query='',token='orbis_'+'a'.repeat(64))=>context.handle(new Request('https://sync.example/'+query,{method,headers:{Authorization:'Bearer '+token,Origin:'https://orbittraveljournal.github.io',...(data?{'Content-Type':'application/json'}:{})},...(data?{body:JSON.stringify(data)}:{})}));
   return {request,calls,row:()=>row};
 }

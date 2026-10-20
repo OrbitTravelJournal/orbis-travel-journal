@@ -119,13 +119,14 @@
     <dialog id="workspace-import-dialog"><form id="workspace-import-form"><button type="button" class="close-modal" id="workspace-import-close" aria-label="Close">×</button><p class="eyebrow">SHARED JOURNEY</p><h2 id="workspace-import-title">A trip to add.</h2><p class="calendar-copy" id="workspace-import-copy">This shared journey will be copied into your account. Your existing trips stay unchanged.</p><div class="workspace-import-preview" id="workspace-import-preview"></div><button class="primary-btn" type="submit">Add to my trips</button><button class="cancel-add" type="button" id="workspace-import-cancel">Not now</button></form></dialog>
     <dialog id="workspace-auth-dialog"><form id="workspace-auth-form"><button type="button" id="workspace-auth-close" class="close-modal" aria-label="关闭账号窗口">×</button><p class="eyebrow">WELCOME TO ORBIS</p><h2>Your trips, together.</h2><p class="calendar-copy">Google 登录后可同步行程、收藏和图片；本地档案只保存在这台设备。</p><button class="glass-button workspace-google-button" type="button" id="workspace-google-sign-in">Continue with Google</button><div class="workspace-auth-divider"><span>or use a local profile</span></div><label>Your name<input id="workspace-auth-name" placeholder="e.g. Ivan Lei" /></label><label>Email<input id="workspace-auth-email" type="email" placeholder="you@example.com" /></label><button class="primary-btn" type="submit">Enter my workspace</button></form></dialog>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="./app.js?v=20261013-booking-ui"></script>
+    <script src="./photo-links.js?v=20261020-photo-links"></script>
+    <script src="./app.js?v=20261020-photo-links"></script>
     <script>
       // Google Identity Services OAuth client for the personal Orbis workspace.
       // This identifier is safe to expose in a browser; keep API secrets server-side.
       window.TABI_GOOGLE_CLIENT_ID = '410563003589-0gt2acjlughfar1kgsril4dlumgq4ikr.apps.googleusercontent.com';
     </script>
-    <script src="./workspace.js?v=20261014-sync-recovery"></script>
+    <script src="./workspace.js?v=20261020-photo-links"></script>
     <script src="./trip-scope.js?v=20261014-library-sync"></script>
     <script src="./layout-adjustments.js?v=20260803-itinerary-recommendations-bottom"></script>
     <link rel="stylesheet" href="./stop-editor.css?v=20261012" />
@@ -161,7 +162,7 @@
       })();
     </script>
     <script src="./travel-info.js?v=20261013-flight-name"></script>
-    <script src="./saved-library.js?v=20261020-shop-category"></script>
+    <script src="./saved-library.js?v=20261020-photo-links"></script>
     <script src="./hotel-card-tools.js?v=20261014-hotel-actions"></script>
     <script src="./meal-cards.js?v=20261019-meal-photos"></script>
     <script src="./booking-files.js?v=20261020-booking-files"></script>
@@ -169,8 +170,8 @@
     <script>if(!document.getElementById("journey-aura")){const aura=document.createElement("div");aura.id="journey-aura";aura.setAttribute("aria-hidden","true");document.body.prepend(aura);}</script>
     <script src="./emoji-ui.js?v=20261020-booking-files"></script>
     <script src="./account-isolation.js?v=20261020-booking-files"></script>
-    <script src="./account-backup.js?v=20261014-cloud"></script>
-    <script src="./cloud-sync.js?v=20261020-photo-sync"></script>
+    <script src="./account-backup.js?v=20261020-photo-links"></script>
+    <script src="./cloud-sync.js?v=20261020-photo-links"></script>
     <script src="./route-order.js?v=20261014-route-organiser"></script>
     <script src="./route-assistant.js?v=20261014-route-organiser"></script>
     <script>if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));</script>
