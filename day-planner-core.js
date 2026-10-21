@@ -1,0 +1,32 @@
+/* Free Google Maps links and transport presentation, shared with tests. */
+(() => {
+  const point=v=>window.OrbisRouteOrder.coordinate(v);
+  function stop(item,day){
+    const e=item[5]||{},saved=typeof savedPlaces!=='undefined'?savedPlaces.find(p=>p.key===e.savedPlaceKey):null;
+    const coordinates=point(e.routeCoordinates||e.coordinates||saved?.coordinates)||window.OrbisRouteOrder.fromMap(e.map||saved?.map);
+    const map=e.map||saved?.map||'';let mapQuery='',placeId=e.googlePlaceId||saved?.googlePlaceId||'',shortLink=false;
+    try{const u=new URL(map);if(/(^|\.)google\.(com|co\.jp|com\.au)$/.test(u.hostname)){mapQuery=u.searchParams.get('query')||u.searchParams.get('q')||'';placeId ||= u.searchParams.get('query_place_id')||'';if(!mapQuery){const match=u.pathname.match(/\/maps\/place\/([^/]+)/);if(match)mapQuery=decodeURIComponent(match[1].replace(/\+/g,' '));}}shortLink=u.hostname==='maps.app.goo.gl'||u.hostname==='goo.gl';}catch{}
+    const address=mapQuery||[e.place||item[2],e.address||saved?.address,e.city||saved?.city||day.city,e.country||saved?.country||day.country].filter(Boolean).join(', ');
+    return {name:item[2],address,coordinates,placeId,map,needsLocation:shortLink&&!coordinates&&!placeId&&!e.address&&!saved?.address};
+  }
+  const location=p=>p.coordinates?`${p.coordinates.lat},${p.coordinates.lng}`:p.address;
+  function directions(a,b,mode){
+    const q=new URLSearchParams({api:'1',origin:location(a),destination:location(b),travelmode:mode});
+    if(a.placeId)q.set('origin_place_id',a.placeId);if(b.placeId)q.set('destination_place_id',b.placeId);
+    return 'https://www.google.com/maps/dir/?'+q;
+  }
+  const nearby=(p,type='restaurant')=>'https://www.google.com/maps/search/?'+new URLSearchParams({api:'1',query:`${type==='cafe'?'咖啡店':type==='bakery'?'面包甜点':'餐厅 美食'} near ${location(p)}`});
+  function mapLink(raw){
+    const value=String(raw||'').trim().match(/https?:\/\/[^\s<>]+/i)?.[0];if(!value)throw new Error('请粘贴餐厅的 Google Maps 分享链接。');
+    let u;try{u=new URL(value)}catch{throw new Error('地图链接无法识别。')}
+    const h=u.hostname.toLowerCase();
+    if(u.protocol!=='https:'||!(/(^|\.)google\.(com|co\.jp|com\.au)$/.test(h)||h==='maps.app.goo.gl'||h==='goo.gl')||u.username||u.password)throw new Error('请使用 Google Maps 的 HTTPS 链接。');
+    if(h==='goo.gl'&&!u.pathname.startsWith('/maps/'))throw new Error('请使用 Google Maps 分享链接。');
+    return u.href;
+  }
+  function transitTime(value,offset){
+    if(!/^\d{4}-\d\d-\d\dT\d\d:\d\d$/.test(value)||!/^[-+]\d\d:\d\d$/.test(offset))throw new Error('请填写出发日期、时间和时区。');
+    const date=new Date(value+':00'+offset);if(!Number.isFinite(+date))throw new Error('出发时间无法识别。');return date.toISOString();
+  }
+  window.OrbisDayPlannerCore={stop,directions,nearby,mapLink,transitTime};
+})();

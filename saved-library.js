@@ -94,7 +94,7 @@
     openForm('加入日程',`<p>${safe(p.name)}</p><label>选择日期<select name="day">${days.map((d,i)=>`<option value="${i}" ${i===selected?'selected':''}>Day ${i+1} · ${safe(d.iso||d.date)} · ${safe(d.city)}</option>`).join('')}</select></label>${field('计划时间','time','','time',true)}${spec(category(p)).baseType==='Meal'?'<label>用餐安排<select name="mealSlot"><option value="breakfast">早餐</option><option value="lunch">午餐</option><option value="dinner">晚餐</option><option value="other">用餐 / 茶歇</option></select></label>':''}`,data=>{
       const day=days[+data.get('day')],time=String(data.get('time')),kind=spec(category(p)).baseType;if(!day||!time)return;
       const extra={place:p.name,city:p.city||'',country:p.country||'',region:p.region||'',address:p.address||'',map:p.map||'',website:p.website||'',photo:p.photo||'',savedPlaceKey:p.key,libraryCategory:category(p),photoSource:p.photoSource||'',photoCredit:p.photoCredit||'',lookupSource:p.lookupSource||''};
-      if(kind==='Meal')extra.mealSlot=String(data.get('mealSlot'));if(p.coordinates)extra.coordinates=p.coordinates;
+      if(kind==='Meal')extra.mealSlot=String(data.get('mealSlot'));if(p.coordinates)extra.coordinates=p.coordinates;if(p.googlePlaceId)extra.googlePlaceId=p.googlePlaceId;
       const item=[time,kind==='Other'?'Activity':kind,p.name,p.notes||p.description||'','—',extra];
       const at=day.items.findIndex(x=>x[0]>time);day.items.splice(at<0?day.items.length:at,0,item);persistTrip();renderItinerary();dialog.close();toast('已加入所选日期');
     });

@@ -1,5 +1,6 @@
 import { handleBookingFiles } from './booking-file-service.js';
 import { lookupPlaces } from './place-lookup.js';
+import { handlePlanner } from './planner-service.js';
 import { photoStore } from './photo-service.js';
 import { createRemoteJWKSet, jwtVerify } from 'npm:jose@6.1.0';
 const keys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
@@ -73,6 +74,10 @@ export async function handle(req){
     }
     if(typeof data.action==='string'&&data.action.startsWith('files-')){
       try{return reply(await handleBookingFiles(data,{base,headers:dbHeaders,sub:identity.sub}));}catch(error){return reply({error:error.status?error.message:'文件服务暂不可用，请稍后重试。'},error.status||503);}
+    }
+    if(typeof data.action==='string'&&data.action.startsWith('planner-')){
+      try{return reply(await handlePlanner(data,{base,headers:dbHeaders,sub:identity.sub,key:Deno.env.get('GOOGLE_MAPS_API_KEY')}));}
+      catch(error){return reply({error:error.status?error.message:'地图查询暂不可用，请改用 Google Maps。'},error.status||503);}
     }
     if(data.action==='lookup'){
       if(typeof data.query!=='string'||!data.query.trim()||data.query.length>160)return reply({error:'Invalid place name'},400);
