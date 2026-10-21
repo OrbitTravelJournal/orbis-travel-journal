@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tabi-app-shell-v56-inline-maps';
+const CACHE_NAME = 'tabi-app-shell-v57-route-text';
 const APP_SHELL = [
   './',
   './index.html',
@@ -11,7 +11,7 @@ const APP_SHELL = [
   './booking-files.js?v=20261020-booking-files',
   './route-order.js?v=20261014-route-organiser',
   './route-assistant.js?v=20261021-day-planner',
-  './day-planner.css?v=20261021-inline-maps',
+  './day-planner.css?v=20261021-route-text',
   './day-planner-core.js?v=20261021-inline-maps',
   './day-planner.js?v=20261021-inline-maps',
   './schedule.js',

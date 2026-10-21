@@ -20,3 +20,8 @@ html body #day-planner-dialog .planner-rule p{line-height:1.6}
 
 html body #day-planner-dialog .planner-route-map{display:block;width:100%;height:420px;min-height:300px;border:0;border-radius:14px;margin-top:14px;background:#eef2f7}html body #day-planner-dialog .planner-google-result h4{color:#252632!important;font-size:16px;line-height:1.5}html body #day-planner-dialog .planner-links button[aria-pressed=true]{background:#e6ddf4;color:#604986!important;border-color:#c7b8df}.planner-food-controls>div:first-child{grid-column:1/-1}
 @media(max-width:580px){html body #day-planner-dialog .planner-route-map{height:390px}}
+
+/* Keep route instructions readable inside the light dialog under glass themes. */
+html body #day-planner-dialog .planner-google-result :is(p,ol,li){color:#303642!important}
+html body #day-planner-dialog .planner-google-result li::marker{color:#303642!important}
+html body #day-planner-dialog .planner-google-result small{color:#596273!important}
