@@ -37,3 +37,5 @@ html body #day-planner-page .planner-tabs{position:sticky;top:76px;z-index:2;bac
 html body #day-planner-page .planner-leg{padding:22px;grid-template-columns:30px minmax(0,1fr);gap:14px}
 html body #day-planner-page .planner-route-map{height:460px}
 @media(max-width:580px){html body #day-planner-page .planner-leg{padding:16px 10px;gap:8px}html body #day-planner-page .planner-route-map{height:390px}.planner-tabs{top:70px}}
+
+html body #day-planner-page .planner-food-keyword{grid-column:1/-1}html body #day-planner-page #planner-food-map{scroll-margin-top:150px}html body #day-planner-page .planner-food-card.is-map-selected{border-color:#a695c7;background:#eee8f580;box-shadow:0 0 0 2px #a695c733}html body #day-planner-page [data-food-map][aria-pressed=true]{background:#e6ddf4;color:#604986!important}

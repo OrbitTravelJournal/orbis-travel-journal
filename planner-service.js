@@ -30,8 +30,14 @@ export async function handlePlanner(data,{base,headers,sub,key,embedKey,fetcher=
     const point=waypoint({coordinates:data.center}).location?.latLng;if(!point)fail('附近搜索需要已确认的坐标，请先确认地点位置。');
     const radius=Number(data.radius);if(![500,1000,1500].includes(radius))fail('请选择500、1000或1500米搜索范围。');
     const type=['restaurant','cafe','bakery'].includes(data.type)?data.type:'restaurant';
-    const result=await google('places','https://places.googleapis.com/v1/places:searchNearby',{includedTypes:[type],maxResultCount:8,rankPreference:'POPULARITY',languageCode:'zh-CN',locationRestriction:{circle:{center:point,radius}}},'places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.currentOpeningHours,places.attributions');
-    return {places:(result.places||[]).map(p=>({id:p.id,name:text(p.displayName?.text),address:text(p.formattedAddress,300),rating:p.rating,ratingCount:p.userRatingCount,openNow:p.currentOpeningHours?.openNow,attributions:(p.attributions||[]).map(a=>({name:text(a.provider),uri:/^https:\/\//.test(a.providerUri||'')?a.providerUri:''}))}))};
+    if(data.keyword!==undefined&&(typeof data.keyword!=='string'||data.keyword.trim().length>80))fail('搜索关键词请保持在80字以内。');
+    const keyword=text(data.keyword,80),mask='places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.currentOpeningHours,places.attributions';
+    const result=keyword?await google('places','https://places.googleapis.com/v1/places:searchText',{textQuery:keyword,includedType:type,strictTypeFiltering:true,pageSize:20,rankPreference:'RELEVANCE',languageCode:'zh-CN',locationBias:{circle:{center:point,radius}}},mask+',places.location'):await google('places','https://places.googleapis.com/v1/places:searchNearby',{includedTypes:[type],maxResultCount:8,rankPreference:'POPULARITY',languageCode:'zh-CN',locationRestriction:{circle:{center:point,radius}}},mask);
+    // Text Search locationBias is not a hard boundary, so enforce the selected radius.
+    const radians=n=>n*Math.PI/180;
+    const distance=p=>{const l=p.location;if(!l||!Number.isFinite(l.latitude)||!Number.isFinite(l.longitude))return Infinity;const a=Math.sin(radians(l.latitude-point.latitude)/2)**2+Math.cos(radians(point.latitude))*Math.cos(radians(l.latitude))*Math.sin(radians(l.longitude-point.longitude)/2)**2;return 6371000*2*Math.asin(Math.sqrt(Math.min(1,a)));};
+    const places=(result.places||[]).filter(p=>!keyword||distance(p)<=radius).slice(0,8);
+    return {places:places.map(p=>({id:p.id,name:text(p.displayName?.text),address:text(p.formattedAddress,300),rating:p.rating,ratingCount:p.userRatingCount,openNow:p.currentOpeningHours?.openNow,attributions:(p.attributions||[]).map(a=>({name:text(a.provider),uri:/^https:\/\//.test(a.providerUri||'')?a.providerUri:''}))}))};
   }
   if(data.action!=='planner-route')fail('未知地图操作。');
   const origin=waypoint(data.origin),destination=waypoint(data.destination),threshold=Number(data.threshold);
