@@ -51,6 +51,7 @@ export async function handlePlanner(data,{base,headers,sub,key,fetcher=fetch,now
   // Google treats the transit modes as preferences; a returned bus route is still valid.
   const buses=publicRoutes.length?publicRoutes:await routes('TRANSIT',{departureTime:new Date(departure).toISOString(),transitPreferences:{allowedTravelModes:['BUS'],routingPreference:'FEWER_TRANSFERS'}});
   if(buses[0])return {mode:'TRANSIT',preference:'PUBLIC',route:summarize(buses[0])};
-  const drive=(await routes('DRIVE'))[0];
-  return drive?{mode:'DRIVE',route:summarize(drive),note:'未找到此时段的公共交通。驾车路线供打车参考，不含出租车价格或叫车服务。'}:{mode:'NONE',note:'未找到可用路线，请在 Google Maps 核对。'};
+  // An empty response can mean missing provider coverage (notably Japan), not no transit.
+  // Keep public transport first and let the traveller check Maps before choosing a taxi.
+  return {mode:'TRANSIT',preference:'MAPS',note:'Google API 未返回公共交通数据，不代表没有地铁或公交。日本公共交通不在此 API 覆盖范围内，请点击本段「公交 / 地铁优先」在 Google Maps 查看班次；确认不合适后再选择打车。'};
 }

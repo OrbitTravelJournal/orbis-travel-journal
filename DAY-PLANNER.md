@@ -19,3 +19,7 @@ Nearby results are limited to eight and ranked by popularity; rating and current
 `node --test tests/*.test.cjs`
 
 Tests cover link escaping, provider references, restricted share-link import, Japan timezone conversion, walking threshold boundary, rail preference, transit-to-taxi fallback, fail-closed quotas, invalid inputs and bounded Places fields. Browser verification uses an isolated local profile/trip and checks mobile and desktop layout, saving a restaurant link, adding it to a day, persistence after reload and empty days.
+
+## Japan transit coverage
+
+Google Routes API excludes Japanese transit partners (https://developers.google.com/maps/faq#transit_directions_countries). An empty transit response must not imply that there is no public transport. The planner keeps the transit Maps link first and asks the traveller to check schedules before selecting the optional taxi link. Actual walking distance and nearby Places search remain available.
