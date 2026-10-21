@@ -12,19 +12,21 @@
 
   function chooser(day,mealSlot,item){
     const candidates=choices(day,mealSlot),cities=[...new Set(candidates.map(p=>p.city||'区域待填写'))],details=document.createElement('details');details.className='meal-options';
-    details.innerHTML=`<summary>${item?'更换餐厅':'选择餐厅'}</summary>${item?'':`<label class="meal-time-label">用餐时间<input type="time" aria-label="${labels[mealSlot]}时间" required></label>`}<label class="meal-city-filter">城市 / 区域<select aria-label="筛选收藏餐厅城市"><option value="">全部收藏餐厅</option>${cities.map(city=>`<option value="${safe(city)}">${safe(city)}</option>`).join('')}</select></label><div class="meal-choice-rail">${candidates.map((p,i)=>`<article class="meal-choice" data-choice-city="${safe(p.city||'区域待填写')}">${/^https?:\/\/|^data:image\//i.test(p.photo||'')?`<img class="meal-choice-photo" src="${safe(p.photo)}" alt="${safe(p.name)}照片" loading="lazy">`: ''}${p.photo&&/^https:\/\//i.test(p.photoSource||'')?`<a class="meal-photo-credit" href="${safe(p.photoSource)}" target="_blank" rel="noreferrer">${safe(p.photoCredit||'照片来源')} ↗</a>`:''}<small>${safe(p.source)} · ${safe(p.city||'')}</small><b>${safe(p.name)}</b><p>${safe(p.note||'')}</p><a href="${safe(/^https?:\/\//i.test(p.map||'')?p.map:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([p.name,p.address,p.region,p.city,p.country].filter(Boolean).join(', '))}`)}" target="_blank" rel="noreferrer">导航 ↗</a><button type="button" data-meal-choice="${i}">选这家</button></article>`).join('')||'<p class="meal-empty">收藏中还没有餐厅。到收藏地点的餐饮栏添加，即可在这里选择。</p>'}</div>${item?.[5]?.mealOriginal?'<button type="button" class="meal-restore">恢复原安排</button>':''}`;
+    details.innerHTML=`<summary>${item?'更换餐厅':'选择餐厅'}</summary>${item?'':`<label class="meal-time-label">用餐时间（可稍后填写）<input type="time" aria-label="${labels[mealSlot]}时间"></label>`}<label class="meal-city-filter">城市 / 区域<select aria-label="筛选收藏餐厅城市"><option value="">全部收藏餐厅</option>${cities.map(city=>`<option value="${safe(city)}">${safe(city)}</option>`).join('')}</select></label><div class="meal-choice-rail">${candidates.map((p,i)=>`<article class="meal-choice" data-choice-city="${safe(p.city||'区域待填写')}">${/^https?:\/\/|^data:image\//i.test(p.photo||'')?`<img class="meal-choice-photo" src="${safe(p.photo)}" alt="${safe(p.name)}照片" loading="lazy">`: ''}${p.photo&&/^https:\/\//i.test(p.photoSource||'')?`<a class="meal-photo-credit" href="${safe(p.photoSource)}" target="_blank" rel="noreferrer">${safe(p.photoCredit||'照片来源')} ↗</a>`:''}<small>${safe(p.source)} · ${safe(p.city||'')}</small><b>${safe(p.name)}</b><p>${safe(p.note||'')}</p><a href="${safe(/^https?:\/\//i.test(p.map||'')?p.map:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([p.name,p.address,p.region,p.city,p.country].filter(Boolean).join(', '))}`)}" target="_blank" rel="noreferrer">导航 ↗</a><button type="button" data-meal-choice="${i}">选这家</button></article>`).join('')||'<p class="meal-empty">收藏中还没有餐厅。到收藏地点的餐饮栏添加，即可在这里选择。</p>'}</div>${item?.[5]?.mealOriginal?'<button type="button" class="meal-restore">恢复原安排</button>':''}`;
     details.querySelectorAll('.meal-choice-photo').forEach(img=>img.addEventListener('error',()=>img.remove()));
     details.querySelector('.meal-city-filter select').onchange=e=>{details.querySelectorAll('.meal-choice').forEach(card=>card.hidden=!!e.target.value&&card.dataset.choiceCity!==e.target.value);};
     details.querySelectorAll('[data-meal-choice]').forEach(button=>button.onclick=()=>{
+      if(button.disabled)return;
       const time=details.querySelector('input');if(time&&!time.reportValidity())return;
       const p=candidates[+button.dataset.mealChoice];
       if(item&&normalize(item[2])===normalize(p.name)){details.open=false;return;}
+      button.disabled=true;
       const original=item?(item[5]?.mealOriginal||JSON.parse(JSON.stringify(item))):null;
       const extra={...(item?.[5]||{}),mealSlot,place:p.name,city:p.city||area(day),region:p.region||'',savedPlaceKey:p.key||'',libraryCategory:window.OrbisSavedLibrary?.category(p)||'Meal',country:p.country||day.country||'',address:p.address||'',map:p.map||'',website:p.website||'',photo:p.photo||'',photoSource:p.photoSource||'',photoCredit:p.photoCredit||'',lookupSource:p.lookupSource||''};
       delete extra.coordinates;delete extra.routeCoordinates;delete extra.locationKey;delete extra.booked;delete extra.bookingStatus;
       if(p.coordinates)extra.coordinates=p.coordinates;if(original)extra.mealOriginal=original;
       if(item){item[2]=p.name;item[3]=p.note||'';item[5]=extra;}
-      else{const next=[time.value,'Meal',p.name,p.note||'',p.duration||'—',extra];let index=day.items.findIndex(x=>x[0]>time.value);day.items.splice(index<0?day.items.length:index,0,next);}
+      else{const value=time?.value||'',next=[value,'Meal',p.name,p.note||'',p.duration||'—',extra];const index=value?day.items.findIndex(x=>x[0]&&x[0]>value):-1;day.items.splice(index<0?day.items.length:index,0,next);}
       persistTrip();renderItinerary();toast('用餐安排已保存');
     });
     const restore=details.querySelector('.meal-restore');if(restore)restore.onclick=()=>{const original=JSON.parse(JSON.stringify(item[5].mealOriginal));item.splice(0,item.length,...original);persistTrip();renderItinerary();};
@@ -40,13 +42,14 @@
     for(const mealSlot of ['breakfast','lunch','dinner']){
       const meals=day.items.filter(x=>x[1]==='Meal'&&slot(x)===mealSlot),entry=document.createElement('div');entry.className='meal-slot';
       const label=document.createElement('b');label.textContent=labels[mealSlot];entry.append(label);
-      if(meals.length){const note=document.createElement('small');note.textContent=meals.map(x=>`${x[0]} · ${x[2]}`).join(' / ');entry.append(note);}
+      if(meals.length){const note=document.createElement('small');note.textContent=meals.map(x=>`${x[0]||'时间待定'} · ${x[2]}`).join(' / ');entry.append(note);}
       else entry.append(chooser(day,mealSlot,null));slots.append(entry);
     }
     document.querySelector('#timeline').before(picker);
     document.querySelectorAll('#timeline .timeline-item').forEach((row,index)=>{
       const item=day.items[index];if(item?.[1]!=='Meal')return;
       const card=row.querySelector('.item-card');card.classList.add('meal-card');
+      const time=row.querySelector('.item-time');if(time&&!item[0])time.prepend(document.createTextNode('时间待定'));
       const type=card.querySelector('.item-type');if(type)type.textContent=`餐饮 · ${labels[slot(item)]}`;
       card.append(chooser(day,slot(item),item));
     });

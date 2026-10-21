@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tabi-app-shell-v62-compact-tabs';
+const CACHE_NAME = 'tabi-app-shell-v63-meal-selection';
 const APP_SHELL = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ const APP_SHELL = [
   './day-planner.css?v=20261021-compact-tabs',
   './day-planner-core.js?v=20261021-food-keyword',
   './day-planner.js?v=20261021-food-keyword',
+  './meal-cards.js?v=20261021-meal-selection',
   './schedule.js',
   './stop-editor.js',
   './stop-editor.css',
