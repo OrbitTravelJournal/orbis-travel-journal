@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tabi-app-shell-v58-map-page';
+const CACHE_NAME = 'tabi-app-shell-v59-food-centers';
 const APP_SHELL = [
   './',
   './index.html',
@@ -13,7 +13,7 @@ const APP_SHELL = [
   './route-assistant.js?v=20261021-day-planner',
   './day-planner.css?v=20261021-map-page',
   './day-planner-core.js?v=20261021-inline-maps',
-  './day-planner.js?v=20261021-map-page',
+  './day-planner.js?v=20261021-food-centers',
   './schedule.js',
   './stop-editor.js',
   './stop-editor.css',

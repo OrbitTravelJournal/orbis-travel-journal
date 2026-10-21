@@ -33,3 +33,5 @@ Nearby food requests acquire fresh device location with a 15-second timeout and 
 ## Map page consolidation
 
 The map navigation tab now hosts day routes and nearby food directly, replacing the old place preview/list. The itinerary's separate planner button and modal are removed. Food shortcuts lead to this same page. Travellers select walking, public transport, or driving directly in each card; the threshold control and automatic calculation/departure form are removed from the UI. Maps Embed has no departure-time parameter; schedules are checked inside the map. No Routes API call is made when selecting a map mode. Leaving the map page clears live coordinates, results and iframes.
+
+Nearby food now offers current-device and itinerary-stop coordinates. Selecting an itinerary stop never requests geolocation; missing coordinates are reported before a provider call. Changing center invalidates pending location and search responses. Itinerary food shortcuts preselect their own stop.
