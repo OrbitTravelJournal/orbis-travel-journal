@@ -35,17 +35,18 @@
     panel.querySelector('#planner-radius').onchange=foodLinks;
     panel.querySelector('#planner-food-type').onchange=foodLinks;
     panel.querySelector('#planner-nearby-query').onclick=searchFood;
+    panel.querySelector('#planner-food-map-open').onclick=browseFoodMap;
     panel.querySelector('#planner-import').onsubmit=importPlace;
     foodLinks();
     // Small status request only after the user opens this feature. No provider call.
-    window.OrbisCloud?.planner('status').then(result=>{if(!current(stamp))return;configured=result.configured===true;embedKey=typeof result.embedKey==='string'?result.embedKey:'';panel.querySelector('#planner-radius-label').hidden=!configured;panel.querySelector('#planner-nearby-query').hidden=!configured;if(embedKey)message('选择交通方式，直接在本页查看路线；附近美食可按日程地点或当前位置搜索。');}).catch(error=>{if(current(stamp))message(error.message||'地图服务暂不可用，请稍后重新进入地图页。');});
+    window.OrbisCloud?.planner('status').then(result=>{if(!current(stamp))return;configured=result.configured===true;embedKey=typeof result.embedKey==='string'?result.embedKey:'';panel.querySelector('#planner-radius-label').hidden=!configured;panel.querySelector('#planner-nearby-query').hidden=!configured;panel.querySelector('#planner-food-map-open').hidden=!embedKey;if(embedKey)message('选择交通方式，直接在本页查看路线；附近美食可按日程地点或当前位置搜索。');}).catch(error=>{if(current(stamp))message(error.message||'地图服务暂不可用，请稍后重新进入地图页。');});
   }
   function tab(name){panel.querySelector('#planner-routes').hidden=name!=='routes';panel.querySelector('#planner-food').hidden=name!=='food';panel.querySelectorAll('[data-planner-tab]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.plannerTab===name)));}
   function renderRoutes(){
     if(stops.length<2)return '<p>当天至少需要两个景点、餐厅或酒店。你可以先把收藏加入当天。</p>';
     return `<p class="planner-hint">按当前日程顺序出发。点击交通方式即可在本段卡片内查看地图，原有行程不会被改动。</p>${stops.slice(0,-1).map((a,i)=>{const b=stops[i+1];return `<article class="planner-leg"><span class="planner-leg-number">${i+1}</span><div><h3>${safe(a.name)} → ${safe(b.name)}</h3>${links(a,b,i)}<div data-leg-map="${i}"></div></div></article>`;}).join('')}<p class="planner-hint">“打车参考”在此显示驾车路线；实际车费和叫车需到打车平台确认。</p>`;
   }
-  function renderFood(){return `<p>选择日程地点或设备当前位置，查找附近餐厅并加入收藏。</p><div class="planner-food-controls"><label>搜索中心<select id="planner-food-center"><option value="current">当前坐标</option><option value="schedule">日程坐标</option></select></label><label id="planner-food-stop-label" hidden>日程地点<select id="planner-food-stop" aria-label="日程地点">${stops.map((p,i)=>`<option value="${i}">${safe(p.item[0])} · ${safe(p.name)}</option>`).join('')||'<option value="-1">当天暂无日程地点</option>'}</select><span id="planner-stop-coordinates"></span></label><div id="planner-current-center"><span>当前坐标</span><p id="planner-location-status" role="status" aria-live="polite">尚未获取当前位置</p>${button('获取当前位置','id="planner-location-refresh"')}</div><label>想吃什么<select id="planner-food-type"><option value="restaurant">餐厅 / 美食</option><option value="cafe">咖啡店</option><option value="bakery">面包 / 甜点</option></select></label><label id="planner-radius-label" hidden>站内查询范围<select id="planner-radius"><option value="500">500 米</option><option value="1000" selected>1 公里</option><option value="1500">1.5 公里</option></select></label></div><div id="planner-food-links" class="planner-links"></div>${button('在网站内搜索','id="planner-nearby-query" hidden')}<p id="planner-food-status" role="status"></p><div id="planner-food-results"></div><form id="planner-import" class="planner-import"><h3>加入餐厅收藏</h3><label>收藏名称<input name="name" required maxlength="120" placeholder="例如：京都想吃的拉面"></label><label>Google Maps 分享链接<input name="map" required type="text" inputmode="url" autocapitalize="off" placeholder="粘贴 Google Maps 的分享链接"></label><label>自己的备注<textarea name="notes" maxlength="1000" placeholder="想吃什么、预算或预订提醒"></textarea></label><p class="planner-import-status" role="status"></p><button type="submit">♡ 加入我的收藏</button></form>`;}
+  function renderFood(){return `<p>选择日程地点或设备当前位置，查找附近餐厅并加入收藏。</p><div class="planner-food-controls"><label>搜索中心<select id="planner-food-center"><option value="current">当前坐标</option><option value="schedule">日程坐标</option></select></label><label id="planner-food-stop-label" hidden>日程地点<select id="planner-food-stop" aria-label="日程地点">${stops.map((p,i)=>`<option value="${i}">${safe(p.item[0])} · ${safe(p.name)}</option>`).join('')||'<option value="-1">当天暂无日程地点</option>'}</select><span id="planner-stop-coordinates"></span></label><div id="planner-current-center"><span>当前坐标</span><p id="planner-location-status" role="status" aria-live="polite">尚未获取当前位置</p>${button('获取当前位置','id="planner-location-refresh"')}</div><label>想吃什么<select id="planner-food-type"><option value="restaurant">餐厅 / 美食</option><option value="cafe">咖啡店</option><option value="bakery">面包 / 甜点</option></select></label><label id="planner-radius-label" hidden>站内查询范围<select id="planner-radius"><option value="500">500 米</option><option value="1000" selected>1 公里</option><option value="1500">1.5 公里</option></select></label></div><div class="planner-links">${button('搜索附近美食','id="planner-nearby-query" hidden')}${button('在本页地图浏览','id="planner-food-map-open" hidden')}</div><p id="planner-food-status" role="status"></p><div id="planner-food-map"></div><div id="planner-food-results"></div><form id="planner-import" class="planner-import"><h3>加入餐厅收藏</h3><label>收藏名称<input name="name" required maxlength="120" placeholder="例如：京都想吃的拉面"></label><label>Google Maps 分享链接<input name="map" required type="text" inputmode="url" autocapitalize="off" placeholder="粘贴 Google Maps 的分享链接"></label><label>自己的备注<textarea name="notes" maxlength="1000" placeholder="想吃什么、预算或预订提醒"></textarea></label><p class="planner-import-status" role="status"></p><button type="submit">♡ 加入我的收藏</button></form>`;}
   const usingCurrent=()=>panel.querySelector('#planner-food-center').value==='current';
   function anchor(){return usingCurrent()?currentLocation:stops[+panel.querySelector('#planner-food-stop').value]||null;}
   function changeCenter(){locationEpoch++;const control=panel.querySelector('#planner-location-refresh');control.disabled=false;if(!currentLocation){panel.querySelector('#planner-location-status').textContent='尚未获取当前位置';control.textContent='获取当前位置';}foodLinks();}
@@ -54,7 +55,7 @@
     const currentCenter=usingCurrent(),p=anchor();
     panel.querySelector('#planner-current-center').hidden=!currentCenter;panel.querySelector('#planner-food-stop-label').hidden=currentCenter;
     panel.querySelector('#planner-stop-coordinates').textContent=p?.coordinates?`${p.coordinates.lat.toFixed(5)}, ${p.coordinates.lng.toFixed(5)}`:'此地点暂无坐标，可先在路线整理助手确认位置，或改用当前坐标。';
-    panel.querySelector('#planner-food-links').innerHTML=p?(p.needsLocation?link('在地图查看此地点',p.map):link('在 Google Maps 找附近美食',C.nearby(p,panel.querySelector('#planner-food-type').value))):'';
+    panel.querySelector('#planner-food-map').replaceChildren();
     panel.querySelector('#planner-food-results').replaceChildren();panel.querySelector('#planner-food-status').textContent='';
   }
   async function locateFood(){
@@ -88,6 +89,16 @@
     catch(error){if(context===identity()&&savedPlaces.includes(record)){savedPlaces.splice(savedPlaces.indexOf(record),1);persistSavedPlaces();}status.textContent=error.message;}
     finally{b.disabled=false;}
   }
+  async function browseFoodMap(){
+    if(!valid()||!embedKey)return;const stamp=epoch,query=foodEpoch,control=panel.querySelector('#planner-food-map-open'),status=panel.querySelector('#planner-food-status');control.disabled=true;
+    try{
+      const p=usingCurrent()?await locateFood():anchor();if(!p||!current(stamp)||query!==foodEpoch||anchor()!==p)return;
+      if(!p.coordinates){status.textContent='请先确认这个日程地点的坐标，或切换到当前坐标。';return;}
+      const type=panel.querySelector('#planner-food-type').value,radius=+panel.querySelector('#planner-radius').value;
+      panel.querySelector('#planner-food-map').innerHTML=`<iframe class="planner-route-map" title="所选坐标附近的餐厅地图" src="${safe(C.embedNearby(p,type,embedKey,radius))}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe><p class="planner-hint">地图以所选坐标为中心浏览周边店铺；按米筛选和收藏请使用「搜索附近美食」。</p>`;
+    }catch(error){if(current(stamp)&&query===foodEpoch)status.textContent=error.message;}
+    finally{if(current(stamp))control.disabled=false;}
+  }
   async function searchFood(){
     if(!valid()||foodWorking)return;const status=panel.querySelector('#planner-food-status'),stamp=epoch,query=++foodEpoch;
     const control=panel.querySelector('#planner-nearby-query');foodWorking=true;control.disabled=true;
@@ -96,7 +107,7 @@
       if(!p.coordinates){status.textContent='这个日程地点还没有坐标，请先在路线整理助手确认位置，或切换到当前坐标。';return;}
       const queryType=panel.querySelector('#planner-food-type').value,queryRadius=+panel.querySelector('#planner-radius').value;status.textContent=usingCurrent()?'正在搜索当前位置附近的美食…':`正在搜索 ${p.name} 附近的美食…`;
       const value=await window.OrbisCloud.planner('nearby',{center:p.coordinates,radius:queryRadius,type:queryType});if(!current(stamp)||query!==foodEpoch||anchor()!==p||panel.querySelector('#planner-food-type').value!==queryType||+panel.querySelector('#planner-radius').value!==queryRadius)return;if(value.fallback){status.textContent=value.reason;return;}
-      const places=value.places||[];status.textContent=places.length?'按 Google 的人气排序。评分和营业状态仅供当前查询参考。':'这个范围没有找到结果，可以扩大范围或打开地图。';
+      const places=value.places||[];status.textContent=places.length?'按 Google 的人气排序。评分和营业状态仅供当前查询参考。':'这个范围没有找到结果，可以扩大范围或点击「在本页地图浏览」。';
       panel.querySelector('#planner-food-results').innerHTML=`<p class="GMP-attribution" translate="no">Google Maps</p>${places.map((p,i)=>`<article class="planner-food-card"><h3>${safe(p.name)}</h3><p>${safe(p.address)}</p><p>${p.rating?`★ ${safe(p.rating)} · ${safe(p.ratingCount||0)} 条评分`:''} ${p.openNow===true?'· 目前营业':p.openNow===false?'· 目前未营业':''}</p><div class="planner-links">${link('地图详情','https://www.google.com/maps/search/?'+new URLSearchParams({api:'1',query:p.name,query_place_id:p.id}))}${button('♡ 收藏',`data-food-save="${i}" aria-label="收藏${safe(p.name)}"`)}</div>${(p.attributions||[]).map(a=>a.uri?link(safe(a.name),a.uri):`<small>${safe(a.name)}</small>`).join('')}</article>`).join('')}`;
       panel.querySelectorAll('[data-food-save]').forEach(b=>b.onclick=()=>{const p=places[+b.dataset.foodSave],form=panel.querySelector('#planner-import');form.elements.map.value='https://www.google.com/maps/search/?'+new URLSearchParams({api:'1',query:'restaurant',query_place_id:p.id});form.elements.name.placeholder='给这家店起个收藏名';form.scrollIntoView({block:'nearest',behavior:'smooth'});form.elements.name.focus();});
     }catch(error){if(current(stamp)&&query===foodEpoch)status.textContent=error.message;}finally{if(current(stamp)&&query===foodEpoch){foodWorking=false;control.disabled=false;}}

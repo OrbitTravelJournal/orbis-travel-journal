@@ -15,7 +15,11 @@
     if(a.placeId)q.set('origin_place_id',a.placeId);if(b.placeId)q.set('destination_place_id',b.placeId);
     return 'https://www.google.com/maps/dir/?'+q;
   }
-  const nearby=(p,type='restaurant')=>'https://www.google.com/maps/search/?'+new URLSearchParams({api:'1',query:`${type==='cafe'?'咖啡店':type==='bakery'?'面包甜点':'餐厅 美食'} near ${location(p)}`});
+  function embedNearby(p,type,key,radius=1000){
+    const center=point(p?.coordinates);if(!center||!key)throw new Error('请先确认搜索中心坐标。');
+    const q={restaurant:'restaurants',cafe:'cafes',bakery:'bakeries'}[type]||'restaurants';
+    return 'https://www.google.com/maps/embed/v1/search?'+new URLSearchParams({key,q,center:`${center.lat},${center.lng}`,zoom:String(radius<=500?16:radius<=1000?15:14),language:'zh-CN'});
+  }
   function mapLink(raw){
     const value=String(raw||'').trim().match(/https?:\/\/[^\s<>]+/i)?.[0];if(!value)throw new Error('请粘贴餐厅的 Google Maps 分享链接。');
     let u;try{u=new URL(value)}catch{throw new Error('地图链接无法识别。')}
@@ -33,5 +37,5 @@
     if(!/^\d{4}-\d\d-\d\dT\d\d:\d\d$/.test(value)||!/^[-+]\d\d:\d\d$/.test(offset))throw new Error('请填写出发日期、时间和时区。');
     const date=new Date(value+':00'+offset);if(!Number.isFinite(+date))throw new Error('出发时间无法识别。');return date.toISOString();
   }
-  window.OrbisDayPlannerCore={stop,directions,nearby,mapLink,transitTime,embedDirections};
+  window.OrbisDayPlannerCore={stop,directions,embedNearby,mapLink,transitTime,embedDirections};
 })();

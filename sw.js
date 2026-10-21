@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tabi-app-shell-v59-food-centers';
+const CACHE_NAME = 'tabi-app-shell-v60-nearby-search';
 const APP_SHELL = [
   './',
   './index.html',
@@ -12,8 +12,8 @@ const APP_SHELL = [
   './route-order.js?v=20261014-route-organiser',
   './route-assistant.js?v=20261021-day-planner',
   './day-planner.css?v=20261021-map-page',
-  './day-planner-core.js?v=20261021-inline-maps',
-  './day-planner.js?v=20261021-food-centers',
+  './day-planner-core.js?v=20261021-nearby-search',
+  './day-planner.js?v=20261021-nearby-search',
   './schedule.js',
   './stop-editor.js',
   './stop-editor.css',
