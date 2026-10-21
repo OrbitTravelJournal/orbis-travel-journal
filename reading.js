@@ -204,18 +204,7 @@ if (typeof document !== 'undefined') (() => {
       if (removePhoto) actions.append(removePhoto);
     });
   };
-  const baseMap = window.renderMap;
-  window.renderMap = function () {
-    if (!days[selected]) return;
-    if (days[selected].items.length) baseMap();
-    else { document.querySelector('#map-stop-list').textContent = '当天暂无地点'; document.querySelector('#google-map-preview').removeAttribute('src'); }
-    let bar = document.querySelector('#reader-map-day');
-    if (!bar) { bar = document.createElement('div'); bar.id = 'reader-map-day'; document.querySelector('.map-page-head').after(bar); }
-    bar.innerHTML = `<label>当天路线 <select>${days.map((day,index) => `<option value="${index}" ${index === selected ? 'selected' : ''}>Day ${index+1} · ${safe(day.iso || day.date)} · ${safe(day.city)}</option>`).join('')}</select></label><button type="button" class="glass-button">返回当天攻略</button>`;
-    bar.querySelector('select').onchange = event => { selected = +event.target.value; renderItinerary(); renderMap(); };
-    bar.querySelector('button').onclick = () => showPage('itinerary');
-    document.querySelectorAll('.navigate-stop').forEach(link => { link.textContent = '导航 ↗'; });
-  };
+  window.renderMap = function () { window.OrbisDayPlanner?.render(); };
   const baseShow = window.showPage;
   window.showPage = function (page) { if (page === 'trips') renderHome(); baseShow(page); };
   // Reuse the existing bottom navigation, with direct access to home and bookings.
