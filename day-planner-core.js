@@ -24,9 +24,14 @@
     if(h==='goo.gl'&&!u.pathname.startsWith('/maps/'))throw new Error('请使用 Google Maps 分享链接。');
     return u.href;
   }
+  function embedDirections(a,b,mode,key){
+    if(!['walking','transit','driving'].includes(mode)||!key)throw new Error('站内地图尚未连接。');
+    const ref=p=>p.placeId?'place_id:'+p.placeId:location(p);
+    return 'https://www.google.com/maps/embed/v1/directions?'+new URLSearchParams({key,origin:ref(a),destination:ref(b),mode,units:'metric',language:'zh-CN'});
+  }
   function transitTime(value,offset){
     if(!/^\d{4}-\d\d-\d\dT\d\d:\d\d$/.test(value)||!/^[-+]\d\d:\d\d$/.test(offset))throw new Error('请填写出发日期、时间和时区。');
     const date=new Date(value+':00'+offset);if(!Number.isFinite(+date))throw new Error('出发时间无法识别。');return date.toISOString();
   }
-  window.OrbisDayPlannerCore={stop,directions,nearby,mapLink,transitTime};
+  window.OrbisDayPlannerCore={stop,directions,nearby,mapLink,transitTime,embedDirections};
 })();

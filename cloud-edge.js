@@ -76,7 +76,7 @@ export async function handle(req){
       try{return reply(await handleBookingFiles(data,{base,headers:dbHeaders,sub:identity.sub}));}catch(error){return reply({error:error.status?error.message:'文件服务暂不可用，请稍后重试。'},error.status||503);}
     }
     if(typeof data.action==='string'&&data.action.startsWith('planner-')){
-      try{return reply(await handlePlanner(data,{base,headers:dbHeaders,sub:identity.sub,key:Deno.env.get('GOOGLE_MAPS_API_KEY')}));}
+      try{return reply(await handlePlanner(data,{base,headers:dbHeaders,sub:identity.sub,key:Deno.env.get('GOOGLE_MAPS_API_KEY'),embedKey:Deno.env.get('GOOGLE_MAPS_EMBED_API_KEY')}));}
       catch(error){return reply({error:error.status?error.message:'地图查询暂不可用，请改用 Google Maps。'},error.status||503);}
     }
     if(data.action==='lookup'){

@@ -23,3 +23,9 @@ Tests cover link escaping, provider references, restricted share-link import, Ja
 ## Japan transit coverage
 
 Google Routes API excludes Japanese transit partners (https://developers.google.com/maps/faq#transit_directions_countries). An empty transit response must not imply that there is no public transport. The planner keeps the transit Maps link first and asks the traveller to check schedules before selecting the optional taxi link. Actual walking distance and nearby Places search remain available.
+
+## Inline route maps and current location
+
+Set a separate `GOOGLE_MAPS_EMBED_API_KEY` Edge Function secret. This is a browser-visible key: restrict it to Maps Embed API and website referrer `https://orbittraveljournal.github.io/*`. Never reuse `GOOGLE_MAPS_API_KEY`, which remains server-only. Authenticated planner status returns only the dedicated embed key. Route mode buttons load an official directions iframe inside the same card; Embed does not accept the selected departure time, so it must be checked in the map. Japanese transit display remains subject to provider coverage and must be tested.
+
+Nearby food requests acquire fresh device location with a 15-second timeout and at most 30 seconds of cached position. No location request occurs just by opening the dialog. Permission denial clears the old center; late callbacks after close, account/trip/day changes are ignored. Coordinates are not persisted in workspaces.

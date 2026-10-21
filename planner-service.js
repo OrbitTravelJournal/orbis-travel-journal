@@ -14,8 +14,8 @@ function summarize(route){
   const steps=(route.legs||[]).flatMap(l=>l.steps||[]);
   return {distanceMeters:route.distanceMeters??null,durationSeconds:duration(route.duration),steps:steps.map(s=>({mode:s.travelMode,instruction:text(s.navigationInstruction?.instructions,400),distanceMeters:s.distanceMeters??null,durationSeconds:duration(s.staticDuration),...(s.transitDetails?{line:text(s.transitDetails.transitLine?.nameShort||s.transitDetails.transitLine?.name),vehicle:text(s.transitDetails.transitLine?.vehicle?.type),from:text(s.transitDetails.stopDetails?.departureStop?.name),to:text(s.transitDetails.stopDetails?.arrivalStop?.name),departureTime:s.transitDetails.stopDetails?.departureTime,arrivalTime:s.transitDetails.stopDetails?.arrivalTime,stops:s.transitDetails.stopCount}:{} )})),warnings:(route.warnings||[]).map(x=>text(x,400))};
 }
-export async function handlePlanner(data,{base,headers,sub,key,fetcher=fetch,now=Date.now()}){
-  if(data.action==='planner-status')return {configured:!!key,limits:{routes:500,places:300}};
+export async function handlePlanner(data,{base,headers,sub,key,embedKey,fetcher=fetch,now=Date.now()}){
+  if(data.action==='planner-status')return {configured:!!key,...(embedKey?{embedKey}:{}),limits:{routes:500,places:300}};
   if(!key)return {fallback:true,reason:'站内查询尚未连接 Google。现在可以免费打开 Google Maps 查看路线和餐厅。'};
   async function google(kind,url,body,mask){
     // Each outbound request reserves a durable global/month + user/day slot. Fail closed.
