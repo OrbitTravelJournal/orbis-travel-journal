@@ -108,14 +108,15 @@
   }
   function routeLink(from, to, day, mode) {
     const endpoint = item => S.coords(item, day)?.join(',') || [item[5]?.place || mapQuery(item, day.city), item[5]?.address, item[5]?.city || day.city, item[5]?.country || day.country].filter(Boolean).join(', ');
-    return `https://www.google.com/maps/dir/?${new URLSearchParams({ api: '1', origin: endpoint(from), destination: endpoint(to), travelmode: mode === 'cycling' ? 'bicycling' : mode === 'auto' ? 'driving' : mode })}`;
+    return `https://www.google.com/maps/dir/?${new URLSearchParams({ api: '1', origin: endpoint(from), destination: endpoint(to), travelmode: !to[5]?.travelMode || to[5].travelMode === 'auto' ? 'transit' : mode === 'cycling' ? 'bicycling' : mode })}`;
   }
   function refreshRecommendations(day) {
     const rows = S.plan(day);
     document.querySelectorAll('#timeline .travel-segment').forEach((segment, index) => {
       const timing = rows[index + 1].travel;
       segment.innerHTML = `<a href="${safe(routeLink(day.items[index], day.items[index + 1], day, timing.mode))}" target="_blank" rel="noreferrer">${timing.minutes == null ? '路程待确认' : `约 ${timing.minutes} 分钟 · ${({walking:'步行',cycling:'骑行',driving:'驾车',transit:'公共交通',auto:'交通'})[timing.mode] || '交通'}`} · 查看路线 ↗</a>`;
-      segment.title = 'Distance-based estimate with a 30% route allowance; confirm the actual route in Maps.';
+      if(!day.items[index+1][5]?.travelMode||day.items[index+1][5].travelMode==='auto')segment.querySelector('a').textContent='路程待确认 · 公交 / 地铁优先 ↗';
+      segment.title = '请在 Google Maps 确认实际距离和班次；自动模式优先公共交通。';
     });
     const apply = document.querySelector('#apply-stop-schedule');
     if (apply) apply.disabled = !rows.length || rows.some(row => row.start == null || row.travel.minutes == null || row.end >= 1440 || row.conflict);
